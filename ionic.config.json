@@ -1,0 +1,7 @@
+{
+  "name": "carrito",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
