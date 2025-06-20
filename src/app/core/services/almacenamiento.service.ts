@@ -562,7 +562,7 @@ export class AlmacenamientoService {
 
         // Restaurar sesiones
         if (respaldo.datos.sesiones && Array.isArray(respaldo.datos.sesiones)) {
-          const sesiones = respaldo.datos.sesiones.map(s => 
+          const sesiones = respaldo.datos.sesiones.map((s: any) => 
             SesionCompra.fromJSON(JSON.stringify(s))
           );
           

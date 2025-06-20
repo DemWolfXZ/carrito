@@ -21,7 +21,7 @@ interface ResultadoValidacion {
   errores: string[];
   advertencias: string[];
   valorSanitizado?: any;
-  nivelSeguridad: 'bajo' | 'medio' | 'alto';
+  nivelSeguridad: 'bajo' | 'medio' | 'alto' | 'crítico';
 }
 
 /**
@@ -398,8 +398,8 @@ export class SeguridadService {
    * @param nombre Nombre del producto
    * @returns ResultadoValidacion Resultado de la validación
    */
-  public validarNombreProducto(nombre: string): ResultadoValidacion {
-    return this.validarEntrada(nombre, 'nombreProducto').pipe().subscribe();
+  public validarNombreProducto(nombre: string): Observable<ResultadoValidacion> {
+    return this.validarEntrada(nombre, 'nombreProducto');
   }
 
   /**
@@ -813,7 +813,7 @@ export class SeguridadService {
     valido: boolean,
     errores: string[],
     advertencias: string[],
-    nivelSeguridad: 'bajo' | 'medio' | 'alto',
+    nivelSeguridad: 'bajo' | 'medio' | 'alto' | 'crítico',
     valorSanitizado?: any
   ): ResultadoValidacion {
     return {
@@ -829,7 +829,7 @@ export class SeguridadService {
    * Determina el nivel de seguridad basado en errores y advertencias
    * @private
    */
-  private determinarNivelSeguridad(errores: string[], advertencias: string[]): 'bajo' | 'medio' | 'alto' {
+  private determinarNivelSeguridad(errores: string[], advertencias: string[]): 'bajo' | 'medio' | 'alto' | 'crítico' {
     if (errores.length > 0) {
       // Verificar si hay errores críticos
       const erroresCriticos = errores.some(error => 
