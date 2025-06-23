@@ -1,10 +1,10 @@
 /**
- * Estilos para el componente de bienvenida optimizado para móviles y tablets
- * Carrusel 3D con espaciado perfecto y banderas diferenciadas por tamaño
- * 100% responsivo para dispositivos móviles
+ * Estilos para el componente de bienvenida con selector de países en grid
+ * Sistema de tarjetas responsivo con SCROLL TÁCTIL OPTIMIZADO
+ * 100% responsivo para dispositivos móviles con navegación táctil perfecta
  * 
  * @author DemWolf
- * @version 1.0
+ * @version 2.1 - Scroll táctil implementado
  */
 
 // Variables de colores y espaciado para móviles
@@ -15,14 +15,22 @@
   --bienvenida-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   --bienvenida-transition: all 0.3s ease;
   
-  // Variables del carrusel optimizado para móviles
-  --carrusel-size: 320px;
-  --carrusel-radius: 180px;
-  --carrusel-item-center-width: 160px;
-  --carrusel-item-center-height: 200px;
-  --carrusel-item-side-width: 100px;
-  --carrusel-item-side-height: 130px;
-  --carrusel-spacing: 80px;
+  // Variables del selector grid con scroll táctil
+  --grid-gap: 12px;
+  --card-min-height: 120px;
+  --card-border-width: 2px;
+  --card-selected-scale: 1.02;
+  
+  // Variables de espaciado vertical PASO 3 - OPTIMIZADO PARA SCROLL
+  --step3-title-height: 80px;
+  --step3-selector-height: auto; // Altura automática para el grid
+  --step3-info-height: 120px;
+  --step3-padding-vertical: 16px;
+  
+  // Variables específicas para scroll táctil
+  --scroll-area-max-height: 300px; // Altura máxima del área de scroll
+  --scrollbar-width: 4px;
+  --scrollbar-thumb-color: var(--ion-color-step-400);
 }
 
 // Contenedor principal de la página
@@ -40,7 +48,7 @@
 }
 
 // ============================
-// SPLASH SCREEN ANIMADO (8 SEGUNDOS)
+// SPLASH SCREEN ANIMADO
 // ============================
 
 .splash-container {
@@ -245,6 +253,18 @@
   }
 }
 
+// Área de contenido con scroll optimizada
+.content-scroll-area {
+  height: calc(100vh - 160px); // Altura fija descontando progress y navegación
+  overflow-y: auto;
+  padding-bottom: 20px; // Espacio adicional al final
+  
+  // CRÍTICO: Scroll suave y táctil optimizado
+  -webkit-overflow-scrolling: touch; // Safari iOS
+  scroll-behavior: smooth;
+  overscroll-behavior: contain; // Prevenir scroll bounce no deseado
+}
+
 // Contenedor principal centrado
 .main-container {
   display: flex;
@@ -276,6 +296,60 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+// ============================
+// LAYOUT OPTIMIZADO PARA PASO 3 - SELECTOR GRID CON SCROLL TÁCTIL
+// ============================
+
+// Layout principal del paso 3 con distribución flex optimizada
+.step3-layout {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px); // Altura total disponible
+  width: 100%;
+  padding: 0 var(--bienvenida-padding);
+}
+
+// Sección de título COMPACTA
+.title-section-compact {
+  flex: 0 0 auto;
+  padding: var(--step3-padding-vertical) 0;
+  
+  .step-title h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--ion-color-dark);
+    line-height: 1.2;
+    
+    @media (prefers-color-scheme: dark) {
+      color: var(--ion-color-light);
+    }
+  }
+  
+  .step-description p {
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--ion-color-medium);
+    margin: 0;
+    padding: 0 8px;
+  }
+}
+
+// Sección del selector grid - OCUPA ESPACIO DISPONIBLE CON SCROLL
+.country-selector-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; // Importante para flex con scroll
+  padding: var(--step3-padding-vertical) 0;
+}
+
+// Sección de información del país en la parte inferior
+.country-info-section-bottom {
+  flex: 0 0 auto;
+  padding-top: var(--step3-padding-vertical);
 }
 
 // ============================
@@ -390,274 +464,328 @@
 }
 
 // ============================
-// PASO 3: CARRUSEL 3D OPTIMIZADO PARA MÓVILES
+// PASO 3: SELECTOR GRID CON SCROLL TÁCTIL PERFECTO
 // ============================
 
-.step-title {
-  h2 {
-    font-size: 22px;
-    font-weight: 600;
-    margin: 0 0 16px 0;
-    color: var(--ion-color-dark);
-    line-height: 1.3;
+// Contenedor principal del selector con scroll táctil optimizado
+.countries-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; // Solo scroll vertical
+  padding: 8px 0;
+  
+  // CRÍTICO: Configuración de scroll táctil para móviles
+  -webkit-overflow-scrolling: touch; // Safari iOS - scroll suave
+  scroll-behavior: smooth; // Scroll suave en navegadores modernos
+  overscroll-behavior-y: contain; // Prevenir scroll bounce vertical
+  overscroll-behavior-x: none; // Sin scroll horizontal
+  
+  // Momentum scrolling para mejor experiencia táctil
+  scrollbar-gutter: stable; // Espacio estable para scrollbar
+  
+  // Estilos del scrollbar para dispositivos que lo soportan
+  &::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--ion-color-step-100);
+    border-radius: calc(var(--scrollbar-width) / 2);
+    margin: 4px 0; // Márgenes arriba y abajo
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-color);
+    border-radius: calc(var(--scrollbar-width) / 2);
+    transition: background-color 0.3s ease;
     
-    @media (prefers-color-scheme: dark) {
-      color: var(--ion-color-light);
+    &:hover {
+      background: var(--ion-color-step-500);
+    }
+    
+    &:active {
+      background: var(--ion-color-step-600);
+    }
+  }
+  
+  // Indicador de scroll en modo oscuro
+  @media (prefers-color-scheme: dark) {
+    &::-webkit-scrollbar-track {
+      background: var(--ion-color-step-200);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: var(--ion-color-step-600);
+      
+      &:hover {
+        background: var(--ion-color-step-700);
+      }
     }
   }
 }
 
-.step-description {
-  p {
-    font-size: 15px;
-    line-height: 1.4;
-    color: var(--ion-color-medium);
-    margin: 0 0 30px 0;
+// Grid de países responsivo con espaciado optimizado para scroll
+.countries-grid {
+  display: grid;
+  gap: var(--grid-gap);
+  padding: 4px;
+  
+  // Grid responsivo según ancho de pantalla
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  
+  @media (max-width: 375px) {
+    grid-template-columns: repeat(2, 1fr); // 2 columnas en móviles pequeños
+    gap: 8px; // Gap más pequeño en pantallas pequeñas
+  }
+  
+  @media (min-width: 376px) and (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr); // 2 columnas en móviles medianos
+    gap: 10px;
+  }
+  
+  @media (min-width: 481px) and (max-width: 768px) {
+    grid-template-columns: repeat(3, 1fr); // 3 columnas en móviles grandes/tablets pequeñas
+    gap: 12px;
+  }
+  
+  @media (min-width: 769px) {
+    grid-template-columns: repeat(4, 1fr); // 4 columnas en tablets grandes
+    gap: 14px;
   }
 }
 
-// Contenedor del carrusel 3D optimizado para móviles
-.carrusel-container {
-  position: relative;
-  width: 100%;
-  max-width: var(--carrusel-size);
-  height: 260px; // Altura fija optimizada para móviles
-  margin: 0 auto 30px;
-  perspective: 800px;
-  perspective-origin: center center;
-}
-
-// Botones de navegación del carrusel
-.carrusel-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 20;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(var(--ion-color-primary-rgb), 0.9);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--bienvenida-transition);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(var(--ion-color-primary-rgb), 0.3);
-  
-  &:hover {
-    background: var(--ion-color-primary);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 20px rgba(var(--ion-color-primary-rgb), 0.4);
-  }
-  
-  &:active {
-    transform: translateY(-50%) scale(0.95);
-  }
-  
-  &.carrusel-nav-left {
-    left: -24px;
-  }
-  
-  &.carrusel-nav-right {
-    right: -24px;
-  }
-  
-  ion-icon {
-    font-size: 24px;
-  }
-}
-
-// Contenedor 3D
-.carrusel-3d {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-}
-
-// Track del carrusel
-.carrusel-track {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  transform-style: preserve-3d;
-  transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-
-// Items del carrusel con espaciado optimizado para móviles
-.carrusel-item {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  background: var(--ion-color-step-50);
-  border-radius: var(--bienvenida-border-radius);
+// Tarjeta de país individual con interacción táctil mejorada
+.country-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
-  border: 2px solid transparent;
-  transform-style: preserve-3d;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 16px 12px;
+  background: var(--ion-color-step-50);
+  border: var(--card-border-width) solid var(--ion-color-step-200);
+  border-radius: var(--bienvenida-border-radius);
+  cursor: pointer;
+  transition: var(--bienvenida-transition);
+  min-height: var(--card-min-height);
+  position: relative;
+  overflow: hidden;
   
-  // Bandera central (activa) - DESTACADA Y CON NOMBRE
-  &.active {
-    width: var(--carrusel-item-center-width);
-    height: var(--carrusel-item-center-height);
-    margin-left: calc(var(--carrusel-item-center-width) / -2);
-    margin-top: calc(var(--carrusel-item-center-height) / -2);
-    padding: 24px 16px;
-    
+  // CRÍTICO: Optimización para touch
+  touch-action: manipulation; // Optimizar para gestos táctiles
+  user-select: none; // Prevenir selección de texto accidental
+  -webkit-touch-callout: none; // Prevenir callout en iOS
+  -webkit-tap-highlight-color: transparent; // Remover highlight azul en tap
+  
+  // Estado normal con hover para desktop
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border-color: var(--ion-color-step-400);
+    }
+  }
+  
+  // Estado de tap para dispositivos táctiles
+  @media (hover: none) and (pointer: coarse) {
+    &:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
+  }
+  
+  // Estado seleccionado
+  &.selected {
     border-color: var(--ion-color-primary);
-    background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.1), rgba(var(--ion-color-secondary-rgb), 0.1));
-    box-shadow: 0 12px 30px rgba(var(--ion-color-primary-rgb), 0.4);
-    transform: translateZ(30px) scale(1.1);
-    z-index: 15;
+    background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.08), rgba(var(--ion-color-secondary-rgb), 0.05));
+    transform: scale(var(--card-selected-scale));
+    box-shadow: 0 8px 30px rgba(var(--ion-color-primary-rgb), 0.25);
+    z-index: 2;
     
-    .pais-bandera {
-      width: 100px;
-      height: 75px;
-      margin-bottom: 16px;
-      
-      .bandera-imagen {
+    // Efecto de brillo sutil
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    
+    // Estado de tap para tarjeta seleccionada
+    @media (hover: none) and (pointer: coarse) {
+      &:active {
+        transform: scale(0.99);
+      }
+    }
+    
+    .country-flag-container {
+      .country-flag {
         border-color: var(--ion-color-primary);
         border-width: 3px;
         box-shadow: 0 4px 20px rgba(var(--ion-color-primary-rgb), 0.3);
       }
     }
     
-    .pais-nombre {
-      opacity: 1;
-      
-      h3 {
+    .country-info {
+      .country-name {
         color: var(--ion-color-primary);
         font-weight: 700;
-        font-size: 16px;
-        margin-bottom: 6px;
       }
       
-      p {
+      .country-currency {
         color: var(--ion-color-dark);
         font-weight: 600;
-        font-size: 12px;
         
         @media (prefers-color-scheme: dark) {
           color: var(--ion-color-light);
         }
       }
     }
-  }
-  
-  // Banderas laterales (no activas) - MÁS PEQUEÑAS Y SIN NOMBRE
-  &:not(.active) {
-    width: var(--carrusel-item-side-width);
-    height: var(--carrusel-item-side-height);
-    margin-left: calc(var(--carrusel-item-side-width) / -2);
-    margin-top: calc(var(--carrusel-item-side-height) / -2);
-    padding: 16px 12px;
     
-    opacity: 0.6;
-    filter: blur(0.5px) brightness(0.8);
-    transform: scale(0.8);
-    
-    &:hover {
-      opacity: 0.8;
-      filter: blur(0px) brightness(0.9);
-      transform: scale(0.85);
-    }
-    
-    .pais-bandera {
-      width: 60px;
-      height: 45px;
-      margin-bottom: 12px;
-      
-      .bandera-imagen {
-        border-width: 1px;
-      }
-    }
-    
-    // OCULTAR NOMBRE EN BANDERAS LATERALES
-    .pais-nombre {
-      opacity: 0;
-      pointer-events: none;
-      transform: scale(0.8);
-    }
-  }
-  
-  .pais-bandera {
-    transition: var(--bienvenida-transition);
-    
-    .bandera-imagen {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 2px solid var(--ion-color-step-300);
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
-      transition: var(--bienvenida-transition);
-    }
-  }
-  
-  .pais-nombre {
-    text-align: center;
-    transition: all 0.8s ease;
-    
-    h3 {
-      font-weight: 600;
-      margin: 0 0 4px 0;
-      color: var(--ion-color-dark);
-      transition: var(--bienvenida-transition);
-      
-      @media (prefers-color-scheme: dark) {
-        color: var(--ion-color-light);
-      }
-    }
-    
-    p {
-      color: var(--ion-color-medium);
-      margin: 0;
-      font-weight: 500;
-      transition: var(--bienvenida-transition);
-    }
-  }
-}
-
-// Indicadores del carrusel
-.carrusel-indicators {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 20px;
-  
-  .indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    border: none;
-    background: var(--ion-color-step-300);
-    cursor: pointer;
-    transition: var(--bienvenida-transition);
-    
-    &.active {
+    // Icono de selección
+    .selection-check {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
       background: var(--ion-color-primary);
-      transform: scale(1.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      animation: checkmarkBounce 0.4s ease-out;
       box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.4);
     }
+  }
+  
+  // Animación de entrada escalonada
+  &:nth-child(1) { animation: cardFadeIn 0.4s ease-out 0.1s both; }
+  &:nth-child(2) { animation: cardFadeIn 0.4s ease-out 0.2s both; }
+  &:nth-child(3) { animation: cardFadeIn 0.4s ease-out 0.3s both; }
+  &:nth-child(4) { animation: cardFadeIn 0.4s ease-out 0.4s both; }
+  &:nth-child(5) { animation: cardFadeIn 0.4s ease-out 0.5s both; }
+  &:nth-child(6) { animation: cardFadeIn 0.4s ease-out 0.6s both; }
+  &:nth-child(7) { animation: cardFadeIn 0.4s ease-out 0.7s both; }
+  &:nth-child(8) { animation: cardFadeIn 0.4s ease-out 0.8s both; }
+  &:nth-child(n+9) { animation: cardFadeIn 0.4s ease-out 0.9s both; }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Contenedor de la bandera
+.country-flag-container {
+  margin-bottom: 12px;
+  
+  .country-flag {
+    width: 60px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: var(--card-border-width) solid var(--ion-color-step-300);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: var(--bienvenida-transition);
     
-    &:hover:not(.active) {
-      background: var(--ion-color-primary);
-      transform: scale(1.3);
+    // Optimización para imágenes de alta densidad
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    
+    // Placeholder mientras carga la imagen
+    background: var(--ion-color-step-100);
+    
+    &[src=""], &:not([src]) {
+      background: linear-gradient(45deg, var(--ion-color-step-100) 25%, transparent 25%), 
+                  linear-gradient(-45deg, var(--ion-color-step-100) 25%, transparent 25%), 
+                  linear-gradient(45deg, transparent 75%, var(--ion-color-step-100) 75%), 
+                  linear-gradient(-45deg, transparent 75%, var(--ion-color-step-100) 75%);
+      background-size: 8px 8px;
+      background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+      animation: loading-stripes 1s linear infinite;
     }
   }
 }
 
-// Información del país seleccionado
+@keyframes loading-stripes {
+  0% {
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  }
+  100% {
+    background-position: 8px 0, 8px 4px, 12px -4px, 4px 0px;
+  }
+}
+
+// Información del país
+.country-info {
+  text-align: center;
+  pointer-events: none; // Prevenir interferencia con tap en la tarjeta
+  
+  .country-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: var(--ion-color-dark);
+    transition: var(--bienvenida-transition);
+    line-height: 1.2;
+    
+    @media (prefers-color-scheme: dark) {
+      color: var(--ion-color-light);
+    }
+  }
+  
+  .country-currency {
+    font-size: 12px;
+    color: var(--ion-color-medium);
+    margin: 0;
+    transition: var(--bienvenida-transition);
+    line-height: 1.2;
+  }
+}
+
+// Icono de selección (check)
+.selection-check {
+  display: none; // Solo visible cuando está seleccionado
+}
+
+@keyframes checkmarkBounce {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Información del país seleccionado optimizada
 .pais-seleccionado {
   width: 100%;
-  margin-top: 30px;
+  margin: 0;
   
   .seleccion-header {
     display: flex;
@@ -737,20 +865,6 @@
         }
       }
     }
-  }
-}
-
-@keyframes checkmarkBounce {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.3);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
   }
 }
 
@@ -1053,6 +1167,7 @@
   align-items: center;
   backdrop-filter: blur(20px);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000; // Asegurar que esté por encima de todo
   
   .nav-spacer {
     flex: 1;
@@ -1103,80 +1218,84 @@
 }
 
 // ============================
-// RESPONSIVE DESIGN PARA MÓVILES Y TABLETS
+// RESPONSIVE DESIGN OPTIMIZADO PARA SCROLL TÁCTIL
 // ============================
 
 // Móviles pequeños (320px - 375px)
 @media (max-width: 375px) {
   :root {
     --bienvenida-padding: 12px;
-    --carrusel-size: 300px;
-    --carrusel-radius: 160px;
-    --carrusel-item-center-width: 140px;
-    --carrusel-item-center-height: 180px;
-    --carrusel-item-side-width: 80px;
-    --carrusel-item-side-height: 110px;
+    --grid-gap: 8px;
+    --card-min-height: 100px;
+    --step3-padding-vertical: 12px;
+    --scroll-area-max-height: 250px; // Altura reducida para móviles pequeños
   }
   
-  .carrusel-container {
-    height: 220px;
-  }
-  
-  .carrusel-nav {
-    width: 40px;
-    height: 40px;
-    
-    &.carrusel-nav-left {
-      left: -20px;
-    }
-    
-    &.carrusel-nav-right {
-      right: -20px;
-    }
-    
-    ion-icon {
+  .title-section-compact {
+    .step-title h2 {
       font-size: 20px;
     }
+    
+    .step-description p {
+      font-size: 14px;
+      padding: 0 4px;
+    }
   }
   
-  .carrusel-item {
-    &.active {
-      padding: 20px 12px;
+  .countries-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 2px; // Menos padding para móviles pequeños
+  }
+  
+  .countries-grid-container {
+    // Altura máxima específica para móviles pequeños
+    max-height: var(--scroll-area-max-height);
+    
+    // Scrollbar más delgado en móviles pequeños
+    &::-webkit-scrollbar {
+      width: 3px;
+    }
+  }
+  
+  .country-card {
+    padding: 12px 8px;
+    min-height: 100px;
+    
+    // Mejorar área de tap para móviles pequeños
+    min-width: 120px;
+    
+    .country-flag-container {
+      margin-bottom: 8px;
       
-      .pais-bandera {
-        width: 80px;
-        height: 60px;
-        margin-bottom: 12px;
-      }
-      
-      .pais-nombre {
-        h3 {
-          font-size: 14px;
-        }
-        
-        p {
-          font-size: 11px;
-        }
+      .country-flag {
+        width: 50px;
+        height: 38px;
       }
     }
     
-    &:not(.active) {
-      padding: 12px 8px;
-      
-      .pais-bandera {
-        width: 50px;
-        height: 38px;
-        margin-bottom: 8px;
+    .country-info {
+      .country-name {
+        font-size: 12px;
+        margin-bottom: 2px;
       }
+      
+      .country-currency {
+        font-size: 10px;
+      }
+    }
+    
+    &.selected .selection-check {
+      width: 20px;
+      height: 20px;
+      top: 6px;
+      right: 6px;
+      font-size: 12px;
     }
   }
   
   .main-title h1 {
     font-size: 24px;
-  }
-  
-  .step-title h2 {
-    font-size: 20px;
   }
   
   .navigation-container {
@@ -1201,46 +1320,88 @@
       display: none;
     }
   }
+  
+  .pais-seleccionado {
+    .seleccion-detalle {
+      padding: 16px;
+      
+      .bandera-seleccionada {
+        width: 60px;
+        height: 45px;
+      }
+      
+      .seleccion-info {
+        h3 {
+          font-size: 16px;
+          margin-bottom: 6px;
+        }
+        
+        p {
+          font-size: 12px;
+          margin-bottom: 2px;
+        }
+      }
+    }
+  }
 }
 
 // Móviles medianos (376px - 414px)
 @media (min-width: 376px) and (max-width: 414px) {
   :root {
-    --carrusel-size: 320px;
-    --carrusel-radius: 170px;
-    --carrusel-item-center-width: 150px;
-    --carrusel-item-center-height: 190px;
-    --carrusel-item-side-width: 90px;
-    --carrusel-item-side-height: 120px;
+    --grid-gap: 10px;
+    --card-min-height: 110px;
+    --scroll-area-max-height: 280px;
   }
   
-  .carrusel-container {
-    height: 240px;
+  .countries-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
   
-  .carrusel-item {
-    &.active {
-      .pais-bandera {
-        width: 90px;
-        height: 68px;
-      }
-      
-      .pais-nombre {
-        h3 {
-          font-size: 15px;
-        }
-        
-        p {
-          font-size: 12px;
-        }
-      }
-    }
+  .countries-grid-container {
+    max-height: var(--scroll-area-max-height);
+  }
+  
+  .country-card {
+    padding: 14px 10px;
+    min-height: 110px;
     
-    &:not(.active) {
-      .pais-bandera {
+    .country-flag-container {
+      margin-bottom: 10px;
+      
+      .country-flag {
         width: 55px;
         height: 41px;
       }
+    }
+    
+    .country-info {
+      .country-name {
+        font-size: 13px;
+        margin-bottom: 3px;
+      }
+      
+      .country-currency {
+        font-size: 11px;
+      }
+    }
+    
+    &.selected .selection-check {
+      width: 22px;
+      height: 22px;
+      top: 7px;
+      right: 7px;
+      font-size: 13px;
+    }
+  }
+  
+  .title-section-compact {
+    .step-title h2 {
+      font-size: 21px;
+    }
+    
+    .step-description p {
+      font-size: 14px;
     }
   }
 }
@@ -1248,16 +1409,40 @@
 // Móviles grandes (415px - 480px)
 @media (min-width: 415px) and (max-width: 480px) {
   :root {
-    --carrusel-size: 340px;
-    --carrusel-radius: 180px;
-    --carrusel-item-center-width: 160px;
-    --carrusel-item-center-height: 200px;
-    --carrusel-item-side-width: 100px;
-    --carrusel-item-side-height: 130px;
+    --grid-gap: 12px;
+    --card-min-height: 120px;
+    --scroll-area-max-height: 320px;
   }
   
-  .carrusel-container {
-    height: 260px;
+  .countries-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .countries-grid-container {
+    max-height: var(--scroll-area-max-height);
+  }
+  
+  .country-card {
+    padding: 16px 12px;
+    min-height: 120px;
+    
+    .country-flag-container {
+      .country-flag {
+        width: 60px;
+        height: 45px;
+      }
+    }
+    
+    .country-info {
+      .country-name {
+        font-size: 14px;
+      }
+      
+      .country-currency {
+        font-size: 12px;
+      }
+    }
   }
 }
 
@@ -1265,73 +1450,71 @@
 @media (min-width: 481px) and (max-width: 768px) {
   :root {
     --bienvenida-padding: 20px;
-    --carrusel-size: 400px;
-    --carrusel-radius: 220px;
-    --carrusel-item-center-width: 180px;
-    --carrusel-item-center-height: 220px;
-    --carrusel-item-side-width: 120px;
-    --carrusel-item-side-height: 150px;
+    --grid-gap: 14px;
+    --card-min-height: 140px;
+    --step3-padding-vertical: 20px;
+    --scroll-area-max-height: 400px;
   }
   
-  .carrusel-container {
-    height: 300px;
+  .countries-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
   }
   
-  .carrusel-nav {
-    width: 56px;
-    height: 56px;
+  .countries-grid-container {
+    max-height: var(--scroll-area-max-height);
     
-    &.carrusel-nav-left {
-      left: -28px;
-    }
-    
-    &.carrusel-nav-right {
-      right: -28px;
-    }
-    
-    ion-icon {
-      font-size: 28px;
+    // Scrollbar un poco más grande para tablets
+    &::-webkit-scrollbar {
+      width: 6px;
     }
   }
   
-  .carrusel-item {
-    &.active {
-      padding: 28px 20px;
-      
-      .pais-bandera {
-        width: 110px;
-        height: 82px;
-        margin-bottom: 18px;
-      }
-      
-      .pais-nombre {
-        h3 {
-          font-size: 17px;
-        }
-        
-        p {
-          font-size: 13px;
-        }
-      }
-    }
+  .country-card {
+    padding: 20px 16px;
+    min-height: 140px;
     
-    &:not(.active) {
-      padding: 18px 14px;
+    .country-flag-container {
+      margin-bottom: 14px;
       
-      .pais-bandera {
+      .country-flag {
         width: 70px;
         height: 52px;
-        margin-bottom: 14px;
       }
+    }
+    
+    .country-info {
+      .country-name {
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      
+      .country-currency {
+        font-size: 13px;
+      }
+    }
+    
+    &.selected .selection-check {
+      width: 26px;
+      height: 26px;
+      top: 10px;
+      right: 10px;
+      font-size: 15px;
+    }
+  }
+  
+  .title-section-compact {
+    .step-title h2 {
+      font-size: 24px;
+    }
+    
+    .step-description p {
+      font-size: 16px;
     }
   }
   
   .main-title h1 {
     font-size: 32px;
-  }
-  
-  .step-title h2 {
-    font-size: 26px;
   }
   
   .features-grid {
@@ -1360,73 +1543,71 @@
   :root {
     --bienvenida-padding: 24px;
     --bienvenida-max-width: 500px;
-    --carrusel-size: 450px;
-    --carrusel-radius: 250px;
-    --carrusel-item-center-width: 200px;
-    --carrusel-item-center-height: 240px;
-    --carrusel-item-side-width: 140px;
-    --carrusel-item-side-height: 170px;
+    --grid-gap: 16px;
+    --card-min-height: 160px;
+    --step3-padding-vertical: 24px;
+    --scroll-area-max-height: 450px;
   }
   
-  .carrusel-container {
-    height: 320px;
+  .countries-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
   }
   
-  .carrusel-nav {
-    width: 64px;
-    height: 64px;
+  .countries-grid-container {
+    max-height: var(--scroll-area-max-height);
     
-    &.carrusel-nav-left {
-      left: -32px;
-    }
-    
-    &.carrusel-nav-right {
-      right: -32px;
-    }
-    
-    ion-icon {
-      font-size: 32px;
+    // Scrollbar más visible para tablets grandes
+    &::-webkit-scrollbar {
+      width: 8px;
     }
   }
   
-  .carrusel-item {
-    &.active {
-      padding: 32px 24px;
-      
-      .pais-bandera {
-        width: 120px;
-        height: 90px;
-        margin-bottom: 20px;
-      }
-      
-      .pais-nombre {
-        h3 {
-          font-size: 18px;
-        }
-        
-        p {
-          font-size: 14px;
-        }
-      }
-    }
+  .country-card {
+    padding: 24px 20px;
+    min-height: 160px;
     
-    &:not(.active) {
-      padding: 20px 16px;
+    .country-flag-container {
+      margin-bottom: 16px;
       
-      .pais-bandera {
+      .country-flag {
         width: 80px;
         height: 60px;
-        margin-bottom: 16px;
       }
+    }
+    
+    .country-info {
+      .country-name {
+        font-size: 16px;
+        margin-bottom: 6px;
+      }
+      
+      .country-currency {
+        font-size: 14px;
+      }
+    }
+    
+    &.selected .selection-check {
+      width: 28px;
+      height: 28px;
+      top: 12px;
+      right: 12px;
+      font-size: 16px;
+    }
+  }
+  
+  .title-section-compact {
+    .step-title h2 {
+      font-size: 26px;
+    }
+    
+    .step-description p {
+      font-size: 17px;
     }
   }
   
   .main-title h1 {
     font-size: 36px;
-  }
-  
-  .step-title h2 {
-    font-size: 28px;
   }
   
   .navigation-container {
@@ -1449,92 +1630,218 @@
 }
 
 // ============================
-// ORIENTACIÓN PAISAJE EN MÓVILES
+// ORIENTACIÓN PAISAJE OPTIMIZADA PARA SCROLL TÁCTIL
 // ============================
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .main-container {
-    min-height: calc(100vh - 120px);
-    justify-content: flex-start;
-    padding-top: 20px;
+  :root {
+    --step3-padding-vertical: 8px;
+    --grid-gap: 8px;
+    --card-min-height: 80px;
+    --scroll-area-max-height: 180px; // Muy reducido para paisaje
   }
   
-  .carrusel-container {
-    height: 200px;
-    margin-bottom: 20px;
+  .step3-layout {
+    height: calc(100vh - 120px);
   }
   
-  .carrusel-item {
-    &.active {
-      width: 120px;
-      height: 160px;
-      margin-left: -60px;
-      margin-top: -80px;
-      padding: 16px 12px;
+  .content-scroll-area {
+    height: calc(100vh - 120px);
+  }
+  
+  .title-section-compact {
+    padding: 8px 0;
+    
+    .step-title h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    
+    .step-description p {
+      font-size: 13px;
+      line-height: 1.2;
+    }
+  }
+  
+  .countries-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  
+  .countries-grid-container {
+    max-height: var(--scroll-area-max-height);
+    
+    // Scrollbar muy delgado en paisaje
+    &::-webkit-scrollbar {
+      width: 2px;
+    }
+  }
+  
+  .country-card {
+    padding: 8px 6px;
+    min-height: 80px;
+    
+    .country-flag-container {
+      margin-bottom: 6px;
       
-      .pais-bandera {
-        width: 70px;
-        height: 52px;
-        margin-bottom: 12px;
-      }
-      
-      .pais-nombre {
-        h3 {
-          font-size: 13px;
-        }
-        
-        p {
-          font-size: 10px;
-        }
+      .country-flag {
+        width: 40px;
+        height: 30px;
       }
     }
     
-    &:not(.active) {
-      width: 80px;
-      height: 110px;
-      margin-left: -40px;
-      margin-top: -55px;
-      padding: 12px 8px;
-      
-      .pais-bandera {
-        width: 45px;
-        height: 34px;
-        margin-bottom: 8px;
+    .country-info {
+      .country-name {
+        font-size: 11px;
+        margin-bottom: 2px;
       }
+      
+      .country-currency {
+        font-size: 9px;
+      }
+    }
+    
+    &.selected .selection-check {
+      width: 18px;
+      height: 18px;
+      top: 4px;
+      right: 4px;
+      font-size: 10px;
     }
   }
   
   .navigation-container {
-    padding: 12px var(--bienvenida-padding) calc(12px + env(safe-area-inset-bottom));
+    padding: 8px var(--bienvenida-padding) calc(8px + env(safe-area-inset-bottom));
+    
+    .nav-button {
+      height: 40px;
+      font-size: 14px;
+    }
   }
   
   .progress-container {
-    padding: 16px var(--bienvenida-padding) 12px;
+    padding: 12px var(--bienvenida-padding) 8px;
   }
   
   .features-grid {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     
     .feature-card {
-      padding: 16px;
+      padding: 12px;
+      
+      .feature-icon ion-icon {
+        font-size: 24px;
+      }
+      
+      .feature-content {
+        h3 {
+          font-size: 14px;
+        }
+        
+        p {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+  
+  .pais-seleccionado {
+    .seleccion-detalle {
+      padding: 12px;
+      
+      .bandera-seleccionada {
+        width: 50px;
+        height: 38px;
+      }
+      
+      .seleccion-info {
+        h3 {
+          font-size: 14px;
+          margin-bottom: 4px;
+        }
+        
+        p {
+          font-size: 11px;
+          margin-bottom: 2px;
+        }
+      }
     }
   }
 }
 
 // ============================
-// ACCESIBILIDAD
+// OPTIMIZACIONES ESPECÍFICAS PARA SCROLL TÁCTIL
+// ============================
+
+// Scroll suave para todos los navegadores
+* {
+  scroll-behavior: smooth;
+}
+
+// Optimización para dispositivos táctiles
+@media (hover: none) and (pointer: coarse) {
+  // Área de scroll con mejor comportamiento táctil
+  .countries-grid-container {
+    // Momentum scrolling para iOS
+    -webkit-overflow-scrolling: touch;
+    
+    // Mejor handling de scroll en Android
+    overscroll-behavior: contain;
+    
+    // Scroll más responsivo
+    scroll-snap-type: y proximity;
+  }
+  
+  // Las tarjetas actúan como puntos de snap sutiles
+  .country-card {
+    scroll-snap-align: start;
+    scroll-margin-top: 8px;
+  }
+  
+  // Scrollbar oculto en dispositivos táctiles pero funcional
+  .countries-grid-container::-webkit-scrollbar {
+    width: 2px;
+    background: transparent;
+  }
+  
+  .countries-grid-container::-webkit-scrollbar-thumb {
+    background: rgba(var(--ion-color-step-400-rgb), 0.3);
+    border-radius: 1px;
+  }
+}
+
+// Optimización para dispositivos con mouse
+@media (hover: hover) and (pointer: fine) {
+  .countries-grid-container {
+    // Scrollbar más visible en desktop
+    &::-webkit-scrollbar {
+      width: var(--scrollbar-width);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+      
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// ============================
+// ACCESIBILIDAD Y USABILIDAD
 // ============================
 
 @media (prefers-reduced-motion: reduce) {
   .step-container.fade-in,
   .feature-card,
   .config-summary .summary-item,
-  .carrusel-item {
+  .country-card {
     animation: none;
   }
   
-  .progress-fill,
-  .carrusel-track {
+  .progress-fill {
     transition: none;
   }
   
@@ -1563,8 +1870,17 @@
     animation: none;
   }
   
+  .country-card.selected::before {
+    animation: none;
+  }
+  
+  // Deshabilitar scroll suave si el usuario prefiere menos movimiento
   * {
-    transition: none !important;
+    scroll-behavior: auto;
+  }
+  
+  .countries-grid-container {
+    scroll-behavior: auto;
   }
 }
 
@@ -1583,19 +1899,82 @@
     border-left-width: 6px;
   }
   
-  .carrusel-item.active {
-    border-width: 4px;
+  .country-card {
+    border-width: 3px;
+    
+    &.selected {
+      border-width: 4px;
+    }
   }
   
   .pais-seleccionado .seleccion-detalle {
     border-width: 4px;
   }
   
-  .carrusel-nav {
-    border: 2px solid white;
-  }
-  
   .progress-container {
     border-bottom-width: 3px;
   }
+  
+  // Scrollbar más visible en alto contraste
+  .countries-grid-container::-webkit-scrollbar-thumb {
+    background: var(--ion-color-dark);
+    
+    @media (prefers-color-scheme: dark) {
+      background: var(--ion-color-light);
+    }
+  }
+}
+
+// Modo oscuro específico para el grid selector con scroll
+@media (prefers-color-scheme: dark) {
+  .country-card {
+    background: var(--ion-color-step-100);
+    border-color: var(--ion-color-step-400);
+    
+    &:hover {
+      background: var(--ion-color-step-150);
+      border-color: var(--ion-color-step-500);
+    }
+    
+    &.selected {
+      background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.15), rgba(var(--ion-color-secondary-rgb), 0.08));
+    }
+  }
+  
+  // Scrollbar en modo oscuro
+  .countries-grid-container {
+    &::-webkit-scrollbar-track {
+      background: var(--ion-color-step-200);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: var(--ion-color-step-600);
+      
+      &:hover {
+        background: var(--ion-color-step-700);
+      }
+    }
+  }
+}
+
+// ============================
+// FOCUS PARA NAVEGACIÓN POR TECLADO
+// ============================
+
+// Indicador de focus para navegación por teclado
+.country-card:focus {
+  outline: 3px solid var(--ion-color-primary);
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+// Focus visible solo cuando se navega por teclado
+.country-card:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.country-card:focus-visible {
+  outline: 3px solid var(--ion-color-primary);
+  outline-offset: 2px;
+  z-index: 3;
 }

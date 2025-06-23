@@ -1,15 +1,15 @@
 /**
  * Componente de bienvenida para la configuración inicial única de la aplicación Carrito
- * Incluye splash animado, carrusel 3D de países y configuración profesional
- * Se muestra solo la primera vez que el usuario abre la app
+ * Compatible con Angular 18 + Ionic 8 + Capacitor 7
+ * Sistema de selector grid responsivo - sustituto del carrusel 3D
  * 
  * @author DemWolf
- * @version 1.0
+ * @version 2.0 - Grid Selector Implementado
  */
 
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 // Importar modelos y servicios usando los paths configurados
@@ -18,15 +18,15 @@ import { Pais } from '@core/models/pais.model';
 import { ConfiguracionService } from '@core/services/configuracion.service';
 import { UsuarioService } from '@core/services/usuario.service';
 
+// ✅ Importar ScreenOrientation de Capacitor 7 (ya instalado en tu proyecto)
+import { ScreenOrientation } from '@capacitor/screen-orientation';
+
 @Component({
   selector: 'app-bienvenida',
   templateUrl: './bienvenida.component.html',
   styleUrls: ['./bienvenida.component.scss']
 })
 export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
-
-  // Referencias a elementos del DOM
-  @ViewChild('carruselContainer', { static: false }) carruselContainer!: ElementRef;
 
   // Estados del componente de bienvenida
   private subscriptions: Subscription = new Subscription();
@@ -53,11 +53,6 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   paisesDisponibles: Pais[] = [];
   paisSeleccionado: Pais | null = null;
   
-  // Control del carrusel 3D
-  carruselActivo: boolean = false;
-  indiceCarruselActual: number = 0;
-  rotacionCarrusel: number = 0;
-  
   // Estados de carga y validación
   cargando: boolean = false;
   formularioValido: boolean = false;
@@ -74,6 +69,10 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   pinConfirmacion: string = '';
   mostrarPin: boolean = false;
   mostrarPinConfirmacion: boolean = false;
+
+  // Control de orientación y dispositivo
+  esTablet: boolean = false;
+  esModoVertical: boolean = true;
 
   // Información de la aplicación para el splash
   infoApp = {
@@ -110,7 +109,8 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     private loadingController: LoadingController,
     private toastController: ToastController,
     private configuracionService: ConfiguracionService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private platform: Platform
   ) {}
 
   /**
@@ -118,6 +118,13 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   async ngOnInit(): Promise<void> {
     try {
+      // Detectar tipo de dispositivo
+      await this.detectarTipoDispositivo();
+      
+      // Configurar orientación según el dispositivo
+      await this.configurarOrientacion();
+      
+      // Inicializar componente
       await this.inicializarComponente();
       
       // Iniciar secuencia de splash automático
@@ -132,9 +139,9 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    * Después de que la vista esté inicializada
    */
   ngAfterViewInit(): void {
-    // Configurar carrusel después de que el DOM esté listo
+    // Ya no es necesario configurar carrusel, pero mantenemos para compatibilidad
     setTimeout(() => {
-      this.configurarCarrusel();
+      this.configurarSelectorPaises();
     }, 100);
   }
 
@@ -144,6 +151,66 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     // Cancelar todas las suscripciones para evitar memory leaks
     this.subscriptions.unsubscribe();
+    
+    // Restaurar orientación original si es necesario
+    this.restaurarOrientacion();
+  }
+
+  /**
+   * Detectar tipo de dispositivo (móvil vs tablet)
+   */
+  private async detectarTipoDispositivo(): Promise<void> {
+    const width = this.platform.width();
+    const height = this.platform.height();
+    
+    // Considerar tablet si tiene más de 768px en cualquier dimensión
+    this.esTablet = Math.max(width, height) >= 768;
+    
+    // Detectar orientación actual
+    this.esModoVertical = height > width;
+    
+    console.log(`Dispositivo detectado: ${this.esTablet ? 'Tablet' : 'Móvil'}, Orientación: ${this.esModoVertical ? 'Vertical' : 'Horizontal'}`);
+  }
+
+  /**
+   * Configurar orientación según el tipo de dispositivo usando Capacitor 7
+   */
+  private async configurarOrientacion(): Promise<void> {
+    // Solo aplicar en dispositivos Capacitor reales
+    if (!this.platform.is('capacitor')) {
+      console.log('No es un dispositivo Capacitor, saltando configuración de orientación');
+      return;
+    }
+
+    try {
+      if (!this.esTablet) {
+        // MÓVILES: Forzar orientación vertical usando Capacitor 7 API
+        await ScreenOrientation.lock({ orientation: 'portrait' });
+        console.log('Orientación bloqueada a vertical para móvil');
+      } else {
+        // TABLETS: Permitir ambas orientaciones
+        await ScreenOrientation.unlock();
+        console.log('Orientación libre para tablet');
+      }
+    } catch (error) {
+      console.warn('No se pudo configurar la orientación (esto es normal en el navegador):', error);
+    }
+  }
+
+  /**
+   * Restaurar orientación original
+   */
+  private async restaurarOrientacion(): Promise<void> {
+    if (!this.platform.is('capacitor')) {
+      return;
+    }
+
+    try {
+      await ScreenOrientation.unlock();
+      console.log('Orientación restaurada');
+    } catch (error) {
+      console.warn('No se pudo restaurar la orientación:', error);
+    }
   }
 
   /**
@@ -164,6 +231,58 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Verificar disponibilidad de biometría (simulado por ahora)
     this.datosConfiguracion.biometriaDisponible = await this.verificarBiometria();
+  }
+
+  /**
+   * Configurar selector de países con grid (reemplaza configurarCarrusel)
+   */
+  private configurarSelectorPaises(): void {
+    if (this.paisesDisponibles.length === 0) {
+      console.warn('No hay países disponibles para configurar el selector');
+      return;
+    }
+    
+    // Seleccionar país por defecto (Chile como ejemplo)
+    const paisDefecto = this.paisesDisponibles.find(p => p.codigo === 'CL');
+    if (paisDefecto && !this.paisSeleccionado) {
+      this.seleccionarPais(paisDefecto);
+    }
+    
+    console.log(`Selector de países configurado. ${this.paisesDisponibles.length} países disponibles`);
+  }
+
+  /**
+   * Seleccionar país (reemplaza la lógica del carrusel)
+   */
+  seleccionarPais(pais: Pais): void {
+    // Actualizar país seleccionado
+    this.paisSeleccionado = pais;
+    this.datosConfiguracion.codigoPais = pais.codigo;
+    
+    // Validar selección
+    this.validarSeleccionPais();
+    
+    // Log para debugging
+    console.log(`País seleccionado: ${pais.nombre} (${pais.codigo})`);
+    
+    // Simular vibración táctil en dispositivos móviles
+    this.simularFeedbackTactil();
+  }
+
+  /**
+   * Simular feedback táctil en dispositivos móviles
+   */
+  private simularFeedbackTactil(): void {
+    // Solo en dispositivos móviles reales
+    if (this.platform.is('capacitor') && !this.esTablet) {
+      try {
+        // Usar Haptic Feedback de Capacitor si está disponible
+        // TODO: Implementar con @capacitor/haptics cuando sea necesario
+        console.log('Feedback táctil simulado');
+      } catch (error) {
+        console.log('Feedback táctil no disponible');
+      }
+    }
   }
 
   /**
@@ -190,58 +309,6 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Configurar carrusel 3D de países
-   */
-  configurarCarrusel(): void {
-    if (!this.carruselContainer) return;
-    
-    // Encontrar país por defecto (Chile como ejemplo)
-    const paisDefecto = this.paisesDisponibles.findIndex(p => p.codigo === 'CL');
-    this.indiceCarruselActual = paisDefecto >= 0 ? paisDefecto : 0;
-    
-    // Configurar rotación inicial
-    this.actualizarRotacionCarrusel();
-  }
-
-  /**
-   * Actualizar rotación del carrusel
-   */
-  actualizarRotacionCarrusel(): void {
-    const totalPaises = this.paisesDisponibles.length;
-    const anguloPortItem = 360 / totalPaises;
-    this.rotacionCarrusel = -this.indiceCarruselActual * anguloPortItem;
-    
-    // Actualizar país seleccionado
-    this.onPaisSeleccionado(this.paisesDisponibles[this.indiceCarruselActual].codigo);
-  }
-
-  /**
-   * Navegar a país anterior en el carrusel
-   */
-  paisAnterior(): void {
-    this.indiceCarruselActual = (this.indiceCarruselActual - 1 + this.paisesDisponibles.length) % this.paisesDisponibles.length;
-    this.actualizarRotacionCarrusel();
-  }
-
-  /**
-   * Navegar a país siguiente en el carrusel
-   */
-  paisSiguiente(): void {
-    this.indiceCarruselActual = (this.indiceCarruselActual + 1) % this.paisesDisponibles.length;
-    this.actualizarRotacionCarrusel();
-  }
-
-  /**
-   * Activar carrusel al entrar en el paso de selección de país
-   */
-  activarCarrusel(): void {
-    this.carruselActivo = true;
-    setTimeout(() => {
-      this.configurarCarrusel();
-    }, 100);
-  }
-
-  /**
    * Avanzar al siguiente paso de configuración
    */
   async siguientePaso(): Promise<void> {
@@ -255,9 +322,11 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.pasoActual < this.totalPasos) {
         this.pasoActual++;
         
-        // Activar carrusel si llegamos al paso de selección de país
+        // Configurar selector si llegamos al paso de selección de país
         if (this.pasoActual === 3) {
-          this.activarCarrusel();
+          setTimeout(() => {
+            this.configurarSelectorPaises();
+          }, 100);
         }
       } else {
         // Último paso - completar configuración
@@ -275,11 +344,6 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   pasoAnterior(): void {
     if (this.pasoActual > 2) { // No permitir volver al splash
       this.pasoActual--;
-      
-      // Desactivar carrusel si salimos del paso de país
-      if (this.pasoActual !== 3) {
-        this.carruselActivo = false;
-      }
     }
   }
 
@@ -354,7 +418,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Validar nombre de usuario
+   * Validar nombre de usuario con sanitización y seguridad
    */
   validarNombre(): boolean {
     const nombre = this.datosConfiguracion.nombre.trim();
@@ -386,7 +450,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Validar PIN de seguridad
+   * Validar PIN de seguridad con verificación de patrones
    */
   validarPin(): boolean {
     const pin = this.datosConfiguracion.pin;
@@ -447,20 +511,6 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Manejar selección de país
-   */
-  onPaisSeleccionado(codigoPais: string): void {
-    // Actualizar código de país
-    this.datosConfiguracion.codigoPais = codigoPais;
-    
-    // Encontrar el país seleccionado en la lista
-    this.paisSeleccionado = this.paisesDisponibles.find(pais => pais.codigo === codigoPais) || null;
-    
-    // Validar selección
-    this.validarSeleccionPais();
-  }
-
-  /**
    * Alternar visibilidad del PIN
    */
   toggleMostrarPin(): void {
@@ -486,12 +536,18 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
       });
       await loading.present();
 
+      // Sanitizar datos antes de guardar
+      this.datosConfiguracion.nombre = this.datosConfiguracion.nombre.trim();
+
       // Guardar configuración inicial
       const exito = await this.configuracionService.guardarConfiguracionInicial(this.datosConfiguracion);
 
       await loading.dismiss();
 
       if (exito) {
+        // Restaurar orientación antes de navegar
+        await this.restaurarOrientacion();
+        
         // Mostrar mensaje de éxito
         await this.mostrarExito('¡Configuración completada!', 'Tu cuenta ha sido creada exitosamente');
         
@@ -517,7 +573,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Mostrar mensaje de error
+   * Mostrar mensaje de error con sanitización
    */
   private async mostrarError(mensaje: string): Promise<void> {
     const toast = await this.toastController.create({
@@ -530,7 +586,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Mostrar mensaje de éxito
+   * Mostrar mensaje de éxito con sanitización
    */
   private async mostrarExito(titulo: string, mensaje: string): Promise<void> {
     const alert = await this.alertController.create({
@@ -638,6 +694,35 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
       return `Ejemplo: ${simbolo}1,234`;
     } else {
       return `Formato: ${simbolo}`;
+    }
+  }
+
+  // ============================
+  // MÉTODOS LEGACY PARA COMPATIBILIDAD (ya no se usan pero se mantienen por si acaso)
+  // ============================
+
+  /**
+   * @deprecated - Ya no se usa, el grid no necesita navegación manual
+   */
+  paisAnterior(): void {
+    console.warn('paisAnterior() está deprecated - el grid no necesita navegación manual');
+  }
+
+  /**
+   * @deprecated - Ya no se usa, el grid no necesita navegación manual
+   */
+  paisSiguiente(): void {
+    console.warn('paisSiguiente() está deprecated - el grid no necesita navegación manual');
+  }
+
+  /**
+   * @deprecated - Ya no se usa, reemplazado por seleccionarPais()
+   */
+  onPaisSeleccionado(codigoPais: string): void {
+    console.warn('onPaisSeleccionado() está deprecated - usar seleccionarPais() directamente');
+    const pais = this.paisesDisponibles.find(p => p.codigo === codigoPais);
+    if (pais) {
+      this.seleccionarPais(pais);
     }
   }
 }
