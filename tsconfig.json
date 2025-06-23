@@ -2,18 +2,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "src",
-    "paths": {
-      "@services/*": ["app/services/*"],
-      "@core-services/*": ["app/core/services/*"],
-      "@models/*": ["app/models/*", "app/core/models/*"],
-      "@core-models/*": ["app/core/models/*"],
-      "@guards/*": ["app/core/guards/*"],
-      "@interceptors/*": ["app/core/interceptors/*"],
-      "@pipes/*": ["app/core/pipes/*"],
-      "@shared/*": ["app/shared/*"],
-      "@utils/*": ["app/utils/*"]
-    },
+    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -30,10 +19,18 @@
     "target": "es2022",
     "module": "es2020",
     "lib": [
-      "es2018",
+      "es2018", 
       "dom"
     ],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "paths": {
+      "@core/*": ["src/app/core/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@features/*": ["src/app/features/*"],
+      "@layout/*": ["src/app/layout/*"],
+      "@utils/*": ["src/app/utils/*"],
+      "@env/*": ["src/environments/*"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
