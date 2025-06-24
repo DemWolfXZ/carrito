@@ -1,0 +1,230 @@
+<!--
+  Template de la pantalla principal con saludo, fecha, tabs y publicidad
+  Layout principal de la aplicación después de la configuración inicial
+  Incluye navegación por tabs y sistema de monetización
+  
+  @author DemWolf
+  @version 1.0
+-->
+
+<ion-content [fullscreen]="true" class="pantalla-principal">
+
+  <!-- Loading inicial -->
+  <div *ngIf="cargandoDatos" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <ion-text>
+      <p>Cargando...</p>
+    </ion-text>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!cargandoDatos" class="contenido-principal">
+
+    <!-- Header con saludo y fecha -->
+    <div class="header-saludo">
+      
+      <!-- Icono de la app en esquina superior -->
+      <div class="app-icon">
+        <ion-icon name="basket-outline" color="primary"></ion-icon>
+      </div>
+
+      <!-- Saludo personalizado -->
+      <div class="saludo-container">
+        <ion-text class="saludo-principal">
+          <h1>{{ saludo }}</h1>
+        </ion-text>
+        
+        <!-- Fecha y hora del sistema -->
+        <div class="fecha-hora-container">
+          <ion-text class="fecha-actual">
+            <p>{{ fechaActual }}</p>
+          </ion-text>
+          <ion-text class="hora-actual">
+            <span>{{ horaActual }}</span>
+          </ion-text>
+        </div>
+      </div>
+
+      <!-- Botón de configuración rápida -->
+      <ion-button 
+        fill="clear" 
+        color="medium" 
+        class="btn-config-rapida"
+        routerLink="/tabs/configuraciones">
+        <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+
+    </div>
+
+    <!-- Información rápida de estado (si hay sesión activa) -->
+    <div *ngIf="mostrarTabContinuar && sesionActiva" class="info-sesion-activa">
+      <ion-card class="card-sesion-activa" (click)="irACompraActiva()">
+        <ion-card-content>
+          <div class="sesion-activa-content">
+            <div class="sesion-info">
+              <ion-icon name="basket" color="primary"></ion-icon>
+              <div class="sesion-datos">
+                <h3>{{ sesionActiva.nombreSupermercado }}</h3>
+                <p>{{ sesionActiva.productos.length }} productos - {{ simboloMoneda }}{{ sesionActiva.totales.total.toLocaleString() }}</p>
+              </div>
+            </div>
+            <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Contenedor de tabs principales -->
+    <div class="tabs-container">
+      
+      <!-- Tab especial "Continuar Compra" si hay sesión activa -->
+      <div *ngIf="mostrarTabContinuar" class="tab-continuar-compra">
+        <ion-button 
+          expand="block"
+          color="secondary"
+          class="btn-continuar-compra"
+          (click)="irACompraActiva()">
+          <ion-icon name="basket-outline" slot="start"></ion-icon>
+          {{ textoTabContinuar }}
+          <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Tabs principales usando ion-tabs -->
+      <ion-tabs (ionTabsDidChange)="onCambioTab($event.tab)">
+        
+        <!-- Tab 1: Historial -->
+        <ion-tab-bar slot="bottom" class="tabs-principales">
+          
+          <ion-tab-button tab="historial" class="tab-button">
+            <ion-icon name="receipt-outline"></ion-icon>
+            <ion-label>Historial</ion-label>
+          </ion-tab-button>
+          
+          <!-- Tab 2: Nueva Compra -->
+          <ion-tab-button tab="nueva-compra" class="tab-button">
+            <ion-icon name="add-circle-outline"></ion-icon>
+            <ion-label>Nueva Compra</ion-label>
+          </ion-tab-button>
+          
+          <!-- Tab 3: Configuraciones -->
+          <ion-tab-button tab="configuraciones" class="tab-button">
+            <ion-icon name="settings-outline"></ion-icon>
+            <ion-label>Configuración</ion-label>
+          </ion-tab-button>
+          
+        </ion-tab-bar>
+
+        <!-- Contenido del Tab 1: Historial -->
+        <ion-tab tab="historial">
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Historial de Compras</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+            <div class="tab-content">
+              <!-- Aquí irá el componente de historial -->
+              <ion-text color="medium">
+                <p>📊 Componente de historial se cargará aquí</p>
+              </ion-text>
+            </div>
+          </ion-content>
+        </ion-tab>
+
+        <!-- Contenido del Tab 2: Nueva Compra -->
+        <ion-tab tab="nueva-compra">
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Nueva Compra</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+            <div class="tab-content">
+              <!-- Aquí irá el componente de nueva compra -->
+              <ion-text color="medium">
+                <p>🛒 Componente de nueva compra se cargará aquí</p>
+              </ion-text>
+            </div>
+          </ion-content>
+        </ion-tab>
+
+        <!-- Contenido del Tab 3: Configuraciones -->
+        <ion-tab tab="configuraciones">
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Configuración</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+            <div class="tab-content">
+              <!-- Aquí irá el componente de configuraciones -->
+              <ion-text color="medium">
+                <p>⚙️ Componente de configuraciones se cargará aquí</p>
+              </ion-text>
+            </div>
+          </ion-content>
+        </ion-tab>
+
+      </ion-tabs>
+
+    </div>
+
+    <!-- Banner de publicidad debajo de los tabs -->
+    <div class="banner-publicidad">
+      <div class="banner-content" (click)="onAnuncioVisualizado()">
+        <ion-text color="medium">
+          <small>Publicidad</small>
+        </ion-text>
+        <div class="anuncio-placeholder">
+          <ion-icon name="megaphone-outline" color="medium"></ion-icon>
+          <span>Espacio para banner publicitario</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Burbuja flotante de donación -->
+  <div 
+    *ngIf="mostrarBurbujaDonacion" 
+    class="burbuja-donacion"
+    [@slideInOut]>
+    
+    <div class="burbuja-content">
+      
+      <!-- Botón cerrar -->
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        class="btn-cerrar-burbuja"
+        (click)="cerrarBurbujaDonacion()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+
+      <!-- Icono de corazón -->
+      <div class="icono-donacion">
+        <ion-icon name="heart" color="danger"></ion-icon>
+      </div>
+
+      <!-- Mensaje de donación -->
+      <div class="mensaje-donacion">
+        <h4>¿Te gusta Carrito?</h4>
+        <p>Apóyanos con una pequeña donación</p>
+      </div>
+
+      <!-- Botón donar -->
+      <ion-button 
+        size="small" 
+        color="primary"
+        class="btn-donar"
+        (click)="abrirModalDonacion()">
+        <ion-icon name="heart-outline" slot="start"></ion-icon>
+        Donar
+      </ion-button>
+
+    </div>
+
+  </div>
+
+</ion-content>

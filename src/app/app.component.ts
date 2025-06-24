@@ -1,6 +1,6 @@
 /**
  * Componente raíz de la aplicación Carrito
- * Maneja la inicialización global y configuraciones de la app
+ * Maneja la inicialización global y configuraciones básicas de la app
  * Punto de entrada principal para toda la aplicación
  * 
  * @author DemWolf
@@ -9,10 +9,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
-
-// TODO: Importar servicios cuando estén disponibles
-// import { ConfiguracionService } from '@core/services/configuracion.service';
-// import { UsuarioService } from '@core/services/usuario.service';
 
 @Component({
   selector: 'app-root',
@@ -24,9 +20,6 @@ export class AppComponent implements OnInit {
 
   constructor(
     private platform: Platform
-    // TODO: Inyectar servicios cuando estén disponibles
-    // private configuracionService: ConfiguracionService,
-    // private usuarioService: UsuarioService
   ) {
     // Inicializar configuraciones básicas de la plataforma
     this.inicializarApp();
@@ -50,10 +43,6 @@ export class AppComponent implements OnInit {
       
       console.log('🛒 Aplicación Carrito iniciada correctamente');
       
-      // TODO: Inicializar servicios core cuando estén disponibles
-      // await this.configuracionService.inicializar();
-      // await this.usuarioService.inicializar();
-      
     } catch (error) {
       console.error('Error al inicializar la aplicación:', error);
     }
@@ -66,8 +55,7 @@ export class AppComponent implements OnInit {
     // Detectar preferencia de tema del sistema por defecto
     const prefiereTemaOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    // TODO: Cargar configuración de tema del usuario cuando esté disponible
-    // Por ahora usar tema automático basado en preferencias del sistema
+    // Usar tema automático basado en preferencias del sistema
     document.body.classList.toggle('dark', prefiereTemaOscuro);
     
     // Escuchar cambios en las preferencias del sistema

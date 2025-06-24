@@ -222,7 +222,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     
     if (configuracionCompleta) {
       // Si ya está configurado, redirigir a tabs principales
-      await this.router.navigate(['/tabs']);
+      await this.router.navigate(['/pantalla-principal']);
       return;
     }
 
@@ -527,41 +527,35 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * Completar configuración inicial
    */
-  private async completarConfiguracion(): Promise<void> {
-    try {
-      // Mostrar loading
-      const loading = await this.loadingController.create({
-        message: 'Configurando tu cuenta...',
-        spinner: 'crescent'
-      });
-      await loading.present();
+private async completarConfiguracion(): Promise<void> {
+  try {
+    // Mostrar loading
+    const loading = await this.loadingController.create({
+      message: 'Configurando tu cuenta...',
+      spinner: 'crescent'
+    });
+    await loading.present();
 
-      // Sanitizar datos antes de guardar
-      this.datosConfiguracion.nombre = this.datosConfiguracion.nombre.trim();
+    // Guardar configuración inicial
+    const exito = await this.configuracionService.guardarConfiguracionInicial(this.datosConfiguracion);
 
-      // Guardar configuración inicial
-      const exito = await this.configuracionService.guardarConfiguracionInicial(this.datosConfiguracion);
+    await loading.dismiss();
 
-      await loading.dismiss();
-
-      if (exito) {
-        // Restaurar orientación antes de navegar
-        await this.restaurarOrientacion();
-        
-        // Mostrar mensaje de éxito
-        await this.mostrarExito('¡Configuración completada!', 'Tu cuenta ha sido creada exitosamente');
-        
-        // Redirigir a tabs principales
-        await this.router.navigate(['/tabs']);
-      } else {
-        await this.mostrarError('Error al guardar la configuración. Inténtalo de nuevo.');
-      }
-
-    } catch (error) {
-      console.error('Error al completar configuración:', error);
-      await this.mostrarError('Error inesperado al configurar tu cuenta');
+    if (exito) {
+      // Mostrar mensaje de éxito
+      await this.mostrarExito('¡Configuración completada!', 'Tu cuenta ha sido creada exitosamente');
+      
+      // CAMBIAR ESTA LÍNEA: Redirigir a pantalla principal
+      await this.router.navigate(['/pantalla-principal']);
+    } else {
+      await this.mostrarError('Error al guardar la configuración. Inténtalo de nuevo.');
     }
+
+  } catch (error) {
+    console.error('Error al completar configuración:', error);
+    await this.mostrarError('Error inesperado al configurar tu cuenta');
   }
+}
 
   /**
    * Verificar disponibilidad de biometría (placeholder)

@@ -1,6 +1,6 @@
 /**
  * Módulo principal de la aplicación Carrito
- * Configura los módulos core, importaciones básicas y providers globales
+ * Configura los módulos básicos, core module y providers globales
  * Punto de entrada para toda la aplicación
  * 
  * @author DemWolf
@@ -18,8 +18,8 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-// TODO: Importar módulo core cuando lo creemos
-// import { CoreModule } from '@core/core.module';
+// Importar módulo core con servicios
+import { CoreModule } from './core/core.module';
 
 @NgModule({
   declarations: [
@@ -38,11 +38,11 @@ import { AppComponent } from './app.component';
       animated: true
     }),
     
-    // Módulo de rutas principal
-    AppRoutingModule,
+    // Módulo core con servicios singleton (SOLO UNA VEZ)
+    CoreModule.forRoot(),
     
-    // TODO: Módulo core con servicios singleton
-    // CoreModule.forRoot()
+    // Módulo de rutas principal
+    AppRoutingModule
   ],
   providers: [
     // Configurar estrategia de reutilización de rutas de Ionic
@@ -50,9 +50,6 @@ import { AppComponent } from './app.component';
       provide: RouteReuseStrategy, 
       useClass: IonicRouteStrategy 
     }
-    
-    // TODO: Agregar providers adicionales cuando sea necesario
-    // Interceptores HTTP, guards globales, etc.
   ],
   bootstrap: [
     // Componente que arranca la aplicación

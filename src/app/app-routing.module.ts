@@ -1,7 +1,7 @@
 /**
  * Módulo de rutas principal de la aplicación Carrito
- * Configura la navegación entre bienvenida y tabs principales
- * Incluye lazy loading para optimizar el rendimiento
+ * Configura la navegación entre bienvenida y pantalla principal
+ * Solo incluye rutas que actualmente existen
  * 
  * @author DemWolf
  * @version 1.0
@@ -27,28 +27,21 @@ const routes: Routes = [
     }
   },
   {
-    // Ruta de tabs principales - después de configuración
-    path: 'tabs',
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule),
+    // Ruta de pantalla principal - después de configuración
+    path: 'pantalla-principal',
+    loadChildren: () => import('./layout/layout.module').then(m => m.LayoutModule),
     data: {
       title: 'Carrito - Control de Gastos'
     }
-    // TODO: Agregar guard para verificar que esté configurado
-    // canActivate: [ConfiguracionGuard]
   },
-  /**
-   * {
-   *   // Ruta de compra activa - sesión de compra en progreso
-   *   path: 'compra-activa',
-   *   loadChildren: () => import('./features/compra-activa/compra-activa.module').then(m => m.CompraActivaModule),
-   *   data: {
-   *     title: 'Compra en Progreso'
-   *   }
-   *   // TODO: Agregar guard para verificar que hay sesión activa
-   *   // canActivate: [SesionActivaGuard]
-   * }
-   */
-
+  {
+    // Mantener ruta original de tabs por compatibilidad
+    path: 'tabs',
+    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule),
+    data: {
+      title: 'Tabs Originales'
+    }
+  },
   {
     // Ruta de fallback - cualquier ruta no encontrada
     path: '**',

@@ -1,0 +1,519 @@
+/**
+ * Estilos para la pantalla principal de la aplicación Carrito
+ * Incluye header de saludo, tabs principales, publicidad y burbuja de donación
+ * Diseño responsivo con soporte para modo claro y oscuro
+ * 
+ * @author DemWolf
+ * @version 1.0
+ */
+
+// Variables y constantes
+:root {
+  --header-height: 120px;
+  --tabs-height: 60px;
+  --banner-height: 80px;
+  --padding-horizontal: 16px;
+  --border-radius: 12px;
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+// Contenedor principal
+.pantalla-principal {
+  --background: var(--ion-color-light);
+  
+  @media (prefers-color-scheme: dark) {
+    --background: var(--ion-color-dark);
+  }
+}
+
+// Loading inicial
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 16px;
+
+  ion-text p {
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+// Contenido principal
+.contenido-principal {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// Header con saludo y fecha
+.header-saludo {
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+  padding: calc(env(safe-area-inset-top) + 16px) var(--padding-horizontal) 20px;
+  color: white;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: var(--header-height);
+
+  .app-icon {
+    ion-icon {
+      font-size: 32px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+  }
+
+  .saludo-container {
+    flex: 1;
+    
+    .saludo-principal {
+      h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0 0 8px 0;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    .fecha-hora-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      
+      .fecha-actual {
+        p {
+          font-size: 14px;
+          opacity: 0.9;
+          margin: 0;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+      }
+
+      .hora-actual {
+        span {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 500;
+          backdrop-filter: blur(10px);
+        }
+      }
+    }
+  }
+
+  .btn-config-rapida {
+    --color: rgba(255, 255, 255, 0.8);
+    --border-radius: 50%;
+    
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+}
+
+// Información de sesión activa
+.info-sesion-activa {
+  padding: var(--padding-horizontal);
+  margin-top: -10px; // Overlap con el header
+  z-index: 10;
+  position: relative;
+
+  .card-sesion-activa {
+    margin: 0;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    ion-card-content {
+      padding: 16px;
+    }
+
+    .sesion-activa-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .sesion-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        ion-icon {
+          font-size: 24px;
+        }
+
+        .sesion-datos {
+          h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            color: var(--ion-color-dark);
+
+            @media (prefers-color-scheme: dark) {
+              color: var(--ion-color-light);
+            }
+          }
+
+          p {
+            font-size: 14px;
+            color: var(--ion-color-medium);
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Contenedor de tabs
+.tabs-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  // Tab especial continuar compra
+  .tab-continuar-compra {
+    padding: var(--padding-horizontal);
+    background: var(--ion-color-step-50);
+    border-bottom: 1px solid var(--ion-color-step-200);
+
+    .btn-continuar-compra {
+      height: 48px;
+      font-weight: 600;
+      --border-radius: var(--border-radius);
+      margin: 8px 0;
+
+      ion-icon {
+        font-size: 20px;
+      }
+    }
+  }
+
+  // Tabs principales
+  ion-tabs {
+    flex: 1;
+    
+    .tabs-principales {
+      background: var(--ion-color-step-50);
+      border-top: 1px solid var(--ion-color-step-200);
+      height: var(--tabs-height);
+
+      .tab-button {
+        --color: var(--ion-color-medium);
+        --color-selected: var(--ion-color-primary);
+        font-size: 12px;
+
+        ion-icon {
+          font-size: 24px;
+          margin-bottom: 4px;
+        }
+
+        ion-label {
+          font-weight: 500;
+        }
+
+        &.tab-selected {
+          --color: var(--ion-color-primary);
+          
+          ion-icon {
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+
+    // Contenido de tabs
+    .tab-content {
+      padding: var(--padding-horizontal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+
+      ion-text {
+        text-align: center;
+
+        p {
+          font-size: 16px;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+// Banner de publicidad
+.banner-publicidad {
+  background: var(--ion-color-step-100);
+  border-top: 1px solid var(--ion-color-step-200);
+  padding: 12px var(--padding-horizontal);
+  min-height: var(--banner-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .banner-content {
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--ion-color-step-300);
+    background: var(--ion-color-step-50);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--ion-color-primary);
+      background: var(--ion-color-step-100);
+    }
+
+    small {
+      display: block;
+      font-size: 10px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .anuncio-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--ion-color-medium);
+
+      ion-icon {
+        font-size: 20px;
+      }
+
+      span {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// Burbuja flotante de donación
+.burbuja-donacion {
+  position: fixed;
+  bottom: calc(var(--tabs-height) + var(--banner-height) + 20px);
+  right: 20px;
+  z-index: 1000;
+  max-width: 280px;
+  animation: slideInBounce 0.5s ease-out;
+
+  .burbuja-content {
+    background: var(--ion-color-step-50);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--ion-color-step-200);
+    position: relative;
+
+    // Flecha apuntando hacia abajo
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      right: 20px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid var(--ion-color-step-50);
+    }
+
+    .btn-cerrar-burbuja {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      --color: var(--ion-color-medium);
+      width: 24px;
+      height: 24px;
+    }
+
+    .icono-donacion {
+      text-align: center;
+      margin-bottom: 12px;
+
+      ion-icon {
+        font-size: 32px;
+        animation: heartbeat 1.5s ease-in-out infinite;
+      }
+    }
+
+    .mensaje-donacion {
+      text-align: center;
+      margin-bottom: 16px;
+
+      h4 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        color: var(--ion-color-dark);
+
+        @media (prefers-color-scheme: dark) {
+          color: var(--ion-color-light);
+        }
+      }
+
+      p {
+        font-size: 13px;
+        color: var(--ion-color-medium);
+        margin: 0;
+        line-height: 1.4;
+      }
+    }
+
+    .btn-donar {
+      width: 100%;
+      height: 40px;
+      font-weight: 600;
+      --border-radius: 20px;
+    }
+  }
+}
+
+// Animaciones
+@keyframes slideInBounce {
+  0% {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-10px) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+  :root {
+    --padding-horizontal: 12px;
+    --header-height: 100px;
+  }
+
+  .header-saludo {
+    .saludo-container {
+      .saludo-principal h1 {
+        font-size: 20px;
+      }
+
+      .fecha-hora-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+    }
+  }
+
+  .burbuja-donacion {
+    right: 12px;
+    left: 12px;
+    max-width: none;
+
+    .burbuja-content::after {
+      right: 50%;
+      transform: translateX(50%);
+    }
+  }
+}
+
+@media (max-width: 320px) {
+  .header-saludo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    .btn-config-rapida {
+      position: absolute;
+      top: 16px;
+      right: var(--padding-horizontal);
+    }
+  }
+
+  .tabs-container .tabs-principales .tab-button {
+    font-size: 10px;
+
+    ion-icon {
+      font-size: 20px;
+    }
+  }
+}
+
+// Modo oscuro
+@media (prefers-color-scheme: dark) {
+  .banner-publicidad .banner-content {
+    border-color: var(--ion-color-step-400);
+    
+    &:hover {
+      border-color: var(--ion-color-primary);
+    }
+  }
+
+  .burbuja-donacion .burbuja-content {
+    background: var(--ion-color-step-100);
+    border-color: var(--ion-color-step-300);
+
+    &::after {
+      border-top-color: var(--ion-color-step-100);
+    }
+  }
+}
+
+// Alto contraste
+@media (prefers-contrast: high) {
+  .banner-publicidad .banner-content {
+    border-width: 3px;
+  }
+
+  .burbuja-donacion .burbuja-content {
+    border-width: 2px;
+  }
+
+  .tabs-container .tabs-principales .tab-button {
+    --color: var(--ion-color-dark);
+    --color-selected: var(--ion-color-primary);
+  }
+}
+
+// Reducir movimiento
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .burbuja-donacion {
+    animation: none;
+  }
+
+  .icono-donacion ion-icon {
+    animation: none;
+  }
+}
