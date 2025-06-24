@@ -1,10 +1,10 @@
 /**
  * Módulo de la pantalla principal de la aplicación Carrito
- * Versión simplificada para probar paso a paso
- * Sin lazy loading de tabs por ahora
+ * Configurado correctamente para el routing y los imports
+ * Compatible con la estructura de carpetas actual
  * 
  * @author DemWolf
- * @version 1.0
+ * @version 1.0 - CORREGIDO
  */
 
 import { NgModule } from '@angular/core';
@@ -18,17 +18,21 @@ import { IonicModule } from '@ionic/angular';
 // Importar componente principal
 import { PantallaPrincipalComponent } from './pantalla-principal.component';
 
-// Rutas simples por ahora - solo el componente principal
+// Configuración de rutas del módulo
 const routes = [
   {
     path: '',
-    component: PantallaPrincipalComponent
+    component: PantallaPrincipalComponent,
+    data: {
+      title: 'Pantalla Principal',
+      description: 'Control de gastos con tabs principales'
+    }
   }
 ];
 
 @NgModule({
   declarations: [
-    // Solo el componente principal por ahora
+    // Componente principal
     PantallaPrincipalComponent
   ],
   imports: [
@@ -39,14 +43,15 @@ const routes = [
     // Módulo de Ionic para componentes UI
     IonicModule,
     
-    // Configuración de rutas básica
+    // Configuración de rutas para lazy loading
     RouterModule.forChild(routes)
   ],
   providers: [
-    // Sin providers específicos por ahora
+    // Los servicios están registrados en CoreModule
+    // No necesitamos providers específicos aquí
   ],
   exports: [
-    // Exportar componente principal
+    // Exportar componente principal si se necesita en otros módulos
     PantallaPrincipalComponent
   ]
 })
