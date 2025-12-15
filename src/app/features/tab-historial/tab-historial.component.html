@@ -1,0 +1,297 @@
+<div class="tab-historial-content">
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando historial...</p>
+  </div>
+
+  <!-- Sección de Borradores -->
+  <div *ngIf="!cargando && sesionesBorrador.length > 0" class="borradores-seccion">
+
+    <ion-list-header>
+      <ion-label>
+        <h2>📋 Listas en Progreso</h2>
+        <p>{{ sesionesBorrador.length }} {{ sesionesBorrador.length === 1 ? 'lista pendiente de completar' : 'listas pendientes de completar' }}</p>
+      </ion-label>
+    </ion-list-header>
+
+    <!-- Acordeón de borradores -->
+    <ion-list class="acordeon-list">
+      <div *ngFor="let sesion of sesionesBorrador; trackBy: trackBySesion" class="sesion-item borrador-item">
+
+        <!-- Cabecera del borrador -->
+        <ion-item
+          button
+          detail="false"
+          (click)="toggleAcordeon(sesion.id)"
+          [class.expanded]="estaExpandida(sesion.id)"
+          class="acordeon-header borrador-header">
+
+          <ion-icon
+            [name]="estaExpandida(sesion.id) ? 'chevron-down' : 'chevron-forward'"
+            slot="start"
+            color="warning">
+          </ion-icon>
+
+          <ion-label>
+            <h2>{{ sesion.nombreSupermercado }}</h2>
+            <p>
+              <ion-icon name="list-outline"></ion-icon>
+              Lista con {{ sesion.productos.length }} producto(s) - Completa los precios
+            </p>
+          </ion-label>
+
+          <ion-badge slot="end" color="warning">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-badge>
+
+        </ion-item>
+
+        <!-- Detalles del borrador (desplegable) -->
+        <div *ngIf="estaExpandida(sesion.id)" @expandCollapse class="acordeon-body">
+
+          <!-- Productos incompletos -->
+          <ion-card class="productos-card">
+            <ion-card-content>
+              <p class="card-title">
+                <strong>Productos en tu lista ({{ sesion.productos.length }}):</strong>
+              </p>
+              <ion-list class="productos-list">
+                <ion-item *ngFor="let producto of sesion.productos" lines="full">
+                  <ion-label>
+                    <p>{{ producto.nombre }}</p>
+                    <small *ngIf="producto.cantidad > 0">Cantidad: {{ producto.cantidad }}</small>
+                    <small *ngIf="producto.precioUnitario > 0">Precio: ${{ producto.precioUnitario | number:'1.2-2' }}</small>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Botones de acción para borrador -->
+          <div class="botones-borrador">
+            <ion-button expand="block" color="warning" size="small" (click)="editarBorrador(sesion.id)">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Completar Lista
+            </ion-button>
+            <ion-button expand="block" color="danger" size="small" (click)="eliminarBorrador(sesion.id)">
+              <ion-icon name="trash-outline" slot="start"></ion-icon>
+              Eliminar
+            </ion-button>
+          </div>
+
+        </div>
+
+      </div>
+    </ion-list>
+
+  </div>
+
+  <!-- Mensaje si no hay borradores pero sí hay compras -->
+  <div *ngIf="!cargando && sesionesBorrador.length === 0 && sesionesCompletadas.length > 0" class="no-borradores">
+    <ion-card color="light">
+      <ion-card-content>
+        <p>
+          <ion-icon name="checkmark-circle-outline" size="large" color="success"></ion-icon>
+        </p>
+        <p>✨ No tienes listas pendientes. Crea una cuando quieras registrar tu próxima compra.</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Lista de sesiones completadas (Acordeón) -->
+  <div *ngIf="!cargando && sesionesCompletadas.length > 0" class="historial-lista">
+
+    <ion-list-header>
+      <ion-label>
+        <h2>Historial de Compras</h2>
+        <p>{{ sesionesCompletadas.length }} {{ sesionesCompletadas.length === 1 ? 'compra registrada' : 'compras registradas' }}</p>
+      </ion-label>
+    </ion-list-header>
+
+    <!-- Acordeón de sesiones -->
+    <ion-list class="acordeon-list">
+      <div *ngFor="let sesion of sesionesCompletadas; trackBy: trackBySesion" class="sesion-item">
+
+        <!-- Cabecera del acordeón (siempre visible) -->
+        <ion-item
+          button
+          detail="false"
+          (click)="toggleAcordeon(sesion.id)"
+          [class.expanded]="estaExpandida(sesion.id)"
+          class="acordeon-header">
+
+          <ion-icon
+            [name]="estaExpandida(sesion.id) ? 'chevron-down' : 'chevron-forward'"
+            slot="start"
+            color="primary">
+          </ion-icon>
+
+          <ion-label>
+            <h2>{{ sesion.nombreSupermercado }}</h2>
+            <p>
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ formatearFecha(sesion.fechaInicio) }}
+              <span *ngIf="diasDesdeCompra(sesion.fechaInicio) === 0" class="badge-hoy">Hoy</span>
+              <span *ngIf="diasDesdeCompra(sesion.fechaInicio) === 1" class="badge-ayer">Ayer</span>
+            </p>
+          </ion-label>
+
+          <ion-note slot="end" color="primary">
+            <strong>${{ sesion.totales.total | number:'1.0-0' }}</strong>
+          </ion-note>
+
+        </ion-item>
+
+        <!-- Contenido expandido del acordeón -->
+        <div *ngIf="estaExpandida(sesion.id)" class="acordeon-content" [@expandCollapse]>
+
+          <!-- Información de la sesión -->
+          <ion-card class="detalle-card">
+            <ion-card-content>
+
+              <!-- Información general -->
+              <div class="info-section">
+                <h3>Información de la Compra</h3>
+
+                <div class="info-item">
+                  <ion-icon name="storefront-outline" color="primary"></ion-icon>
+                  <div class="info-text">
+                    <span class="label">Lugar</span>
+                    <span class="value">{{ sesion.nombreSupermercado }}</span>
+                  </div>
+                </div>
+
+                <div class="info-item">
+                  <ion-icon name="calendar-outline" color="primary"></ion-icon>
+                  <div class="info-text">
+                    <span class="label">Fecha</span>
+                    <span class="value">{{ sesion.fechaInicio | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+
+                <div class="info-item">
+                  <ion-icon name="time-outline" color="primary"></ion-icon>
+                  <div class="info-text">
+                    <span class="label">Hora</span>
+                    <span class="value">{{ sesion.horaInicio }} - {{ sesion.horaFinalizacion }}</span>
+                  </div>
+                </div>
+
+                <div class="info-item" *ngIf="sesion.metadatos.ubicacion">
+                  <ion-icon name="location-outline" color="primary"></ion-icon>
+                  <div class="info-text">
+                    <span class="label">Ubicación</span>
+                    <span class="value">{{ sesion.metadatos.ubicacion }}</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Resumen de totales -->
+              <div class="totales-section">
+                <h3>Resumen</h3>
+
+                <div class="totales-grid">
+                  <div class="total-item">
+                    <ion-icon name="cube-outline" color="secondary"></ion-icon>
+                    <div>
+                      <span class="total-label">Productos</span>
+                      <span class="total-value">{{ sesion.totales.cantidadProductos }}</span>
+                    </div>
+                  </div>
+
+                  <div class="total-item">
+                    <ion-icon name="layers-outline" color="tertiary"></ion-icon>
+                    <div>
+                      <span class="total-label">Items</span>
+                      <span class="total-value">{{ sesion.totales.cantidadItems }}</span>
+                    </div>
+                  </div>
+
+                  <div class="total-item total-principal">
+                    <ion-icon name="cash-outline" color="success"></ion-icon>
+                    <div>
+                      <span class="total-label">Total Pagado</span>
+                      <span class="total-value">${{ sesion.totales.total | number:'1.0-0' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lista de productos -->
+              <div class="productos-section">
+                <h3>Productos Comprados ({{ sesion.productos.length }})</h3>
+
+                <ion-list class="productos-list">
+                  <ion-item
+                    *ngFor="let producto of sesion.productos; trackBy: trackByProducto"
+                    lines="full"
+                    class="producto-item">
+
+                    <ion-label>
+                      <h4>{{ producto.nombre }}</h4>
+                      <p>
+                        <span class="cantidad">{{ producto.cantidad }}x</span>
+                        <span class="precio">${{ producto.precioUnitario | number:'1.0-0' }}</span>
+                        <span *ngIf="producto.categoria" class="categoria">• {{ producto.categoria }}</span>
+                      </p>
+                      <p *ngIf="producto.notas" class="notas">
+                        <ion-icon name="document-text-outline"></ion-icon>
+                        {{ producto.notas }}
+                      </p>
+                    </ion-label>
+
+                    <ion-note slot="end" color="dark">
+                      <strong>${{ producto.total | number:'1.0-0' }}</strong>
+                    </ion-note>
+
+                  </ion-item>
+                </ion-list>
+              </div>
+
+              <!-- Estadísticas adicionales (si existen) -->
+              <div class="estadisticas-section" *ngIf="sesion.estadisticas">
+                <h3>Estadísticas</h3>
+
+                <div class="stats-grid">
+                  <!-- Producto más caro -->
+                  <div class="stat-item stat-destacado" *ngIf="sesion.estadisticas.productoMasCaro">
+                    <span class="stat-label">Producto más caro</span>
+                    <span class="stat-value">{{ sesion.estadisticas.productoMasCaro.nombre }}</span>
+                    <span class="stat-precio">${{ sesion.estadisticas.productoMasCaro.precioUnitario | number:'1.0-0' }}</span>
+                  </div>
+
+                  <!-- Producto que más se compró -->
+                  <div class="stat-item stat-destacado" *ngIf="obtenerProductoConMayorCantidad(sesion)">
+                    <span class="stat-label">Producto que más se compró</span>
+                    <span class="stat-value">{{ obtenerProductoConMayorCantidad(sesion).nombre }} ({{ obtenerProductoConMayorCantidad(sesion).cantidad }}x)</span>
+                    <span class="stat-detalle">
+                      ${{ obtenerProductoConMayorCantidad(sesion).precioUnitario | number:'1.0-0' }} c/u •
+                      Total: ${{ obtenerProductoConMayorCantidad(sesion).total | number:'1.0-0' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+            </ion-card-content>
+          </ion-card>
+
+        </div>
+
+      </div>
+    </ion-list>
+
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!cargando && sesionesCompletadas.length === 0" class="empty-state">
+    <ion-icon name="receipt-outline" color="medium" size="large"></ion-icon>
+    <ion-text color="medium">
+      <h2>Sin compras registradas</h2>
+      <p>Tus listas guardadas aparecerán aquí</p>
+    </ion-text>
+  </div>
+
+</div>

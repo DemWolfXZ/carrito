@@ -2,12 +2,12 @@
  * Componente de bienvenida para la configuración inicial única de la aplicación Carrito
  * Compatible con Angular 18 + Ionic 8 + Capacitor 7
  * Sistema de selector grid responsivo - sustituto del carrusel 3D
- * 
+ *
  * @author DemWolf
- * @version 2.0 - CON DEBUGGING EXTENSIVO - ERRORES TYPESCRIPT CORREGIDOS
+ * @version 2.2 - FIX FINAL PARA NAVEGACIÓN CON NGZONE
  */
 
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, ToastController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
@@ -17,6 +17,7 @@ import { DatosConfiguracionInicial } from '../../core/models/usuario.model';
 import { Pais } from '../../core/models/pais.model';
 import { ConfiguracionService } from '../../core/services/configuracion.service';
 import { UsuarioService } from '../../core/services/usuario.service';
+import { AlmacenamientoService } from '../../core/services/almacenamiento.service';
 
 // ✅ Importar ScreenOrientation de Capacitor 7 (ya instalado en tu proyecto)
 import { ScreenOrientation } from '@capacitor/screen-orientation';
@@ -30,45 +31,37 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Estados del componente de bienvenida
   private subscriptions: Subscription = new Subscription();
-  
+
   // Control de pasos de configuración
   pasoActual: number = 1; // 1: Splash, 2: Explicación, 3: Selección País, 4: Configuración Personal, 5: Completado
   totalPasos: number = 5;
-  
+
   // Control de splash screen
   mostrarSplash: boolean = true;
   splashAnimacionCompleta: boolean = false;
-  
+
   // Datos de configuración inicial
   datosConfiguracion: DatosConfiguracionInicial = {
     nombre: '',
     codigoPais: '',
-    pin: '',
-    biometriaDisponible: false,
-    biometriaHabilitada: false,
     configuracionesIniciales: {}
   };
-  
+
   // Listas de datos
   paisesDisponibles: Pais[] = [];
   paisSeleccionado: Pais | null = null;
-  
+
   // Estados de carga y validación
   cargando: boolean = false;
   formularioValido: boolean = false;
-  
+
   // Validaciones por campo
   validaciones = {
     nombre: { valido: false, mensaje: '' },
-    pais: { valido: false, mensaje: '' },
-    pin: { valido: false, mensaje: '' },
-    pinConfirmacion: { valido: false, mensaje: '' }
+    pais: { valido: false, mensaje: '' }
   };
-  
+
   // Campos del formulario
-  pinConfirmacion: string = '';
-  mostrarPin: boolean = false;
-  mostrarPinConfirmacion: boolean = false;
 
   // Control de orientación y dispositivo
   esTablet: boolean = false;
@@ -105,18 +98,22 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private router: Router,
+    private ngZone: NgZone, // ✅ AGREGAR NGZONE PARA FIX DE NAVEGACIÓN
     private alertController: AlertController,
     private loadingController: LoadingController,
     private toastController: ToastController,
     private configuracionService: ConfiguracionService,
     private usuarioService: UsuarioService,
+    private almacenamientoService: AlmacenamientoService,
     private platform: Platform
   ) {
     console.log('🏗️ CONSTRUCTOR de BienvenidaComponent ejecutado');
     console.log('🔍 DEBUG - Servicios inyectados:', {
       router: !!this.router,
+      ngZone: !!this.ngZone,
       configuracionService: !!this.configuracionService,
       usuarioService: !!this.usuarioService,
+      almacenamientoService: !!this.almacenamientoService,
       platform: !!this.platform
     });
   }
@@ -125,32 +122,113 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    * Inicialización del componente
    */
   async ngOnInit(): Promise<void> {
+    console.log('🚀 =====================================');
     console.log('🚀 INICIANDO ngOnInit de BienvenidaComponent');
-    
+    console.log('🚀 =====================================');
+
     try {
       console.log('🛒 Inicializando componente de bienvenida...');
-      
-      // Detectar tipo de dispositivo
-      console.log('📱 Detectando tipo de dispositivo...');
-      await this.detectarTipoDispositivo();
-      
-      // Configurar orientación según el dispositivo
-      console.log('🔄 Configurando orientación...');
-      await this.configurarOrientacion();
-      
-      // Inicializar componente
-      console.log('⚙️ Inicializando componente...');
+
+      // ✅ YA NO ES NECESARIO VERIFICAR AQUÍ - El Guard se encarga de eso
+      // Si llegamos aquí, es porque el guard permitió el acceso
       await this.inicializarComponente();
-      
+
       // Iniciar secuencia de splash automático
       console.log('🎬 Iniciando splash sequence...');
       this.iniciarSplashSequence();
-      
+
       console.log('✅ Componente de bienvenida inicializado correctamente');
     } catch (error) {
       console.error('❌ ERROR CRÍTICO en ngOnInit:', error);
       console.error('❌ Stack trace:', (error as Error)?.stack || 'Stack no disponible');
       await this.mostrarError('Error al cargar la configuración inicial');
+    }
+  }
+
+  /**
+   * ✅ NUEVO: Verificar si ya existe configuración completa
+   */
+  private async verificarConfiguracionExistente(): Promise<boolean> {
+    try {
+      console.log('🔍 Verificando configuración existente...');
+
+      // Verificar directamente en almacenamiento
+      const configuracionExiste = await this.almacenamientoService.existeConfiguracion();
+      const usuarioExiste = await this.almacenamientoService.existeUsuario();
+
+      console.log('🔍 Estado del almacenamiento:', {
+        configuracionExiste,
+        usuarioExiste
+      });
+
+      if (!configuracionExiste || !usuarioExiste) {
+        console.log('🔍 No hay configuración completa - continuar con bienvenida');
+        return false;
+      }
+
+      // Verificar si la configuración está marcada como completa
+      const configuracion = await this.almacenamientoService.obtenerConfiguracion();
+      const usuario = await this.almacenamientoService.obtenerUsuario();
+
+      console.log('🔍 Configuración cargada:', configuracion);
+      console.log('🔍 Usuario cargado:', usuario);
+
+      const configuracionCompleta = configuracion?.configuracionCompleta && usuario?.configuracionCompleta;
+      console.log('🔍 ¿Configuración completa?', configuracionCompleta);
+
+      return configuracionCompleta || false;
+
+    } catch (error) {
+      console.error('❌ Error al verificar configuración existente:', error);
+      return false;
+    }
+  }
+
+  /**
+   * ✅ MÉTODO CRÍTICO CORREGIDO CON NGZONE: Redirigir directamente a pantalla principal
+   */
+  private async redirigirAPantallaPrincipal(): Promise<void> {
+    try {
+      console.log('🚀 =====================================');
+      console.log('🚀 REDIRIGIENDO CON NGZONE...');
+      console.log('🚀 =====================================');
+
+      // ✅ USAR NGZONE PARA ASEGURAR NAVEGACIÓN
+      this.ngZone.run(async () => {
+        console.log('🚀 Dentro de NgZone.run()...');
+
+        try {
+          // Intentar múltiples rutas en orden de prioridad
+          const rutasAlternativas = ['/pantalla-principal', '/tabs/tab1', '/tabs'];
+
+          for (const ruta of rutasAlternativas) {
+            console.log(`🚀 Intentando navegar a: ${ruta}`);
+
+            const navegacionExitosa = await this.router.navigate([ruta], {
+              replaceUrl: true, // Reemplazar URL para evitar volver a bienvenida
+              skipLocationChange: false
+            });
+
+            console.log(`🚀 Navegación a ${ruta}:`, navegacionExitosa);
+
+            if (navegacionExitosa) {
+              console.log('✅ =====================================');
+              console.log(`✅ NAVEGACIÓN EXITOSA A ${ruta}`);
+              console.log('✅ =====================================');
+              return;
+            }
+          }
+
+          console.error('❌ Todas las rutas fallaron');
+
+        } catch (error) {
+          console.error('❌ Error en navegación dentro de NgZone:', error);
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error en redirección directa:', error);
+      // En caso de error, mostrar la bienvenida
     }
   }
 
@@ -170,10 +248,10 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   ngOnDestroy(): void {
     console.log('🧹 Limpiando componente de bienvenida...');
-    
+
     // Cancelar todas las suscripciones para evitar memory leaks
     this.subscriptions.unsubscribe();
-    
+
     // Restaurar orientación original si es necesario
     this.restaurarOrientacion();
   }
@@ -183,18 +261,18 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   private async detectarTipoDispositivo(): Promise<void> {
     console.log('🔍 Iniciando detección de dispositivo...');
-    
+
     const width = this.platform.width();
     const height = this.platform.height();
-    
+
     console.log(`📏 Dimensiones detectadas: ${width}x${height}`);
-    
+
     // Considerar tablet si tiene más de 768px en cualquier dimensión
     this.esTablet = Math.max(width, height) >= 768;
-    
+
     // Detectar orientación actual
     this.esModoVertical = height > width;
-    
+
     console.log(`📱 Dispositivo detectado: ${this.esTablet ? 'Tablet' : 'Móvil'}, Orientación: ${this.esModoVertical ? 'Vertical' : 'Horizontal'}`);
   }
 
@@ -203,7 +281,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   private async configurarOrientacion(): Promise<void> {
     console.log('🔄 Configurando orientación...');
-    
+
     // Solo aplicar en dispositivos Capacitor reales
     if (!this.platform.is('capacitor')) {
       console.log('🌐 No es un dispositivo Capacitor, saltando configuración de orientación');
@@ -230,7 +308,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   private async restaurarOrientacion(): Promise<void> {
     console.log('🔄 Restaurando orientación...');
-    
+
     if (!this.platform.is('capacitor')) {
       return;
     }
@@ -248,39 +326,15 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   private async inicializarComponente(): Promise<void> {
     console.log('⚙️ Inicializando datos del componente...');
-    
-    try {
-      // Verificar si ya existe configuración (por seguridad)
-      console.log('🔍 Verificando configuración existente...');
-      console.log('🔍 DEBUG - configuracionService existe?', !!this.configuracionService);
-      
-      if (!this.configuracionService) {
-        throw new Error('ConfiguracionService no está disponible');
-      }
-      
-      console.log('🔍 Llamando a esConfiguracionCompleta()...');
-      const configuracionCompleta = await this.configuracionService.esConfiguracionCompleta();
-      console.log('🔍 Resultado de esConfiguracionCompleta():', configuracionCompleta);
-      
-      if (configuracionCompleta) {
-        console.log('⏭️ Configuración ya completada, redirigiendo...');
-        // Si ya está configurado, redirigir a pantalla principal
-        await this.router.navigate(['/pantalla-principal']);
-        return;
-      }
 
+    try {
       // Cargar países disponibles desde el servicio
       console.log('🌍 Cargando países disponibles...');
       this.paisesDisponibles = this.configuracionService.obtenerPaisesActivos();
       console.log(`🌍 Países cargados: ${this.paisesDisponibles.length}`, this.paisesDisponibles);
-      
-      // Verificar disponibilidad de biometría (simulado por ahora)
-      console.log('🔐 Verificando biometría...');
-      this.datosConfiguracion.biometriaDisponible = await this.verificarBiometria();
-      console.log('🔐 Biometría disponible:', this.datosConfiguracion.biometriaDisponible);
-      
+
       console.log('✅ Inicialización del componente completada correctamente');
-      
+
     } catch (error) {
       console.error('❌ ERROR en inicializarComponente:', error);
       console.error('❌ Stack trace:', (error as Error)?.stack || 'Stack no disponible');
@@ -293,21 +347,21 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   private configurarSelectorPaises(): void {
     console.log('🎯 Configurando selector de países...');
-    
+
     if (this.paisesDisponibles.length === 0) {
       console.warn('⚠️ No hay países disponibles para configurar el selector');
       return;
     }
-    
+
     // Seleccionar país por defecto (Chile como ejemplo)
     const paisDefecto = this.paisesDisponibles.find(p => p.codigo === 'CL');
     console.log('🎯 País por defecto encontrado:', paisDefecto);
-    
+
     if (paisDefecto && !this.paisSeleccionado) {
       console.log('🎯 Seleccionando país por defecto...');
       this.seleccionarPais(paisDefecto);
     }
-    
+
     console.log(`🎯 Selector de países configurado. ${this.paisesDisponibles.length} países disponibles`);
   }
 
@@ -316,18 +370,18 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   seleccionarPais(pais: Pais): void {
     console.log('🌍 Seleccionando país:', pais);
-    
+
     // Actualizar país seleccionado
     this.paisSeleccionado = pais;
     this.datosConfiguracion.codigoPais = pais.codigo;
-    
+
     // Validar selección
     const validacion = this.validarSeleccionPais();
     console.log('🌍 Resultado de validación:', validacion);
-    
+
     // Log para debugging
     console.log(`🌍 País seleccionado: ${pais.nombre} (${pais.codigo})`);
-    
+
     // Simular vibración táctil en dispositivos móviles
     this.simularFeedbackTactil();
   }
@@ -365,7 +419,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   private ocultarSplash(): void {
     console.log('🎭 Ocultando splash...');
     this.splashAnimacionCompleta = true;
-    
+
     // Esperar a que termine la animación de salida
     setTimeout(() => {
       this.mostrarSplash = false;
@@ -382,15 +436,15 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     console.log(`⏭️ MÉTODO siguientePaso() EJECUTADO`);
     console.log(`⏭️ Paso actual: ${this.pasoActual}`);
     console.log('⏭️ =====================================');
-    
+
     try {
       console.log(`⏭️ Intentando avanzar del paso ${this.pasoActual} al ${this.pasoActual + 1}`);
-      
+
       // Validar paso actual antes de avanzar
       console.log('🔍 Validando paso actual...');
       const validacionPaso = await this.validarPasoActual();
       console.log('🔍 Resultado de validación:', validacionPaso);
-      
+
       if (!validacionPaso) {
         console.log('❌ Validación del paso actual falló');
         return;
@@ -401,7 +455,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
         console.log(`➡️ Avanzando paso: ${this.pasoActual} -> ${this.pasoActual + 1}`);
         this.pasoActual++;
         console.log(`✅ Avanzado al paso ${this.pasoActual}`);
-        
+
         // Configurar selector si llegamos al paso de selección de país
         if (this.pasoActual === 3) {
           console.log('🌍 Llegamos al paso 3, configurando selector de países...');
@@ -429,7 +483,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   pasoAnterior(): void {
     console.log(`⏮️ Retrocediendo desde paso ${this.pasoActual}`);
-    
+
     if (this.pasoActual > 2) { // No permitir volver al splash
       this.pasoActual--;
       console.log(`⏮️ Retrocedido al paso ${this.pasoActual}`);
@@ -441,28 +495,28 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   private async validarPasoActual(): Promise<boolean> {
     console.log(`🔍 Validando paso ${this.pasoActual}...`);
-    
+
     switch (this.pasoActual) {
       case 1:
       case 2:
         // Pasos de splash y explicación - siempre válidos
         console.log('✅ Pasos 1-2 siempre válidos');
         return true;
-        
+
       case 3:
         // Validar selección de país
         const validPais = this.validarSeleccionPais();
         console.log(`🌍 Validación país: ${validPais}`);
         console.log('🌍 Estado de validaciones.pais:', this.validaciones.pais);
         return validPais;
-        
+
       case 4:
         // Validar configuración personal
         const validPersonal = this.validarConfiguracionPersonal();
         console.log(`👤 Validación personal: ${validPersonal}`);
         console.log('👤 Estado de todas las validaciones:', this.validaciones);
         return validPersonal;
-        
+
       default:
         console.log('✅ Paso por defecto - válido');
         return true;
@@ -476,7 +530,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     console.log('🌍 Validando selección de país...');
     console.log('🌍 datosConfiguracion.codigoPais:', this.datosConfiguracion.codigoPais);
     console.log('🌍 paisSeleccionado:', this.paisSeleccionado);
-    
+
     // Verificar que hay un país seleccionado
     if (!this.datosConfiguracion.codigoPais) {
       this.validaciones.pais.valido = false;
@@ -488,7 +542,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     // Verificar que el país es válido
     const paisValido = this.configuracionService.validarCodigoPais(this.datosConfiguracion.codigoPais);
     console.log('🌍 País válido según servicio:', paisValido);
-    
+
     if (!paisValido) {
       this.validaciones.pais.valido = false;
       this.validaciones.pais.mensaje = 'País seleccionado no válido';
@@ -503,41 +557,20 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Validar configuración personal (nombre y PIN)
+   * Validar configuración personal (solo nombre)
    */
   private validarConfiguracionPersonal(): boolean {
     console.log('👤 Validando configuración personal...');
     console.log('👤 Datos actuales:', {
-      nombre: this.datosConfiguracion.nombre,
-      pin: this.datosConfiguracion.pin,
-      pinConfirmacion: this.pinConfirmacion
+      nombre: this.datosConfiguracion.nombre
     });
-    
-    let valido = true;
 
     // Validar nombre
     const nombreValido = this.validarNombre();
     console.log('👤 Nombre válido:', nombreValido);
-    if (!nombreValido) {
-      valido = false;
-    }
 
-    // Validar PIN
-    const pinValido = this.validarPin();
-    console.log('👤 PIN válido:', pinValido);
-    if (!pinValido) {
-      valido = false;
-    }
-
-    // Validar confirmación de PIN
-    const pinConfirmacionValido = this.validarPinConfirmacion();
-    console.log('👤 PIN confirmación válido:', pinConfirmacionValido);
-    if (!pinConfirmacionValido) {
-      valido = false;
-    }
-
-    console.log('👤 Validación personal final:', valido);
-    return valido;
+    console.log('👤 Validación personal final:', nombreValido);
+    return nombreValido;
   }
 
   /**
@@ -573,104 +606,24 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     return true;
   }
 
-  /**
-   * Validar PIN de seguridad con verificación de patrones
-   */
-  validarPin(): boolean {
-    const pin = this.datosConfiguracion.pin;
-    console.log('🔐 Validando PIN:', `"${pin}" (longitud: ${pin.length})`);
 
-    // Verificar longitud exacta
-    if (pin.length !== 6) {
-      this.validaciones.pin.valido = false;
-      this.validaciones.pin.mensaje = 'El PIN debe tener exactamente 6 dígitos';
-      return false;
-    }
-
-    // Verificar que son solo números
-    if (!/^\d{6}$/.test(pin)) {
-      this.validaciones.pin.valido = false;
-      this.validaciones.pin.mensaje = 'El PIN solo debe contener números';
-      return false;
-    }
-
-    // Verificar que no sea un patrón obvio
-    if (this.esPinInseguro(pin)) {
-      this.validaciones.pin.valido = false;
-      this.validaciones.pin.mensaje = 'PIN muy simple. Usa una combinación más segura';
-      return false;
-    }
-
-    this.validaciones.pin.valido = true;
-    this.validaciones.pin.mensaje = '';
-    return true;
-  }
 
   /**
-   * Validar confirmación de PIN
-   */
-  validarPinConfirmacion(): boolean {
-    console.log('🔐 Validando confirmación PIN:', {
-      pin: this.datosConfiguracion.pin,
-      confirmacion: this.pinConfirmacion,
-      coinciden: this.pinConfirmacion === this.datosConfiguracion.pin
-    });
-    
-    if (this.pinConfirmacion !== this.datosConfiguracion.pin) {
-      this.validaciones.pinConfirmacion.valido = false;
-      this.validaciones.pinConfirmacion.mensaje = 'Los PIN no coinciden';
-      return false;
-    }
-
-    this.validaciones.pinConfirmacion.valido = true;
-    this.validaciones.pinConfirmacion.mensaje = '';
-    return true;
-  }
-
-  /**
-   * Verificar si el PIN es inseguro (patrones obvios)
-   */
-  private esPinInseguro(pin: string): boolean {
-    // Patrones inseguros comunes
-    const patronesInseguros = [
-      '123456', '654321', '111111', '222222', '333333',
-      '444444', '555555', '666666', '777777', '888888',
-      '999999', '000000', '012345', '543210'
-    ];
-
-    return patronesInseguros.includes(pin);
-  }
-
-  /**
-   * Alternar visibilidad del PIN
-   */
-  toggleMostrarPin(): void {
-    this.mostrarPin = !this.mostrarPin;
-  }
-
-  /**
-   * Alternar visibilidad de confirmación de PIN
-   */
-  toggleMostrarPinConfirmacion(): void {
-    this.mostrarPinConfirmacion = !this.mostrarPinConfirmacion;
-  }
-
-  /**
-   * ✅ Completar configuración inicial - MÉTODO CRÍTICO CON DEBUGGING EXTENSIVO
+   * ✅ MÉTODO CRÍTICO COMPLETAMENTE CORREGIDO CON NGZONE: Completar configuración inicial
    */
   private async completarConfiguracion(): Promise<void> {
     console.log('🚀 =====================================');
     console.log('🚀 EJECUTANDO completarConfiguracion()');
     console.log('🚀 =====================================');
-    
+
     try {
       console.log('🚀 Iniciando proceso de completar configuración...');
-      
+
       // DEBUG: Mostrar estado actual de los datos
       console.log('📊 Estado actual de datosConfiguracion:', this.datosConfiguracion);
       console.log('📊 Estado actual de paisSeleccionado:', this.paisSeleccionado);
       console.log('📊 Estado actual de validaciones:', this.validaciones);
-      
+
       // Mostrar loading
       console.log('⏳ Creando loading...');
       const loading = await this.loadingController.create({
@@ -681,65 +634,75 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
       await loading.present();
       console.log('⏳ Loading presentado correctamente');
 
-      console.log('💾 Guardando configuración inicial...');
+      console.log('💾 =====================================');
+      console.log('💾 GUARDANDO CONFIGURACIÓN INICIAL');
+      console.log('💾 =====================================');
       console.log('💾 Datos a guardar:', this.datosConfiguracion);
-      
-      // DEBUG: Verificar que el servicio existe antes de usarlo
-      console.log('🔍 configuracionService existe?', !!this.configuracionService);
-      console.log('🔍 Método guardarConfiguracionInicial existe?', typeof this.configuracionService.guardarConfiguracionInicial);
-      
-      // Guardar configuración inicial
+
+      // ✅ PASO CRÍTICO: Guardar configuración inicial CORRECTAMENTE
       console.log('💾 Llamando a configuracionService.guardarConfiguracionInicial...');
-      const exito = await this.configuracionService.guardarConfiguracionInicial(this.datosConfiguracion);
-      console.log('💾 Resultado de guardarConfiguracionInicial:', exito);
+      const exitoConfiguracion = await this.configuracionService.guardarConfiguracionInicial(this.datosConfiguracion);
+      console.log('💾 Resultado de guardarConfiguracionInicial:', exitoConfiguracion);
+
+      if (!exitoConfiguracion) {
+        console.error('❌ Error al guardar configuración inicial');
+        await loading.dismiss();
+        await this.mostrarError('Error al guardar la configuración. Inténtalo de nuevo.');
+        return;
+      }
+
+      console.log('✅ Configuración inicial guardada exitosamente');
+
+      // ✅ NUEVO PASO CRÍTICO: Verificar que TODO se guardó correctamente
+      console.log('🔍 =====================================');
+      console.log('🔍 VERIFICANDO DATOS GUARDADOS');
+      console.log('🔍 =====================================');
+
+      const configuracionGuardada = await this.almacenamientoService.obtenerConfiguracion();
+      const usuarioGuardado = await this.almacenamientoService.obtenerUsuario();
+
+      console.log('🔍 Configuración recuperada:', configuracionGuardada);
+      console.log('🔍 Usuario recuperado:', usuarioGuardado);
+
+      const datosCompletos = configuracionGuardada?.configuracionCompleta && usuarioGuardado?.configuracionCompleta;
+      console.log('🔍 ¿Datos marcados como completos?', datosCompletos);
+
+      if (!datosCompletos) {
+        console.error('❌ Los datos no se guardaron correctamente');
+        await loading.dismiss();
+        await this.mostrarError('Error al verificar la configuración guardada. Inténtalo de nuevo.');
+        return;
+      }
 
       console.log('⏳ Cerrando loading...');
       await loading.dismiss();
       console.log('⏳ Loading cerrado');
 
-      if (exito) {
-        console.log('✅ Configuración guardada exitosamente');
-        
-        // Mostrar mensaje de éxito
-        console.log('🎉 Mostrando mensaje de éxito...');
-        await this.mostrarExito('¡Configuración completada!', 'Tu cuenta ha sido creada exitosamente');
-        console.log('🎉 Mensaje de éxito mostrado');
-        
-        console.log('🚀 =====================================');
-        console.log('🚀 INTENTANDO NAVEGACIÓN A PANTALLA PRINCIPAL');
-        console.log('🚀 =====================================');
-        console.log('🚀 Router existe?', !!this.router);
-        console.log('🚀 Método navigate existe?', typeof this.router.navigate);
-        
-        console.log('🚀 Ejecutando router.navigate(["/pantalla-principal"])...');
-        
-        try {
-          const navegacionExitosa = await this.router.navigate(['/pantalla-principal']);
-          console.log('🚀 Resultado de navegación:', navegacionExitosa);
-          
-          if (navegacionExitosa) {
-            console.log('✅ =====================================');
-            console.log('✅ NAVEGACIÓN EXITOSA A PANTALLA PRINCIPAL');
-            console.log('✅ =====================================');
-          } else {
-            console.error('❌ =====================================');
-            console.error('❌ NAVEGACIÓN FALLÓ - navigate() retornó false');
-            console.error('❌ =====================================');
-            await this.mostrarError('Error al navegar a la pantalla principal');
-          }
-        } catch (errorNavegacion) {
-          console.error('❌ =====================================');
-          console.error('❌ ERROR CRÍTICO EN NAVEGACIÓN');
-          console.error('❌ Error:', errorNavegacion);
-          console.error('❌ Stack trace:', (errorNavegacion as Error)?.stack || 'Stack no disponible');
-          console.error('❌ =====================================');
-          await this.mostrarError('Error crítico de navegación: ' + (errorNavegacion as Error)?.message || 'Error desconocido');
-        }
-        
-      } else {
-        console.error('❌ Error al guardar configuración');
-        await this.mostrarError('Error al guardar la configuración. Inténtalo de nuevo.');
+      // ✅ PASO CRÍTICO: Forzar recarga del usuario en UsuarioService
+      console.log('🔄 =====================================');
+      console.log('🔄 FORZANDO RECARGA DEL USUARIO EN SERVICIO');
+      console.log('🔄 =====================================');
+
+      const recargaExitosa = await this.usuarioService.recargarUsuario();
+      console.log('🔄 ¿Recarga exitosa?', recargaExitosa);
+
+      if (!recargaExitosa) {
+        console.error('❌ No se pudo recargar el usuario en el servicio');
+        await this.mostrarError('Error al inicializar el usuario. Inténtalo de nuevo.');
+        return;
       }
+
+      // Mostrar mensaje de éxito
+      console.log('🎉 Mostrando mensaje de éxito...');
+      await this.mostrarExito('¡Configuración completada!', 'Tu cuenta ha sido creada exitosamente');
+      console.log('🎉 Mensaje de éxito mostrado');
+
+      console.log('🚀 =====================================');
+      console.log('🚀 NAVEGANDO A PANTALLA PRINCIPAL CON NGZONE');
+      console.log('🚀 =====================================');
+
+      // ✅ NAVEGACIÓN CORREGIDA CON NGZONE
+      await this.navegarAPantallaPrincipalConNgZone();
 
     } catch (error) {
       console.error('❌ =====================================');
@@ -747,19 +710,78 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
       console.error('❌ Error:', error);
       console.error('❌ Stack trace:', (error as Error)?.stack || 'Stack no disponible');
       console.error('❌ =====================================');
+
+      // Asegurarse de cerrar loading si hay error
+      try {
+        await this.loadingController.dismiss();
+      } catch (dismissError) {
+        console.warn('⚠️ Error al cerrar loading:', dismissError);
+      }
+
       await this.mostrarError('Error inesperado al configurar tu cuenta: ' + (error as Error)?.message || 'Error desconocido');
     }
   }
 
   /**
-   * Verificar disponibilidad de biometría (placeholder)
+   * ✅ MÉTODO CRÍTICO CON NGZONE: Navegación especializada con NgZone
    */
-  private async verificarBiometria(): Promise<boolean> {
-    // TODO: Implementar verificación real de biometría con Capacitor
-    // Por ahora retornamos false
-    console.log('🔐 Verificación de biometría simulada - retornando false');
-    return false;
+  private async navegarAPantallaPrincipalConNgZone(): Promise<void> {
+    console.log('🚀 =====================================');
+    console.log('🚀 NAVEGACIÓN CON NGZONE INICIADA');
+    console.log('🚀 =====================================');
+
+    // ✅ EJECUTAR NAVEGACIÓN DENTRO DE NGZONE
+    this.ngZone.run(async () => {
+      console.log('🚀 Ejecutando navegación dentro de NgZone.run()...');
+
+      const rutasAlternativas = [
+        '/pantalla-principal',
+        '/tabs/tab1',
+        '/tabs'
+      ];
+
+      for (let i = 0; i < rutasAlternativas.length; i++) {
+        const ruta = rutasAlternativas[i];
+        console.log(`🚀 Intento ${i + 1}: Navegando a ${ruta}`);
+
+        try {
+          const navegacionExitosa = await this.router.navigate([ruta], {
+            replaceUrl: true, // ✅ CRÍTICO: Reemplazar URL para evitar volver a bienvenida
+            skipLocationChange: false,
+            state: { fromBienvenida: true } // ✅ Agregar estado para debug
+          });
+
+          console.log(`🚀 Resultado navegación a ${ruta}:`, navegacionExitosa);
+
+          if (navegacionExitosa) {
+            console.log('✅ =====================================');
+            console.log(`✅ NAVEGACIÓN EXITOSA A ${ruta} CON NGZONE`);
+            console.log('✅ =====================================');
+
+            // ✅ ESPERAR PARA ASEGURAR NAVEGACIÓN COMPLETA
+            await new Promise(resolve => setTimeout(resolve, 200));
+            return;
+          }
+
+        } catch (errorNavegacion) {
+          console.error(`❌ Error en navegación a ${ruta}:`, errorNavegacion);
+
+          // Si es el último intento, mostrar error
+          if (i === rutasAlternativas.length - 1) {
+            console.error('❌ =====================================');
+            console.error('❌ TODOS LOS INTENTOS DE NAVEGACIÓN CON NGZONE FALLARON');
+            console.error('❌ =====================================');
+
+            // ✅ ÚLTIMO RECURSO: Forzar recarga de página
+            console.log('🔄 ÚLTIMO RECURSO: Recargando página...');
+            window.location.href = '/pantalla-principal';
+          }
+        }
+      }
+    });
   }
+
+
 
   /**
    * Mostrar mensaje de error con sanitización
@@ -820,7 +842,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
       case 3:
         return 'Esto nos ayudará a configurar la moneda y formato correcto para tu región';
       case 4:
-        return 'Personaliza tu experiencia y configura tu PIN de seguridad';
+        return 'Personaliza tu experiencia con tu nombre';
       case 5:
         return 'Tu cuenta ha sido configurada exitosamente';
       default:
@@ -840,14 +862,14 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
         case 3:
           return this.validaciones.pais.valido;
         case 4:
-          return this.validaciones.nombre.valido && 
-                 this.validaciones.pin.valido && 
-                 this.validaciones.pinConfirmacion.valido;
+          return this.validaciones.nombre.valido;
+        case 5:
+          return true; // ✅ PERMITIR AVANZAR EN PASO 5 (pantalla de confirmación final)
         default:
           return false;
       }
     })();
-    
+
     console.log(`🔍 puedeAvanzar (paso ${this.pasoActual}):`, resultado);
     return resultado;
   }
@@ -877,12 +899,12 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   get formatoMonedaLegible(): string {
     if (!this.paisSeleccionado) return '';
-    
+
     // Convertir formato técnico a ejemplo legible
     // De "$ #,##0.00" a "Ejemplo: $1,234.56"
     const formato = this.paisSeleccionado.formatoMoneda;
     const simbolo = this.paisSeleccionado.simboloMoneda;
-    
+
     // Generar ejemplo basado en el formato
     if (formato.includes('.00')) {
       return `Ejemplo: ${simbolo}1,234.56`;

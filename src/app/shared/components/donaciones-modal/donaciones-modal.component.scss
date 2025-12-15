@@ -1,0 +1,117 @@
+.mensaje-donacion {
+  text-align: center;
+  margin: 30px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 193, 7, 0.15));
+  border-radius: 12px;
+  border-left: 4px solid #ff6b6b;
+
+  .icon-grande {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .texto-mensaje {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ion-text-color);
+    font-weight: 500;
+  }
+}
+
+.opciones-donacion {
+  margin: 30px 0;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--ion-text-color);
+  }
+}
+
+.grid-opciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  .opcion-donacion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 12px;
+    border-radius: 12px;
+    background: var(--ion-color-primary);
+    border: 2px solid var(--ion-color-primary);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 100px;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: var(--ion-color-primary-shade);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(63, 81, 181, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .emoji {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    .label {
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      color: white;
+      line-height: 1.3;
+    }
+  }
+}
+
+.info-donacion {
+  background: rgba(76, 175, 80, 0.15);
+  border-left: 4px solid #4caf50;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 30px 0;
+  display: flex;
+  gap: 12px;
+
+  ion-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 20px;
+    color: #4caf50;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ion-text-color);
+
+    strong {
+      color: #4caf50;
+    }
+  }
+}
+
+.btn-cerrar {
+  margin-top: 20px;
+}
+
+@media (min-width: 600px) {
+  .grid-opciones {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}

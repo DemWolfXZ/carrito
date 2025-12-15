@@ -1,7 +1,7 @@
 /**
  * Servicio para gestionar los datos del usuario de la aplicación Carrito
  * Maneja perfil, configuraciones personales, estadísticas y actividad del usuario
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
@@ -10,8 +10,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 // Importar modelos necesarios
-import { 
-  Usuario, 
+import {
+  Usuario,
   ConfiguracionUsuario,
   EstadisticasUsuario,
   ActualizacionPerfil,
@@ -27,11 +27,14 @@ import {
   puedeCrearNuevaSesion
 } from '@core/models/usuario.model';
 
-import { 
+import {
   Pais,
   buscarPaisPorCodigo,
   obtenerInfoMoneda
 } from '@core/models/pais.model';
+
+// ✅ IMPORTAR AlmacenamientoService
+import { AlmacenamientoService } from './almacenamiento.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +52,9 @@ export class UsuarioService {
   // Usuario actual en memoria
   private usuarioActual: Usuario | null = null;
 
-  constructor() {
+  constructor(
+    private almacenamientoService: AlmacenamientoService // ✅ INYECTAR SERVICIO
+  ) {
     // Inicializar el servicio cargando datos del usuario
     this.inicializarUsuario();
   }
@@ -60,10 +65,10 @@ export class UsuarioService {
   private async inicializarUsuario(): Promise<void> {
     try {
       this.cargandoSubject.next(true);
-      
+
       // Intentar cargar usuario existente
       const usuarioExistente = await this.cargarUsuarioAlmacenado();
-      
+
       if (usuarioExistente && validarUsuario(usuarioExistente)) {
         // Actualizar última actividad
         this.usuarioActual = actualizarUltimaActividad(usuarioExistente);
@@ -73,7 +78,7 @@ export class UsuarioService {
         // No hay usuario configurado
         this.usuarioSubject.next(null);
       }
-      
+
     } catch (error) {
       console.error('Error al inicializar usuario:', error);
       this.usuarioSubject.next(null);
@@ -106,7 +111,7 @@ export class UsuarioService {
    */
   async obtenerInfoBasica(): Promise<{nombre: string, pais: string, moneda: string} | null> {
     await this.esperarInicializacion();
-    
+
     if (!this.usuarioActual) {
       return null;
     }
@@ -142,7 +147,7 @@ export class UsuarioService {
    */
   async obtenerEstadoUsuario(): Promise<EstadoUsuario> {
     await this.esperarInicializacion();
-    
+
     if (!this.usuarioActual) {
       return EstadoUsuario.NUEVO;
     }
@@ -156,7 +161,7 @@ export class UsuarioService {
    */
   async puedeCrearNuevaSesion(): Promise<boolean> {
     await this.esperarInicializacion();
-    
+
     if (!this.usuarioActual) {
       return false;
     }
@@ -170,7 +175,7 @@ export class UsuarioService {
    */
   async obtenerInfoPais(): Promise<Pais | null> {
     await this.esperarInicializacion();
-    
+
     if (!this.usuarioActual) {
       return null;
     }
@@ -184,7 +189,7 @@ export class UsuarioService {
    */
   async obtenerInfoMoneda(): Promise<{moneda: string, simbolo: string, formato: string} | null> {
     await this.esperarInicializacion();
-    
+
     if (!this.usuarioActual) {
       return null;
     }
@@ -200,7 +205,7 @@ export class UsuarioService {
   async actualizarPerfil(actualizacion: ActualizacionPerfil): Promise<boolean> {
     try {
       await this.esperarInicializacion();
-      
+
       if (!this.usuarioActual) {
         throw new Error('No hay usuario para actualizar');
       }
@@ -272,7 +277,7 @@ export class UsuarioService {
   async actualizarEstadisticas(estadisticas: Partial<EstadisticasUsuario>): Promise<boolean> {
     try {
       await this.esperarInicializacion();
-      
+
       if (!this.usuarioActual) {
         throw new Error('No hay usuario para actualizar estadísticas');
       }
@@ -299,19 +304,53 @@ export class UsuarioService {
   }
 
   /**
-   * Registrar nueva actividad del usuario
+   * ✅ NUEVO: Forzar recarga del usuario desde almacenamiento
+   * Útil después de guardar datos en otros componentes
+   * @returns Promise<boolean> true si se recargó correctamente
+   */
+  async recargarUsuario(): Promise<boolean> {
+    try {
+      console.log('🔄 Forzando recarga del usuario...');
+      this.cargandoSubject.next(true);
+
+      // Recargar usuario desde almacenamiento
+      const usuarioExistente = await this.cargarUsuarioAlmacenado();
+
+      if (usuarioExistente && validarUsuario(usuarioExistente)) {
+        this.usuarioActual = usuarioExistente;
+        this.usuarioSubject.next(this.usuarioActual);
+        console.log('✅ Usuario recargado exitosamente:', this.usuarioActual.nombre);
+        return true;
+      } else {
+        console.log('❌ No se pudo recargar el usuario');
+        this.usuarioActual = null;
+        this.usuarioSubject.next(null);
+        return false;
+      }
+
+    } catch (error) {
+      console.error('❌ Error al recargar usuario:', error);
+      this.usuarioActual = null;
+      this.usuarioSubject.next(null);
+      return false;
+    } finally {
+      this.cargandoSubject.next(false);
+    }
+  }
+
+  /**
    * @returns Promise<void>
    */
   async registrarActividad(): Promise<void> {
     try {
       await this.esperarInicializacion();
-      
+
       if (this.usuarioActual) {
         this.usuarioActual = actualizarUltimaActividad(this.usuarioActual);
         await this.guardarUsuario(this.usuarioActual);
         this.usuarioSubject.next(this.usuarioActual);
       }
-      
+
     } catch (error) {
       console.error('Error al registrar actividad:', error);
     }
@@ -361,7 +400,7 @@ export class UsuarioService {
     try {
       // Eliminar datos almacenados
       await this.eliminarUsuarioAlmacenado();
-      
+
       // Limpiar memoria
       this.usuarioActual = null;
       this.usuarioSubject.next(null);
@@ -411,39 +450,45 @@ export class UsuarioService {
   }
 
   /**
-   * Cargar usuario desde almacenamiento local
+   * ✅ CORREGIDO: Cargar usuario desde almacenamiento local usando AlmacenamientoService
    * @returns Promise<Usuario | null> usuario cargado
    */
   private async cargarUsuarioAlmacenado(): Promise<Usuario | null> {
     try {
-      // Por ahora cargamos desde localStorage
-      // Más adelante esto se conectará con AlmacenamientoService encriptado
-      const usuarioString = localStorage.getItem('carrito_usuario');
-      
-      if (!usuarioString) {
+      console.log('📂 Cargando usuario desde AlmacenamientoService...');
+
+      // ✅ USAR AlmacenamientoService en lugar de localStorage directo
+      const usuario = await this.almacenamientoService.obtenerUsuario();
+
+      if (!usuario) {
+        console.log('📂 No se encontró usuario en almacenamiento');
         return null;
       }
 
-      const usuario = JSON.parse(usuarioString);
-      
-      // Convertir strings de fecha a objetos Date
-      usuario.fechaCreacion = new Date(usuario.fechaCreacion);
-      usuario.ultimaActividad = new Date(usuario.ultimaActividad);
-      
-      if (usuario.estadisticas.ultimaCompra) {
+      console.log('📂 Usuario cargado exitosamente:', usuario.nombre);
+
+      // Convertir strings de fecha a objetos Date si es necesario
+      if (typeof usuario.fechaCreacion === 'string') {
+        usuario.fechaCreacion = new Date(usuario.fechaCreacion);
+      }
+      if (typeof usuario.ultimaActividad === 'string') {
+        usuario.ultimaActividad = new Date(usuario.ultimaActividad);
+      }
+
+      if (usuario.estadisticas.ultimaCompra && typeof usuario.estadisticas.ultimaCompra === 'string') {
         usuario.estadisticas.ultimaCompra = new Date(usuario.estadisticas.ultimaCompra);
       }
 
       return usuario;
-      
+
     } catch (error) {
-      console.error('Error al cargar usuario almacenado:', error);
+      console.error('❌ Error al cargar usuario almacenado:', error);
       return null;
     }
   }
 
   /**
-   * Guardar usuario en almacenamiento local
+   * ✅ CORREGIDO: Guardar usuario en almacenamiento local usando AlmacenamientoService
    * @param usuario Usuario a guardar
    */
   private async guardarUsuario(usuario: Usuario): Promise<void> {
@@ -453,25 +498,40 @@ export class UsuarioService {
         throw new Error('Usuario inválido para guardar');
       }
 
-      // Por ahora guardamos en localStorage
-      // Más adelante esto se conectará con AlmacenamientoService encriptado
-      const usuarioString = JSON.stringify(usuario);
-      localStorage.setItem('carrito_usuario', usuarioString);
-      
+      console.log('💾 Guardando usuario con AlmacenamientoService...');
+
+      // ✅ USAR AlmacenamientoService en lugar de localStorage directo
+      const exito = await this.almacenamientoService.guardarUsuario(usuario);
+
+      if (!exito) {
+        throw new Error('No se pudo guardar el usuario');
+      }
+
+      console.log('💾 Usuario guardado exitosamente');
+
     } catch (error) {
-      console.error('Error al guardar usuario:', error);
+      console.error('❌ Error al guardar usuario:', error);
       throw error;
     }
   }
 
   /**
-   * Eliminar usuario del almacenamiento local
+   * ✅ CORREGIDO: Eliminar usuario del almacenamiento local usando AlmacenamientoService
    */
   private async eliminarUsuarioAlmacenado(): Promise<void> {
     try {
-      localStorage.removeItem('carrito_usuario');
+      console.log('🗑️ Eliminando usuario con AlmacenamientoService...');
+
+      // ✅ USAR AlmacenamientoService en lugar de localStorage directo
+      const exito = await this.almacenamientoService.eliminarUsuario();
+
+      if (!exito) {
+        throw new Error('No se pudo eliminar el usuario');
+      }
+
+      console.log('🗑️ Usuario eliminado exitosamente');
     } catch (error) {
-      console.error('Error al eliminar usuario almacenado:', error);
+      console.error('❌ Error al eliminar usuario almacenado:', error);
       throw error;
     }
   }

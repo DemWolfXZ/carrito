@@ -2,13 +2,14 @@
  * Módulo principal de la aplicación Carrito
  * Configura los módulos básicos, core module y providers globales
  * Punto de entrada para toda la aplicación
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // ✅ AGREGAR PARA ANIMACIONES
 import { RouteReuseStrategy } from '@angular/router';
 
 // Importar módulos de Ionic
@@ -29,7 +30,8 @@ import { CoreModule } from './core/core.module';
   imports: [
     // Módulos básicos de Angular
     BrowserModule,
-    
+    BrowserAnimationsModule, // ✅ REQUERIDO PARA ANIMACIONES
+
     // Módulo principal de Ionic con configuración por defecto
     IonicModule.forRoot({
       // Configuración global de Ionic
@@ -37,18 +39,18 @@ import { CoreModule } from './core/core.module';
       mode: 'ios', // Usar modo iOS para consistencia en todas las plataformas
       animated: true
     }),
-    
+
     // Módulo core con servicios singleton (SOLO UNA VEZ)
     CoreModule.forRoot(),
-    
+
     // Módulo de rutas principal
     AppRoutingModule
   ],
   providers: [
     // Configurar estrategia de reutilización de rutas de Ionic
-    { 
-      provide: RouteReuseStrategy, 
-      useClass: IonicRouteStrategy 
+    {
+      provide: RouteReuseStrategy,
+      useClass: IonicRouteStrategy
     }
   ],
   bootstrap: [

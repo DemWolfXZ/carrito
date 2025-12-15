@@ -1,18 +1,18 @@
 /**
  * Servicio para gestionar la configuración inicial y general de la aplicación Carrito
  * Maneja la verificación de primer inicio, configuraciones de usuario y países soportados
- * 
+ *
  * @author DemWolf
- * @version 1.0
+ * @version 1.1 - CORREGIDO
  */
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 // Importar modelos necesarios
-import { 
-  ConfiguracionApp, 
-  CONFIGURACION_INICIAL, 
+import {
+  ConfiguracionApp,
+  CONFIGURACION_INICIAL,
   crearConfiguracionInicial,
   validarConfiguracion,
   marcarConfiguracionCompleta,
@@ -21,21 +21,24 @@ import {
   ActualizacionConfiguracion
 } from '@core/models/configuracion.model';
 
-import { 
-  Pais, 
-  PAISES_SOPORTADOS, 
+import {
+  Pais,
+  PAISES_SOPORTADOS,
   buscarPaisPorCodigo,
   obtenerPaisesActivos,
   validarCodigoPais,
   obtenerInfoMoneda
 } from '@core/models/pais.model';
 
-import { 
-  Usuario, 
+import {
+  Usuario,
   DatosConfiguracionInicial,
   crearNuevoUsuario,
   validarUsuario
 } from '@core/models/usuario.model';
+
+// Importar servicio de almacenamiento
+import { AlmacenamientoService } from './almacenamiento.service';
 
 @Injectable({
   providedIn: 'root'
@@ -53,7 +56,9 @@ export class ConfiguracionService {
   // Configuración actual en memoria
   private configuracionActual: ConfiguracionApp | null = null;
 
-  constructor() {
+  constructor(
+    private almacenamientoService: AlmacenamientoService
+  ) {
     // Inicializar el servicio cargando la configuración
     this.inicializarConfiguracion();
   }
@@ -64,24 +69,27 @@ export class ConfiguracionService {
   private async inicializarConfiguracion(): Promise<void> {
     try {
       this.cargandoSubject.next(true);
-      
-      // Intentar cargar configuración existente
-      const configExistente = await this.cargarConfiguracionAlmacenada();
-      
+
+      // Intentar cargar configuración existente usando AlmacenamientoService
+      console.log('🔧 ConfiguracionService: Cargando configuración...');
+      const configExistente = await this.almacenamientoService.obtenerConfiguracion();
+
       if (configExistente && validarConfiguracion(configExistente)) {
         // Usar configuración existente
+        console.log('✅ ConfiguracionService: Configuración existente cargada');
         this.configuracionActual = configExistente;
         this.configuracionSubject.next(configExistente);
       } else {
         // Crear configuración inicial
+        console.log('🆕 ConfiguracionService: Creando configuración inicial');
         const nuevaConfig = crearConfiguracionInicial();
-        await this.guardarConfiguracion(nuevaConfig);
+        await this.almacenamientoService.guardarConfiguracion(nuevaConfig);
         this.configuracionActual = nuevaConfig;
         this.configuracionSubject.next(nuevaConfig);
       }
-      
+
     } catch (error) {
-      console.error('Error al inicializar configuración:', error);
+      console.error('❌ ConfiguracionService: Error al inicializar configuración:', error);
       // En caso de error, usar configuración por defecto
       this.configuracionActual = CONFIGURACION_INICIAL;
       this.configuracionSubject.next(CONFIGURACION_INICIAL);
@@ -96,6 +104,7 @@ export class ConfiguracionService {
    */
   async esPrimerInicio(): Promise<boolean> {
     await this.esperarInicializacion();
+    console.log('🔍 ConfiguracionService: esPrimerInicio =', this.configuracionActual?.primerInicio ?? true);
     return this.configuracionActual?.primerInicio ?? true;
   }
 
@@ -105,7 +114,9 @@ export class ConfiguracionService {
    */
   async esConfiguracionCompleta(): Promise<boolean> {
     await this.esperarInicializacion();
-    return this.configuracionActual?.configuracionCompleta ?? false;
+    const completa = this.configuracionActual?.configuracionCompleta ?? false;
+    console.log('🔍 ConfiguracionService: esConfiguracionCompleta =', completa);
+    return completa;
   }
 
   /**
@@ -114,11 +125,11 @@ export class ConfiguracionService {
    */
   async obtenerEstadoConfiguracion(): Promise<EstadoConfiguracion> {
     await this.esperarInicializacion();
-    
+
     if (!this.configuracionActual) {
       return EstadoConfiguracion.ERROR;
     }
-    
+
     return obtenerEstadoConfiguracion(this.configuracionActual);
   }
 
@@ -166,40 +177,68 @@ export class ConfiguracionService {
   }
 
   /**
-   * Guardar configuración inicial completa del usuario
+   * ✅ MÉTODO CRÍTICO CORREGIDO - Guardar configuración inicial completa del usuario
    * @param datosIniciales Datos de la configuración inicial
    * @returns Promise<boolean> true si se guardó correctamente
    */
   async guardarConfiguracionInicial(datosIniciales: DatosConfiguracionInicial): Promise<boolean> {
     try {
+      console.log('💾 ConfiguracionService: Iniciando guardarConfiguracionInicial...');
+      console.log('💾 Datos recibidos:', datosIniciales);
+
       // Validar datos de entrada
       if (!this.validarDatosIniciales(datosIniciales)) {
         throw new Error('Datos de configuración inicial inválidos');
       }
 
       // Crear usuario con los datos iniciales
+      console.log('👤 Creando nuevo usuario...');
       const nuevoUsuario = crearNuevoUsuario(datosIniciales);
-      
+
       // Obtener información de moneda del país seleccionado
       const infoMoneda = this.obtenerInfoMonedaPais(datosIniciales.codigoPais);
       if (infoMoneda) {
         nuevoUsuario.moneda = infoMoneda.moneda;
       }
 
-      // Guardar usuario (esto debería ir al servicio de usuario cuando lo creemos)
-      await this.guardarUsuarioInicial(nuevoUsuario);
+      // ✅ CRÍTICO: Guardar usuario usando AlmacenamientoService
+      console.log('💾 Guardando usuario con AlmacenamientoService...');
+      const usuarioGuardado = await this.almacenamientoService.guardarUsuario(nuevoUsuario);
+
+      if (!usuarioGuardado) {
+        throw new Error('No se pudo guardar el usuario');
+      }
+
+      console.log('✅ Usuario guardado correctamente');
 
       // Marcar configuración como completa
       if (this.configuracionActual) {
+        console.log('📝 Marcando configuración como completa...');
         this.configuracionActual = marcarConfiguracionCompleta(this.configuracionActual);
-        await this.guardarConfiguracion(this.configuracionActual);
+
+        // Guardar configuración actualizada
+        const configGuardada = await this.almacenamientoService.guardarConfiguracion(this.configuracionActual);
+
+        if (!configGuardada) {
+          throw new Error('No se pudo guardar la configuración actualizada');
+        }
+
         this.configuracionSubject.next(this.configuracionActual);
+        console.log('✅ Configuración marcada como completa y guardada');
       }
+
+      // ✅ Verificar que todo se guardó correctamente
+      const usuarioVerificacion = await this.almacenamientoService.obtenerUsuario();
+      const configVerificacion = await this.almacenamientoService.obtenerConfiguracion();
+
+      console.log('🔍 Verificación final:');
+      console.log('- Usuario guardado:', !!usuarioVerificacion);
+      console.log('- Configuración completa:', configVerificacion?.configuracionCompleta);
 
       return true;
 
     } catch (error) {
-      console.error('Error al guardar configuración inicial:', error);
+      console.error('❌ ConfiguracionService: Error al guardar configuración inicial:', error);
       return false;
     }
   }
@@ -221,7 +260,7 @@ export class ConfiguracionService {
   async actualizarConfiguracion(actualizacion: ActualizacionConfiguracion): Promise<boolean> {
     try {
       await this.esperarInicializacion();
-      
+
       if (!this.configuracionActual) {
         throw new Error('No hay configuración actual para actualizar');
       }
@@ -262,8 +301,8 @@ export class ConfiguracionService {
         throw new Error('Configuración actualizada no es válida');
       }
 
-      // Guardar cambios
-      await this.guardarConfiguracion(this.configuracionActual);
+      // Guardar cambios usando AlmacenamientoService
+      await this.almacenamientoService.guardarConfiguracion(this.configuracionActual);
       this.configuracionSubject.next(this.configuracionActual);
 
       return true;
@@ -280,10 +319,20 @@ export class ConfiguracionService {
    */
   async resetearConfiguracion(): Promise<boolean> {
     try {
+      console.log('🔄 Reseteando configuración...');
+
+      // Eliminar datos existentes
+      await this.almacenamientoService.eliminarConfiguracion();
+      await this.almacenamientoService.eliminarUsuario();
+
+      // Crear nueva configuración
       const nuevaConfig = crearConfiguracionInicial();
-      await this.guardarConfiguracion(nuevaConfig);
+      await this.almacenamientoService.guardarConfiguracion(nuevaConfig);
+
       this.configuracionActual = nuevaConfig;
       this.configuracionSubject.next(nuevaConfig);
+
+      console.log('✅ Configuración reseteada');
       return true;
     } catch (error) {
       console.error('Error al resetear configuración:', error);
@@ -301,16 +350,13 @@ export class ConfiguracionService {
   private validarDatosIniciales(datos: DatosConfiguracionInicial): boolean {
     // Validar nombre
     if (!datos.nombre || datos.nombre.length < 2 || datos.nombre.length > 30) {
+      console.error('❌ Nombre inválido');
       return false;
     }
 
     // Validar país
     if (!this.validarCodigoPais(datos.codigoPais)) {
-      return false;
-    }
-
-    // Validar PIN
-    if (!datos.pin || datos.pin.length !== 6 || !/^\d{6}$/.test(datos.pin)) {
+      console.error('❌ País inválido');
       return false;
     }
 
@@ -333,72 +379,5 @@ export class ConfiguracionService {
         });
       }
     });
-  }
-
-  /**
-   * Cargar configuración desde almacenamiento local
-   * @returns Promise<ConfiguracionApp | null> configuración cargada
-   */
-  private async cargarConfiguracionAlmacenada(): Promise<ConfiguracionApp | null> {
-    try {
-      // Por ahora simulamos carga desde localStorage
-      // Más adelante esto se conectará con AlmacenamientoService
-      const configString = localStorage.getItem('carrito_configuracion');
-      
-      if (!configString) {
-        return null;
-      }
-
-      const config = JSON.parse(configString);
-      
-      // Convertir strings de fecha a objetos Date
-      config.fechaInstalacion = new Date(config.fechaInstalacion);
-      config.ultimaActualizacion = new Date(config.ultimaActualizacion);
-
-      return config;
-      
-    } catch (error) {
-      console.error('Error al cargar configuración almacenada:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Guardar configuración en almacenamiento local
-   * @param config Configuración a guardar
-   */
-  private async guardarConfiguracion(config: ConfiguracionApp): Promise<void> {
-    try {
-      // Por ahora guardamos en localStorage
-      // Más adelante esto se conectará con AlmacenamientoService encriptado
-      const configString = JSON.stringify(config);
-      localStorage.setItem('carrito_configuracion', configString);
-      
-    } catch (error) {
-      console.error('Error al guardar configuración:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Guardar usuario inicial (temporal hasta crear UsuarioService)
-   * @param usuario Usuario a guardar
-   */
-  private async guardarUsuarioInicial(usuario: Usuario): Promise<void> {
-    try {
-      // Validar usuario antes de guardar
-      if (!validarUsuario(usuario)) {
-        throw new Error('Usuario inválido');
-      }
-
-      // Por ahora guardamos en localStorage
-      // Más adelante esto irá al UsuarioService
-      const usuarioString = JSON.stringify(usuario);
-      localStorage.setItem('carrito_usuario', usuarioString);
-      
-    } catch (error) {
-      console.error('Error al guardar usuario inicial:', error);
-      throw error;
-    }
   }
 }

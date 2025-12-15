@@ -2,7 +2,7 @@
  * Modelo de datos para sesiones de compra en la aplicación Carrito
  * Maneja el estado completo de una compra: productos, totales, límites y validaciones
  * Incluye control del límite de 2 sesiones por mes
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
@@ -32,7 +32,8 @@ export enum EstadoSesion {
   PAUSADA = 'pausada',                 // Temporalmente pausada
   COMPLETADA = 'completada',           // Finalizada exitosamente
   CANCELADA = 'cancelada',             // Cancelada por el usuario
-  EXPIRADA = 'expirada'                // Expirada por tiempo (24h)
+  EXPIRADA = 'expirada',               // Expirada por tiempo (24h)
+  BORRADOR = 'borrador'                // Borrador sin precios/cantidades completos
 }
 
 // Interface para totales calculados de la sesión
@@ -125,7 +126,7 @@ export const VALIDACION_SESION = {
     maxLongitud: 200
   },
   productos: {
-    maximo: 200                        // Máximo productos por sesión
+    maximo: 20                         // Máximo productos por sesión
   },
   tiempoMaximo: 24 * 60 * 60 * 1000,   // 24 horas en milisegundos
   limiteMensual: 2                     // Máximo 2 sesiones por mes
@@ -201,11 +202,11 @@ export function validarDatosSesion(datos: NuevaSesion | ActualizacionSesion): Va
   // Validar nombre del supermercado si está presente
   if ('nombreSupermercado' in datos && datos.nombreSupermercado !== undefined) {
     const nombre = datos.nombreSupermercado.trim();
-    
+
     if (nombre.length < VALIDACION_SESION.nombreSupermercado.minLongitud) {
       errores.push('El nombre del supermercado es obligatorio');
     }
-    
+
     if (nombre.length > VALIDACION_SESION.nombreSupermercado.maxLongitud) {
       errores.push(`El nombre del supermercado no puede tener más de ${VALIDACION_SESION.nombreSupermercado.maxLongitud} caracteres`);
     }
@@ -220,15 +221,15 @@ export function validarDatosSesion(datos: NuevaSesion | ActualizacionSesion): Va
   // Validar presupuesto si está presente
   if (datos.presupuestoEstimado !== undefined && datos.presupuestoEstimado !== null) {
     const presupuesto = Number(datos.presupuestoEstimado);
-    
+
     if (isNaN(presupuesto) || presupuesto <= 0) {
       errores.push('El presupuesto debe ser un número mayor a 0');
     }
-    
+
     if (presupuesto < VALIDACION_SESION.presupuesto.minimo) {
       errores.push(`El presupuesto mínimo es ${VALIDACION_SESION.presupuesto.minimo}`);
     }
-    
+
     if (presupuesto > VALIDACION_SESION.presupuesto.maximo) {
       errores.push(`El presupuesto máximo es ${VALIDACION_SESION.presupuesto.maximo.toLocaleString()}`);
     }
@@ -390,15 +391,15 @@ export function finalizarSesion(sesion: SesionCompra): SesionCompra | null {
  */
 export function calcularTotalesSesion(sesion: SesionCompra): TotalesSesion {
   const productos = sesion.productos;
-  
+
   const subtotal = productos.reduce((sum, producto) => sum + producto.total, 0);
   const cantidadProductos = productos.length;
   const cantidadItems = productos.reduce((sum, producto) => sum + producto.cantidad, 0);
-  
+
   const descuentos = 0; // Por ahora no hay descuentos
   const impuestos = 0;  // Por ahora no hay impuestos
   const total = subtotal - descuentos + impuestos;
-  
+
   let porcentajePresupuesto = 0;
   if (sesion.presupuestoEstimado && sesion.presupuestoEstimado > 0) {
     porcentajePresupuesto = Math.round((total / sesion.presupuestoEstimado) * 100);
@@ -424,7 +425,7 @@ export function calcularEstadisticasSesion(sesion: SesionCompra): EstadisticasSe
   const productos = sesion.productos;
   const ahora = new Date();
   const tiempoTranscurrido = Math.round((ahora.getTime() - sesion.fechaInicio.getTime()) / (1000 * 60));
-  
+
   let productoMasCaro: Producto | null = null;
   let productoMasCaroTotal: Producto | null = null;
   let categoriaConMasProductos: CategoriaProducto | null = null;
@@ -433,12 +434,12 @@ export function calcularEstadisticasSesion(sesion: SesionCompra): EstadisticasSe
 
   if (productos.length > 0) {
     // Producto más caro por precio unitario
-    productoMasCaro = productos.reduce((max, producto) => 
+    productoMasCaro = productos.reduce((max, producto) =>
       producto.precioUnitario > max.precioUnitario ? producto : max
     );
 
     // Producto más caro por total
-    productoMasCaroTotal = productos.reduce((max, producto) => 
+    productoMasCaroTotal = productos.reduce((max, producto) =>
       producto.total > max.total ? producto : max
     );
 
@@ -508,9 +509,9 @@ export function obtenerResumenMensual(sesiones: SesionCompra[], ano: number, mes
 
   const sesionesCreadas = sesionesMes.length;
   const sesionesCompletadas = sesionesMes.filter(s => s.estado === EstadoSesion.COMPLETADA).length;
-  
+
   // Solo cuentan para el límite las sesiones completadas y canceladas (que se usaron)
-  const sesionesUsadas = sesionesMes.filter(s => 
+  const sesionesUsadas = sesionesMes.filter(s =>
     s.estado === EstadoSesion.COMPLETADA || s.estado === EstadoSesion.CANCELADA
   ).length;
 

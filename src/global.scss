@@ -35,3 +35,42 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+/**
+ * Estilos globales personalizados
+ * -----------------------------------------------------
+ */
+
+// Asegurar que ion-content use el color de fondo correcto
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+// Asegurar que el body use el color de fondo correcto
+body {
+  background: var(--ion-background-color);
+}
+
+// Estilos para listas y cards
+ion-list {
+  background: transparent;
+}
+
+ion-card {
+  background: var(--ion-card-background);
+}
+
+// Ajustes para el modo oscuro
+body.dark {
+  ion-content {
+    --background: var(--ion-background-color);
+  }
+
+  ion-toolbar {
+    --background: var(--ion-toolbar-background);
+  }
+
+  ion-item {
+    --background: var(--ion-item-background);
+  }
+}

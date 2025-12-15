@@ -1,7 +1,7 @@
 /**
  * Modelo de datos para el usuario de la aplicación Carrito
  * Incluye información personal, configuraciones y preferencias
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
@@ -15,7 +15,6 @@ export interface Usuario {
   fechaCreacion: Date;                 // Fecha de creación del perfil
   ultimaActividad: Date;               // Última vez que usó la aplicación
   configuracionCompleta: boolean;      // Si completó la configuración inicial
-  autenticacionHabilitada: boolean;    // Si configuró PIN/biometría
   configuraciones: ConfiguracionUsuario; // Configuraciones personalizadas del usuario
   estadisticas: EstadisticasUsuario;   // Estadísticas de uso de la aplicación
 }
@@ -26,22 +25,18 @@ export interface ConfiguracionUsuario {
   temaVisual: TemaVisual;              // Tema de la aplicación
   tamanoFuente: TamanoFuente;          // Tamaño de fuente preferido
   idioma: Idioma;                      // Idioma de la aplicación
-  
+
   // Configuraciones de notificaciones
   notificacionesHabilitadas: boolean;  // Si recibe notificaciones
   sonidoNotificaciones: boolean;       // Si las notificaciones tienen sonido
   vibracionNotificaciones: boolean;    // Si las notificaciones vibran
-  
-  // Configuraciones de autenticación
-  biometriaHabilitada: boolean;        // Si usa autenticación biométrica
-  tiempoBloqueoSensible: number;       // Minutos para bloquear funciones sensibles (donaciones)
-  
+
   // Configuraciones de compras
   presupuestoTipico?: number;          // Presupuesto sugerido por defecto
   recordatorioPresupuesto: boolean;    // Si muestra recordatorios de presupuesto
   alertaPresupuesto80: boolean;        // Alerta al 80% del presupuesto
   alertaPresupuesto100: boolean;       // Alerta al 100% del presupuesto
-  
+
   // Configuraciones de privacidad
   permitirScreenshots: boolean;        // Si permite capturas de pantalla
   modoPrivado: boolean;               // Ocultar información sensible en vista previa de apps
@@ -96,9 +91,6 @@ export enum EstadoUsuario {
 export interface DatosConfiguracionInicial {
   nombre: string;                      // Nombre elegido por el usuario
   codigoPais: string;                  // Código ISO del país seleccionado
-  pin: string;                         // PIN de 6 dígitos (será encriptado)
-  biometriaDisponible: boolean;        // Si el dispositivo soporta biometría
-  biometriaHabilitada: boolean;        // Si el usuario eligió usar biometría
   configuracionesIniciales: Partial<ConfiguracionUsuario>; // Configuraciones básicas
 }
 
@@ -115,21 +107,17 @@ export const CONFIGURACION_DEFECTO: ConfiguracionUsuario = {
   temaVisual: TemaVisual.AUTOMATICO,
   tamanoFuente: TamanoFuente.MEDIANO,
   idioma: Idioma.ESPANOL,
-  
+
   // Notificaciones
   notificacionesHabilitadas: true,
   sonidoNotificaciones: true,
   vibracionNotificaciones: true,
-  
-  // Autenticación
-  biometriaHabilitada: false,          // Se configura después
-  tiempoBloqueoSensible: 5,            // 5 minutos por defecto
-  
+
   // Compras
   recordatorioPresupuesto: true,
   alertaPresupuesto80: true,
   alertaPresupuesto100: true,
-  
+
   // Privacidad
   permitirScreenshots: true,
   modoPrivado: false
@@ -154,7 +142,7 @@ export const ESTADISTICAS_INICIALES: EstadisticasUsuario = {
  */
 export function crearNuevoUsuario(datosIniciales: DatosConfiguracionInicial): Usuario {
   const ahora = new Date();
-  
+
   return {
     id: generarUUID(),
     nombre: datosIniciales.nombre,
@@ -163,10 +151,8 @@ export function crearNuevoUsuario(datosIniciales: DatosConfiguracionInicial): Us
     fechaCreacion: ahora,
     ultimaActividad: ahora,
     configuracionCompleta: true,
-    autenticacionHabilitada: true,
     configuraciones: {
       ...CONFIGURACION_DEFECTO,
-      biometriaHabilitada: datosIniciales.biometriaHabilitada,
       ...datosIniciales.configuracionesIniciales
     },
     estadisticas: ESTADISTICAS_INICIALES
@@ -183,17 +169,17 @@ export function validarUsuario(usuario: Usuario): boolean {
   if (!usuario.id || !usuario.nombre || !usuario.pais) {
     return false;
   }
-  
+
   // Validar longitud del nombre
   if (usuario.nombre.length < 2 || usuario.nombre.length > 30) {
     return false;
   }
-  
+
   // Validar que las fechas sean válidas
   if (!(usuario.fechaCreacion instanceof Date) || !(usuario.ultimaActividad instanceof Date)) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -218,13 +204,13 @@ export function obtenerEstadoUsuario(usuario: Usuario): EstadoUsuario {
   if (!usuario.configuracionCompleta) {
     return EstadoUsuario.CONFIGURANDO;
   }
-  
+
   // Considerar inactivo si no ha usado la app en más de 30 días
   const diasInactivo = (Date.now() - usuario.ultimaActividad.getTime()) / (1000 * 60 * 60 * 24);
   if (diasInactivo > 30) {
     return EstadoUsuario.INACTIVO;
   }
-  
+
   return EstadoUsuario.ACTIVO;
 }
 
@@ -238,7 +224,7 @@ export function puedeCrearNuevaSesion(usuario: Usuario): boolean {
   if (!usuario.configuracionCompleta) {
     return false;
   }
-  
+
   // Verificar que no exceda el límite mensual (se validará en el servicio de compras)
   return true;
 }

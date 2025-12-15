@@ -2,19 +2,19 @@
   Template del componente de bienvenida con selector grid de países
   Sistema de tarjetas que aprovecha el 100% de la pantalla móvil
   Sustituto profesional del carrusel 3D problemático
-  
+
   @author DemWolf
   @version 2.0 - Grid selector implementado
 -->
 
 <ion-content [fullscreen]="true" class="bienvenida-content">
-  
+
   <!-- SPLASH SCREEN ANIMADO -->
-  <div 
-    *ngIf="mostrarSplash" 
+  <div
+    *ngIf="mostrarSplash"
     class="splash-container"
     [class.splash-exit]="splashAnimacionCompleta">
-    
+
     <!-- Logo principal con animación de crecimiento -->
     <div class="splash-logo">
       <div class="logo-circle">
@@ -39,8 +39,8 @@
     <!-- Indicador de progreso superior -->
     <div class="progress-container">
       <div class="progress-bar">
-        <div 
-          class="progress-fill" 
+        <div
+          class="progress-fill"
           [style.width.%]="((pasoActual - 1) / (totalPasos - 1)) * 100">
         </div>
       </div>
@@ -54,7 +54,7 @@
 
       <!-- PASO 2: Explicación de la App -->
       <div *ngIf="pasoActual === 2" class="step-container fade-in">
-        
+
         <!-- Sección de título -->
         <div class="title-section">
           <ion-text class="main-title">
@@ -68,15 +68,15 @@
         <!-- Características principales con animación escalonada -->
         <div class="features-section">
           <div class="features-grid">
-            <div 
-              *ngFor="let feature of infoApp.caracteristicas; let i = index" 
+            <div
+              *ngFor="let feature of infoApp.caracteristicas; let i = index"
               class="feature-card"
               [style.animation-delay.ms]="i * 200">
-              
+
               <div class="feature-icon">
                 <ion-icon [name]="feature.icono" [color]="i % 2 === 0 ? 'primary' : 'secondary'"></ion-icon>
               </div>
-              
+
               <div class="feature-content">
                 <h3>{{ feature.titulo }}</h3>
                 <p>{{ feature.descripcion }}</p>
@@ -95,10 +95,10 @@
 
       <!-- PASO 3: Selección de País con GRID RESPONSIVO -->
       <div *ngIf="pasoActual === 3" class="step-container fade-in">
-        
+
         <!-- Contenedor principal del paso 3 con layout flex optimizado -->
         <div class="step3-layout">
-          
+
           <!-- Sección de título COMPACTA -->
           <div class="title-section-compact">
             <ion-text class="step-title">
@@ -111,15 +111,15 @@
 
           <!-- Sección del selector grid - OCUPA ESPACIO DISPONIBLE -->
           <div class="country-selector-section">
-            
+
             <!-- Contenedor del grid con scroll -->
             <div class="countries-grid-container">
-              
+
               <!-- Grid responsivo de países -->
               <div class="countries-grid">
-                
+
                 <!-- Tarjeta de cada país -->
-                <div 
+                <div
                   *ngFor="let pais of paisesDisponibles; let i = index"
                   class="country-card"
                   [class.selected]="paisSeleccionado?.codigo === pais.codigo"
@@ -128,33 +128,33 @@
                   tabindex="0"
                   (keydown.enter)="seleccionarPais(pais)"
                   (keydown.space)="seleccionarPais(pais)">
-                  
+
                   <!-- Bandera del país -->
                   <div class="country-flag-container">
-                    <img 
-                      [src]="pais.bandera" 
+                    <img
+                      [src]="pais.bandera"
                       [alt]="'Bandera de ' + pais.nombre"
                       class="country-flag"
                       loading="lazy">
                   </div>
-                  
+
                   <!-- Información del país -->
                   <div class="country-info">
                     <h3 class="country-name">{{ pais.nombre }}</h3>
                     <p class="country-currency">{{ pais.simboloMoneda }} {{ pais.moneda }}</p>
                   </div>
-                  
+
                   <!-- Icono de selección (solo visible cuando está seleccionado) -->
                   <div *ngIf="paisSeleccionado?.codigo === pais.codigo" class="selection-check">
                     <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
                   </div>
-                  
+
                 </div>
 
               </div>
-              
+
             </div>
-            
+
           </div>
 
           <!-- Sección de información del país seleccionado -->
@@ -164,10 +164,10 @@
                 <ion-icon name="checkmark-circle" color="success"></ion-icon>
                 <span>País seleccionado</span>
               </div>
-              
+
               <div class="seleccion-detalle">
-                <img 
-                  [src]="paisSeleccionado.bandera" 
+                <img
+                  [src]="paisSeleccionado.bandera"
                   [alt]="'Bandera de ' + paisSeleccionado.nombre"
                   class="bandera-seleccionada">
                 <div class="seleccion-info">
@@ -178,14 +178,14 @@
               </div>
             </div>
           </div>
-          
+
         </div>
 
       </div>
 
       <!-- PASO 4: Configuración Personal -->
       <div *ngIf="pasoActual === 4" class="step-container fade-in">
-        
+
         <!-- Sección de título -->
         <div class="title-section">
           <ion-text class="step-title">
@@ -210,12 +210,12 @@
               </div>
 
               <!-- Campo de nombre -->
-              <ion-item 
+              <ion-item
                 class="form-item"
                 [class.item-error]="!validaciones.nombre.valido && validaciones.nombre.mensaje">
-                
+
                 <ion-label position="stacked">¿Cómo te gustaría que te llamemos? *</ion-label>
-                <ion-input 
+                <ion-input
                   [(ngModel)]="datosConfiguracion.nombre"
                   (ionInput)="validarNombre()"
                   type="text"
@@ -226,102 +226,18 @@
               </ion-item>
 
               <!-- Mensaje de error para nombre -->
-              <div 
-                *ngIf="!validaciones.nombre.valido && validaciones.nombre.mensaje" 
+              <div
+                *ngIf="!validaciones.nombre.valido && validaciones.nombre.mensaje"
                 class="error-message">
                 <ion-icon name="alert-circle-outline"></ion-icon>
                 {{ validaciones.nombre.mensaje }}
               </div>
             </div>
 
-            <!-- Separador -->
-            <div class="form-separator"></div>
-
-            <!-- Sección PIN de seguridad -->
-            <div class="form-group">
-              <div class="section-header">
-                <ion-icon name="shield-checkmark-outline" color="secondary"></ion-icon>
-                <div>
-                  <h4>PIN de seguridad</h4>
-                  <p>Para proteger las donaciones y funciones sensibles</p>
-                </div>
-              </div>
-
-              <!-- Campo PIN -->
-              <ion-item 
-                class="form-item pin-item"
-                [class.item-error]="!validaciones.pin.valido && validaciones.pin.mensaje">
-                
-                <ion-label position="stacked">PIN (6 dígitos) *</ion-label>
-                <ion-input 
-                  [(ngModel)]="datosConfiguracion.pin"
-                  (ionInput)="validarPin()"
-                  [type]="mostrarPin ? 'text' : 'password'"
-                  placeholder="••••••"
-                  maxlength="6"
-                  inputmode="numeric">
-                </ion-input>
-                
-                <!-- Botón para mostrar/ocultar PIN -->
-                <ion-button 
-                  fill="clear" 
-                  slot="end"
-                  (click)="toggleMostrarPin()">
-                  <ion-icon 
-                    [name]="mostrarPin ? 'eye-off-outline' : 'eye-outline'"
-                    slot="icon-only">
-                  </ion-icon>
-                </ion-button>
-              </ion-item>
-
-              <!-- Mensaje de error para PIN -->
-              <div 
-                *ngIf="!validaciones.pin.valido && validaciones.pin.mensaje" 
-                class="error-message">
-                <ion-icon name="alert-circle-outline"></ion-icon>
-                {{ validaciones.pin.mensaje }}
-              </div>
-
-              <!-- Campo confirmación PIN -->
-              <ion-item 
-                class="form-item pin-item"
-                [class.item-error]="!validaciones.pinConfirmacion.valido && validaciones.pinConfirmacion.mensaje">
-                
-                <ion-label position="stacked">Confirmar PIN *</ion-label>
-                <ion-input 
-                  [(ngModel)]="pinConfirmacion"
-                  (ionInput)="validarPinConfirmacion()"
-                  [type]="mostrarPinConfirmacion ? 'text' : 'password'"
-                  placeholder="••••••"
-                  maxlength="6"
-                  inputmode="numeric">
-                </ion-input>
-                
-                <!-- Botón para mostrar/ocultar confirmación PIN -->
-                <ion-button 
-                  fill="clear" 
-                  slot="end"
-                  (click)="toggleMostrarPinConfirmacion()">
-                  <ion-icon 
-                    [name]="mostrarPinConfirmacion ? 'eye-off-outline' : 'eye-outline'"
-                    slot="icon-only">
-                  </ion-icon>
-                </ion-button>
-              </ion-item>
-
-              <!-- Mensaje de error para confirmación PIN -->
-              <div 
-                *ngIf="!validaciones.pinConfirmacion.valido && validaciones.pinConfirmacion.mensaje" 
-                class="error-message">
-                <ion-icon name="alert-circle-outline"></ion-icon>
-                {{ validaciones.pinConfirmacion.mensaje }}
-              </div>
-
-              <!-- Información de seguridad -->
-              <div class="security-info">
-                <ion-icon name="lock-closed-outline" color="medium"></ion-icon>
-                <span>Tu PIN se guardará de forma segura y encriptada en tu dispositivo</span>
-              </div>
+            <!-- Información de seguridad -->
+            <div class="security-info">
+              <ion-icon name="shield-checkmark-outline" color="success"></ion-icon>
+              <span>Tus datos están protegidos por la seguridad de tu dispositivo (PIN/huella/Face ID)</span>
             </div>
 
           </div>
@@ -331,7 +247,7 @@
 
       <!-- PASO 5: Configuración Completada -->
       <div *ngIf="pasoActual === 5" class="step-container fade-in">
-        
+
         <!-- Sección de éxito -->
         <div class="success-section">
           <!-- Icono de éxito -->
@@ -367,7 +283,7 @@
             </div>
             <div class="summary-item">
               <ion-icon name="shield-checkmark-outline" color="success"></ion-icon>
-              <span><strong>Seguridad:</strong> PIN configurado</span>
+              <span><strong>Seguridad:</strong> Protegido por tu dispositivo</span>
             </div>
           </div>
         </div>
@@ -378,11 +294,11 @@
 
     <!-- Botones de navegación fijos en la parte inferior -->
     <div class="navigation-container">
-      
+
       <!-- Botón atrás (solo si no es el primer paso después del splash) -->
-      <ion-button 
+      <ion-button
         *ngIf="pasoActual > 2 && pasoActual < 5"
-        fill="outline" 
+        fill="outline"
         color="medium"
         (click)="pasoAnterior()"
         class="nav-button secondary">
@@ -394,22 +310,22 @@
       <div *ngIf="pasoActual === 2 || pasoActual === 5" class="nav-spacer"></div>
 
       <!-- Botón principal -->
-      <ion-button 
+      <ion-button
         [disabled]="!puedeAvanzar || cargando"
         (click)="siguientePaso()"
         class="nav-button primary"
         [color]="pasoActual === 5 ? 'success' : 'primary'">
-        
+
         <!-- Mostrar spinner cuando está cargando -->
         <ion-spinner *ngIf="cargando" name="crescent" slot="start"></ion-spinner>
-        
+
         <!-- Icono del botón -->
-        <ion-icon 
+        <ion-icon
           *ngIf="!cargando"
-          [name]="pasoActual === 5 ? 'checkmark-outline' : 'arrow-forward-outline'" 
+          [name]="pasoActual === 5 ? 'checkmark-outline' : 'arrow-forward-outline'"
           slot="end">
         </ion-icon>
-        
+
         {{ textoBotonPrincipal }}
       </ion-button>
 

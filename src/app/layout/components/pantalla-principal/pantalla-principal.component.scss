@@ -1,519 +1,534 @@
 /**
- * Estilos para la pantalla principal de la aplicación Carrito
- * Incluye header de saludo, tabs principales, publicidad y burbuja de donación
- * Diseño responsivo con soporte para modo claro y oscuro
- * 
+ * Estilos Pantalla Principal - Diseño moderno optimizado móvil
+ * Tema: Compras/Carrito con gradientes y animaciones sutiles
+ *
  * @author DemWolf
- * @version 1.0
+ * @version 3.0 - UX/UI Optimizado
  */
 
-// Variables y constantes
-:root {
-  --header-height: 120px;
-  --tabs-height: 60px;
-  --banner-height: 80px;
-  --padding-horizontal: 16px;
-  --border-radius: 12px;
-  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-// Contenedor principal
 .pantalla-principal {
-  --background: var(--ion-color-light);
-  
-  @media (prefers-color-scheme: dark) {
-    --background: var(--ion-color-dark);
-  }
-}
-
-// Loading inicial
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  gap: 16px;
-
-  ion-text p {
-    color: var(--ion-color-medium);
-    margin: 0;
-  }
-}
-
-// Contenido principal
-.contenido-principal {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-// Header con saludo y fecha
-.header-saludo {
-  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
-  padding: calc(env(safe-area-inset-top) + 16px) var(--padding-horizontal) 20px;
-  color: white;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-height: var(--header-height);
-
-  .app-icon {
-    ion-icon {
-      font-size: 32px;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-    }
-  }
-
-  .saludo-container {
-    flex: 1;
-    
-    .saludo-principal {
-      h1 {
-        font-size: 24px;
-        font-weight: 600;
-        margin: 0 0 8px 0;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-      }
-    }
-
-    .fecha-hora-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      
-      .fecha-actual {
-        p {
-          font-size: 14px;
-          opacity: 0.9;
-          margin: 0;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-      }
-
-      .hora-actual {
-        span {
-          background: rgba(255, 255, 255, 0.2);
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 500;
-          backdrop-filter: blur(10px);
-        }
-      }
-    }
-  }
-
-  .btn-config-rapida {
-    --color: rgba(255, 255, 255, 0.8);
-    --border-radius: 50%;
-    
-    ion-icon {
-      font-size: 24px;
-    }
-  }
-}
-
-// Información de sesión activa
-.info-sesion-activa {
-  padding: var(--padding-horizontal);
-  margin-top: -10px; // Overlap con el header
-  z-index: 10;
-  position: relative;
-
-  .card-sesion-activa {
-    margin: 0;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-medium);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    ion-card-content {
-      padding: 16px;
-    }
-
-    .sesion-activa-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      .sesion-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        ion-icon {
-          font-size: 24px;
-        }
-
-        .sesion-datos {
-          h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 0 0 4px 0;
-            color: var(--ion-color-dark);
-
-            @media (prefers-color-scheme: dark) {
-              color: var(--ion-color-light);
-            }
-          }
-
-          p {
-            font-size: 14px;
-            color: var(--ion-color-medium);
-            margin: 0;
-          }
-        }
-      }
-    }
-  }
-}
-
-// Contenedor de tabs
-.tabs-container {
-  flex: 1;
+  --background: var(--ion-background-color);
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 
-  // Tab especial continuar compra
-  .tab-continuar-compra {
-    padding: var(--padding-horizontal);
-    background: var(--ion-color-step-50);
-    border-bottom: 1px solid var(--ion-color-step-200);
-
-    .btn-continuar-compra {
-      height: 48px;
-      font-weight: 600;
-      --border-radius: var(--border-radius);
-      margin: 8px 0;
-
-      ion-icon {
-        font-size: 20px;
-      }
-    }
+  // Asegurar diseño móvil responsivo
+  @media (max-width: 768px) {
+    font-size: 14px;
   }
 
-  // Tabs principales
-  ion-tabs {
-    flex: 1;
-    
-    .tabs-principales {
-      background: var(--ion-color-step-50);
-      border-top: 1px solid var(--ion-color-step-200);
-      height: var(--tabs-height);
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
 
-      .tab-button {
-        --color: var(--ion-color-medium);
-        --color-selected: var(--ion-color-primary);
-        font-size: 12px;
+  .loading-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-        ion-icon {
-          font-size: 24px;
-          margin-bottom: 4px;
-        }
-
-        ion-label {
-          font-weight: 500;
-        }
-
-        &.tab-selected {
-          --color: var(--ion-color-primary);
-          
-          ion-icon {
-            transform: scale(1.1);
-          }
-        }
-      }
-    }
-
-    // Contenido de tabs
-    .tab-content {
-      padding: var(--padding-horizontal);
+    .loading-content {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 200px;
+      gap: 16px;
 
-      ion-text {
-        text-align: center;
-
-        p {
-          font-size: 16px;
-          margin: 0;
-        }
-      }
-    }
-  }
-}
-
-// Banner de publicidad
-.banner-publicidad {
-  background: var(--ion-color-step-100);
-  border-top: 1px solid var(--ion-color-step-200);
-  padding: 12px var(--padding-horizontal);
-  min-height: var(--banner-height);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .banner-content {
-    width: 100%;
-    text-align: center;
-    cursor: pointer;
-    padding: 16px;
-    border-radius: var(--border-radius);
-    border: 2px dashed var(--ion-color-step-300);
-    background: var(--ion-color-step-50);
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: var(--ion-color-primary);
-      background: var(--ion-color-step-100);
-    }
-
-    small {
-      display: block;
-      font-size: 10px;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .anuncio-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      color: var(--ion-color-medium);
-
-      ion-icon {
-        font-size: 20px;
-      }
-
-      span {
-        font-size: 14px;
-      }
-    }
-  }
-}
-
-// Burbuja flotante de donación
-.burbuja-donacion {
-  position: fixed;
-  bottom: calc(var(--tabs-height) + var(--banner-height) + 20px);
-  right: 20px;
-  z-index: 1000;
-  max-width: 280px;
-  animation: slideInBounce 0.5s ease-out;
-
-  .burbuja-content {
-    background: var(--ion-color-step-50);
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: var(--shadow-medium);
-    border: 1px solid var(--ion-color-step-200);
-    position: relative;
-
-    // Flecha apuntando hacia abajo
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      right: 20px;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 8px solid var(--ion-color-step-50);
-    }
-
-    .btn-cerrar-burbuja {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      --color: var(--ion-color-medium);
-      width: 24px;
-      height: 24px;
-    }
-
-    .icono-donacion {
-      text-align: center;
-      margin-bottom: 12px;
-
-      ion-icon {
-        font-size: 32px;
-        animation: heartbeat 1.5s ease-in-out infinite;
-      }
-    }
-
-    .mensaje-donacion {
-      text-align: center;
-      margin-bottom: 16px;
-
-      h4 {
-        font-size: 16px;
-        font-weight: 600;
-        margin: 0 0 4px 0;
-        color: var(--ion-color-dark);
-
-        @media (prefers-color-scheme: dark) {
-          color: var(--ion-color-light);
-        }
+      .loading-icon {
+        font-size: 64px;
+        color: var(--ion-color-primary);
+        animation: pulse 1.5s ease-in-out infinite;
       }
 
       p {
-        font-size: 13px;
         color: var(--ion-color-medium);
-        margin: 0;
-        line-height: 1.4;
+      }
+    }
+  }
+
+  .main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ad-banner-top {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+
+    ion-chip {
+      --background: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      height: 28px;
+    }
+  }
+
+  .hero-section {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    // Ajuste responsivo móvil
+    @media (max-width: 480px) {
+      height: 180px;
+    }
+
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      .gradient-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        animation: gradientShift 15s ease infinite;
+        background-size: 200% 200%;
+      }
+
+      .cart-icons {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+
+        .floating-cart {
+          position: absolute;
+          font-size: 80px;
+          color: rgba(255, 255, 255, 0.1);
+          animation: float 20s ease-in-out infinite;
+
+          &.cart-1 {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+          }
+
+          &.cart-2 {
+            top: 50%;
+            right: 15%;
+            animation-delay: 7s;
+          }
+
+          &.cart-3 {
+            bottom: 30%;
+            left: 20%;
+            animation-delay: 14s;
+          }
+        }
+      }
+
+      .pattern-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        opacity: 0.6;
       }
     }
 
-    .btn-donar {
-      width: 100%;
-      height: 40px;
-      font-weight: 600;
-      --border-radius: 20px;
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: 100%;
+
+      // Responsive móvil
+      @media (max-width: 480px) {
+        padding: 16px;
+        gap: 12px;
+      }
+    }
+
+    .user-welcome {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .avatar-container {
+        position: relative;
+
+        .avatar-circle {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.95);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+          ion-icon {
+            font-size: 26px;
+            color: var(--ion-color-primary);
+          }
+        }
+
+        .avatar-badge {
+          position: absolute;
+          bottom: -2px;
+          right: -2px;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: var(--ion-color-success);
+          border: 3px solid white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          ion-icon {
+            font-size: 14px;
+            color: white;
+          }
+        }
+      }
+
+      .welcome-text {
+
+        .user-name {
+          margin: 0 0 4px 0;
+          font-size: 22px;
+          font-weight: 800;
+          color: white;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+          @media (max-width: 480px) {
+            font-size: 20px;
+          }
+        }
+
+        .tagline {
+          margin: 0 0 12px 0;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        // Mensaje motivador
+        .motivational-message {
+          margin-top: 12px;
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          border-radius: 10px;
+          border-left: 4px solid rgba(255, 255, 255, 0.5);
+
+          p {
+            margin: 6px 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.4;
+            font-weight: 500;
+
+            &:first-child {
+              margin-top: 0;
+            }
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+        > ion-icon:first-child {
+          font-size: 28px;
+        }
+
+        .stat-info {
+          flex: 1;
+
+          .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            display: block;
+          }
+
+          .stat-label {
+            font-size: 12px;
+            color: var(--ion-color-medium);
+          }
+        }
+
+        .arrow {
+          font-size: 20px;
+        }
+      }
+    }
+  }
+
+  .tabs-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--ion-background-color);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 95px; // Espacio para los tabs fijos
+
+    // Smooth scroll para mejor UX
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  // Wrapper para tabs fijos como footer (UX/UI)
+  .tab-bar-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: transparent;
+
+    // Safe area para dispositivos con notch
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .semicircle-tab-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 85px;
+    background: transparent;
+    padding: 0 8px;
+    position: relative;
+
+    // Botones laterales semicirculares
+    .semicircle-btn {
+      flex: 1;
+      max-width: 120px;
+      height: 70px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      cursor: pointer;
+      margin: 0 2px;
+      padding-top: 16px;
+      background: var(--ion-card-background);
+      border-radius: 50% 50% 0 0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      position: relative;
+
+      // Efecto de integración con el fondo
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--ion-background-color);
+      }
+
+      // Responsive para móviles pequeños (UX/UI)
+      @media (max-width: 480px) {
+        max-width: 95px;
+        margin: 0 1px;
+        padding-top: 14px;
+      }
+
+      // Touch target mínimo 44x44px (guías Apple/Google)
+      @media (max-width: 375px) {
+        max-width: 85px;
+        font-size: 11px;
+      }
+
+      .semicircle-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        color: var(--ion-color-medium);
+
+        ion-icon {
+          font-size: 28px;
+          transition: all 0.35s ease;
+        }
+
+        ion-label {
+          font-size: 12px;
+          font-weight: 600;
+          transition: all 0.35s ease;
+          letter-spacing: 0.3px;
+        }
+      }
+
+      // Estado activo
+      &.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 -8px 24px rgba(102, 126, 234, 0.4);
+        transform: translateY(-6px);
+        border-color: rgba(255, 255, 255, 0.2);
+
+        .semicircle-content {
+          ion-icon {
+            color: white;
+            transform: scale(1.2);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+          }
+
+          ion-label {
+            color: white;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+          }
+        }
+      }
+
+      // Tab central
+      &.tab-center {
+        background: transparent;
+        box-shadow: none;
+        border: none;
+
+        &::before {
+          display: none;
+        }
+
+        .center-fab {
+          margin-top: -35px;
+
+          ion-fab-button {
+            --box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+          }
+
+          @media (max-width: 480px) {
+            margin-top: -28px;
+
+            ion-fab-button {
+              width: 54px;
+              height: 54px;
+            }
+          }
+
+          @media (max-width: 375px) {
+            margin-top: -26px;
+
+            ion-fab-button {
+              width: 50px;
+              height: 50px;
+            }
+          }
+        }
+
+        .center-label {
+          position: absolute;
+          bottom: 12px;
+          font-size: 12px;
+          font-weight: 700;
+          color: var(--ion-color-success);
+
+          @media (max-width: 480px) {
+            bottom: 8px;
+            font-size: 11px;
+          }
+        }
+
+        &.active .center-label {
+          color: var(--ion-color-success-shade);
+          font-weight: 800;
+        }
+      }
+    }
+  }
+
+  .burbuja-donacion {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    z-index: 9999;
+    background: white;
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-width: 280px;
+
+    .btn-cerrar {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+    }
+
+    .burbuja-content {
+      text-align: center;
+      padding-top: 8px;
+
+      ion-icon[name="heart"] {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      h4 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0 0 16px 0;
+        font-size: 14px;
+        color: var(--ion-color-medium);
+      }
     }
   }
 }
 
-// Animaciones
-@keyframes slideInBounce {
-  0% {
-    transform: translateX(100%) scale(0.8);
-    opacity: 0;
-  }
-  60% {
-    transform: translateX(-10px) scale(1.05);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-@keyframes heartbeat {
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.95); }
+}
+
+@keyframes float {
   0%, 100% {
-    transform: scale(1);
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px);
   }
   50% {
-    transform: scale(1.1);
+    transform: translateY(-10px) translateX(-10px);
   }
-}
-
-// Responsive design
-@media (max-width: 480px) {
-  :root {
-    --padding-horizontal: 12px;
-    --header-height: 100px;
-  }
-
-  .header-saludo {
-    .saludo-container {
-      .saludo-principal h1 {
-        font-size: 20px;
-      }
-
-      .fecha-hora-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-    }
-  }
-
-  .burbuja-donacion {
-    right: 12px;
-    left: 12px;
-    max-width: none;
-
-    .burbuja-content::after {
-      right: 50%;
-      transform: translateX(50%);
-    }
-  }
-}
-
-@media (max-width: 320px) {
-  .header-saludo {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-
-    .btn-config-rapida {
-      position: absolute;
-      top: 16px;
-      right: var(--padding-horizontal);
-    }
-  }
-
-  .tabs-container .tabs-principales .tab-button {
-    font-size: 10px;
-
-    ion-icon {
-      font-size: 20px;
-    }
-  }
-}
-
-// Modo oscuro
-@media (prefers-color-scheme: dark) {
-  .banner-publicidad .banner-content {
-    border-color: var(--ion-color-step-400);
-    
-    &:hover {
-      border-color: var(--ion-color-primary);
-    }
-  }
-
-  .burbuja-donacion .burbuja-content {
-    background: var(--ion-color-step-100);
-    border-color: var(--ion-color-step-300);
-
-    &::after {
-      border-top-color: var(--ion-color-step-100);
-    }
-  }
-}
-
-// Alto contraste
-@media (prefers-contrast: high) {
-  .banner-publicidad .banner-content {
-    border-width: 3px;
-  }
-
-  .burbuja-donacion .burbuja-content {
-    border-width: 2px;
-  }
-
-  .tabs-container .tabs-principales .tab-button {
-    --color: var(--ion-color-dark);
-    --color-selected: var(--ion-color-primary);
-  }
-}
-
-// Reducir movimiento
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  .burbuja-donacion {
-    animation: none;
-  }
-
-  .icono-donacion ion-icon {
-    animation: none;
+  75% {
+    transform: translateY(-30px) translateX(5px);
   }
 }

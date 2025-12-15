@@ -1,7 +1,7 @@
 /**
  * Modelo de datos para la configuración general de la aplicación Carrito
  * Maneja configuraciones globales, versionado y migración de datos
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
@@ -26,20 +26,21 @@ export interface ConfiguracionesGlobales {
   maxComprasPorMes: number;            // Máximo 2 compras por mes
   duracionMaximaSesion: number;        // 24 horas en milisegundos
   maxProductosPorSesion: number;       // Máximo productos por sesión de compra
-  
+
   // Configuraciones de notificaciones
   horasAntesExpiracion: number[];      // [20, 23] horas para notificar antes de expirar
   intervaloRespaldo: number;           // Intervalo de respaldo automático (minutos)
-  
+
   // Configuraciones de moneda y formato
   decimalesMoneda: number;             // Decimales por defecto (2)
   separadorMiles: string;              // Separador de miles (',')
   separadorDecimal: string;            // Separador decimal ('.')
-  
+
   // Configuraciones de interfaz
   tiempoAnimaciones: number;           // Duración de animaciones (ms)
   tamanoMaximoTexto: number;           // Caracteres máximos en campos de texto
   timeoutInactividad: number;          // Tiempo de inactividad antes de bloqueo (solo donaciones)
+  tema: 'claro' | 'oscuro' | 'auto';   // Tema de la aplicación
 }
 
 // Límites y restricciones de la aplicación
@@ -49,12 +50,12 @@ export interface LimitesAplicacion {
   maxCaracteresProducto: number;       // 100 caracteres para nombre de producto
   maxCaracteresSupermercado: number;   // 50 caracteres para nombre de supermercado
   maxCaracteresNotas: number;          // 200 caracteres para notas
-  
+
   // Límites de valores numéricos
   maxPrecioProducto: number;           // Precio máximo por producto
   maxCantidadProducto: number;         // 100 unidades máximo por producto
   maxPresupuestoSesion: number;        // Presupuesto máximo por sesión
-  
+
   // Límites de tiempo
   minTiempoEntreSesiones: number;      // Tiempo mínimo entre sesiones (minutos)
   maxDiasHistorial: number;            // Días de historial a mantener
@@ -67,17 +68,12 @@ export interface ConfiguracionSeguridad {
   algoritmoEncriptacion: string;       // 'AES-256-GCM'
   longitudClaveEncriptacion: number;   // 256 bits
   iteracionesPBKDF2: number;          // 10,000 iteraciones para derivación de claves
-  
+
   // Validaciones
   habilitarSanitizacionXSS: boolean;   // Sanitización automática de inputs
   habilitarValidacionSQL: boolean;     // Validación contra inyección SQL
   habilitarLogSeguridad: boolean;      // Logging de eventos de seguridad
-  
-  // Autenticación
-  intentosMaximosPIN: number;          // 3 intentos máximos para PIN
-  tiempoBloqueoPIN: number;            // 5 minutos de bloqueo tras fallos
-  longitudPIN: number;                 // 6 dígitos obligatorios
-  
+
   // Integridad
   verificarIntegridad: boolean;        // Verificar integridad de datos al cargar
   hashearDatosSensibles: boolean;      // Hashear datos críticos
@@ -90,13 +86,13 @@ export interface ConfiguracionMantenimiento {
   limpiezaAutomatica: boolean;         // Limpieza automática de datos antiguos
   frecuenciaLimpieza: number;          // Días entre limpiezas automáticas
   mantenerUltimasNSesiones: number;    // Mantener últimas N sesiones siempre
-  
+
   // Respaldos
   respaldoAutomatico: boolean;         // Respaldo automático habilitado
   frecuenciaRespaldo: number;          // Horas entre respaldos
   ubicacionRespaldo: string;           // Ubicación de archivos de respaldo
   maxRespaldosConservados: number;     // Máximo de respaldos a conservar
-  
+
   // Optimización
   optimizarBaseDatos: boolean;         // Optimización automática de BD
   frecuenciaOptimizacion: number;      // Días entre optimizaciones
@@ -111,80 +107,76 @@ export const CONFIGURACION_INICIAL: ConfiguracionApp = {
   fechaInstalacion: new Date(),
   ultimaActualizacion: new Date(),
   configuracionCompleta: false,
-  
+
   configuraciones: {
     // Límites de uso
     maxComprasPorMes: 2,
     duracionMaximaSesion: 24 * 60 * 60 * 1000, // 24 horas en ms
     maxProductosPorSesion: 200,
-    
+
     // Notificaciones
     horasAntesExpiracion: [20, 23], // 4 horas y 1 hora antes
     intervaloRespaldo: 60, // Cada hora
-    
+
     // Formato de moneda
     decimalesMoneda: 2,
     separadorMiles: ',',
     separadorDecimal: '.',
-    
+
     // Interfaz
     tiempoAnimaciones: 300, // 300ms
     tamanoMaximoTexto: 200,
-    timeoutInactividad: 5 * 60 * 1000 // 5 minutos para donaciones
+    timeoutInactividad: 5 * 60 * 1000, // 5 minutos para donaciones
+    tema: 'claro' // Tema por defecto
   },
-  
+
   limites: {
     // Límites de texto
     maxCaracteresNombre: 30,
     maxCaracteresProducto: 100,
     maxCaracteresSupermercado: 50,
     maxCaracteresNotas: 200,
-    
+
     // Límites numéricos
     maxPrecioProducto: 1000000, // 1 millón en moneda local
     maxCantidadProducto: 100,
     maxPresupuestoSesion: 10000000, // 10 millones en moneda local
-    
+
     // Límites temporales
     minTiempoEntreSesiones: 1, // 1 minuto mínimo
     maxDiasHistorial: 365, // 1 año de historial
     maxSesionesAlmacenadas: 50 // Máximo 50 sesiones guardadas
   },
-  
+
   seguridad: {
     // Encriptación
     algoritmoEncriptacion: 'AES-256-GCM',
     longitudClaveEncriptacion: 256,
     iteracionesPBKDF2: 10000,
-    
+
     // Validaciones
     habilitarSanitizacionXSS: true,
     habilitarValidacionSQL: true,
     habilitarLogSeguridad: true,
-    
-    // Autenticación
-    intentosMaximosPIN: 3,
-    tiempoBloqueoPIN: 5 * 60 * 1000, // 5 minutos
-    longitudPIN: 6,
-    
+
     // Integridad
     verificarIntegridad: true,
     hashearDatosSensibles: true,
     respaldoEncriptado: true
   },
-  
+
   mantenimiento: {
     // Limpieza
     limpiezaAutomatica: true,
     frecuenciaLimpieza: 7, // Cada semana
     mantenerUltimasNSesiones: 10,
-    
+
     // Respaldos
     respaldoAutomatico: true,
     frecuenciaRespaldo: 24, // Cada día
     ubicacionRespaldo: 'respaldos/',
     maxRespaldosConservados: 7, // Una semana de respaldos
-    
+
     // Optimización
     optimizarBaseDatos: true,
     frecuenciaOptimizacion: 30, // Cada mes
@@ -251,21 +243,21 @@ export function validarConfiguracion(config: ConfiguracionApp): boolean {
   if (!config.version || !config.versionDatos) {
     return false;
   }
-  
+
   // Validar que las fechas sean válidas
   if (!(config.fechaInstalacion instanceof Date) || !(config.ultimaActualizacion instanceof Date)) {
     return false;
   }
-  
+
   // Validar límites básicos
   if (config.configuraciones.maxComprasPorMes !== 2) {
     return false; // Debe ser exactamente 2
   }
-  
+
   if (config.configuraciones.duracionMaximaSesion !== 24 * 60 * 60 * 1000) {
     return false; // Debe ser exactamente 24 horas
   }
-  
+
   return true;
 }
 
@@ -278,11 +270,11 @@ export function obtenerEstadoConfiguracion(config: ConfiguracionApp): EstadoConf
   if (!config.configuracionCompleta && config.primerInicio) {
     return EstadoConfiguracion.INICIAL;
   }
-  
+
   if (!config.configuracionCompleta) {
     return EstadoConfiguracion.CONFIGURANDO;
   }
-  
+
   return EstadoConfiguracion.COMPLETA;
 }
 

@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ titulo }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Mensaje principal -->
+  <div class="mensaje-donacion">
+    <ion-icon name="heart" color="danger" class="icon-grande"></ion-icon>
+    <p class="texto-mensaje">{{ mensaje }}</p>
+  </div>
+
+  <!-- Opciones de donación -->
+  <div class="opciones-donacion">
+    <h3>Elige tu donación</h3>
+
+    <div class="grid-opciones">
+      <button
+        *ngFor="let opcion of opcionesDonacion"
+        class="opcion-donacion"
+        (click)="procesarDonacion(opcion)"
+        [disabled]="procesando"
+        ion-button
+        expand="block">
+        <div class="emoji">{{ opcion.emoji }}</div>
+        <div class="label">{{ opcion.label }}</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Información -->
+  <div class="info-donacion">
+    <ion-icon name="shield-checkmark" color="success"></ion-icon>
+    <p>
+      <strong>100% seguro.</strong> Tus datos de pago son procesados de forma segura.
+      Esta app no guarda información de pago.
+    </p>
+  </div>
+
+  <!-- Botón cerrar -->
+  <ion-button
+    (click)="cerrarModal()"
+    expand="block"
+    fill="outline"
+    color="medium"
+    class="btn-cerrar">
+    No, gracias
+  </ion-button>
+</ion-content>

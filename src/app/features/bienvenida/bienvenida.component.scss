@@ -2,7 +2,7 @@
  * Estilos para el componente de bienvenida con selector de países en grid
  * Sistema de tarjetas responsivo con SCROLL TÁCTIL OPTIMIZADO
  * 100% responsivo para dispositivos móviles con navegación táctil perfecta
- * 
+ *
  * @author DemWolf
  * @version 2.1 - Scroll táctil implementado
  */
@@ -14,19 +14,19 @@
   --bienvenida-border-radius: 12px;
   --bienvenida-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   --bienvenida-transition: all 0.3s ease;
-  
+
   // Variables del selector grid con scroll táctil
   --grid-gap: 12px;
   --card-min-height: 120px;
   --card-border-width: 2px;
   --card-selected-scale: 1.02;
-  
+
   // Variables de espaciado vertical PASO 3 - OPTIMIZADO PARA SCROLL
   --step3-title-height: 80px;
   --step3-selector-height: auto; // Altura automática para el grid
   --step3-info-height: 120px;
   --step3-padding-vertical: 16px;
-  
+
   // Variables específicas para scroll táctil
   --scroll-area-max-height: 300px; // Altura máxima del área de scroll
   --scrollbar-width: 4px;
@@ -36,12 +36,12 @@
 // Contenedor principal de la página
 .bienvenida-content {
   --background: var(--ion-color-light);
-  
+
   // Modo oscuro
   @media (prefers-color-scheme: dark) {
     --background: var(--ion-color-dark);
   }
-  
+
   // Asegurar altura completa
   height: 100vh;
   overflow: hidden;
@@ -63,10 +63,10 @@
   align-items: center;
   background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-secondary) 100%);
   z-index: 9999;
-  
+
   // Animación de entrada más lenta
   animation: splashEnter 1.2s ease-out;
-  
+
   // Animación de salida suave
   &.splash-exit {
     animation: splashExit 1.2s ease-in forwards;
@@ -100,7 +100,7 @@
 .splash-logo {
   text-align: center;
   color: white;
-  
+
   .logo-circle {
     width: 140px;
     height: 140px;
@@ -114,14 +114,14 @@
     animation: logoGrow 4s ease-out infinite alternate;
     border: 3px solid rgba(255, 255, 255, 0.4);
     box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-    
+
     .logo-icon {
       font-size: 70px;
       color: white;
       text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
     }
   }
-  
+
   .app-name {
     font-size: 48px;
     font-weight: 700;
@@ -130,7 +130,7 @@
     animation: textFadeIn 1.5s ease-out 0.8s both;
     letter-spacing: 2px;
   }
-  
+
   .app-tagline {
     font-size: 18px;
     opacity: 0.95;
@@ -168,18 +168,18 @@
   display: flex;
   gap: 12px;
   margin-top: 60px;
-  
+
   .dot {
     width: 14px;
     height: 14px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.9);
     animation: dotPulse 2s ease-in-out infinite;
-    
+
     &:nth-child(2) {
       animation-delay: 0.4s;
     }
-    
+
     &:nth-child(3) {
       animation-delay: 0.8s;
     }
@@ -223,7 +223,7 @@
   padding: 20px var(--bienvenida-padding) 16px;
   background: linear-gradient(135deg, var(--ion-color-step-50), var(--ion-color-step-100));
   border-bottom: 1px solid var(--ion-color-step-200);
-  
+
   .progress-bar {
     width: 100%;
     height: 6px;
@@ -232,7 +232,7 @@
     overflow: hidden;
     margin-bottom: 12px;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    
+
     .progress-fill {
       height: 100%;
       background: linear-gradient(90deg, var(--ion-color-primary), var(--ion-color-secondary));
@@ -241,7 +241,7 @@
       box-shadow: 0 1px 6px rgba(var(--ion-color-primary-rgb), 0.4);
     }
   }
-  
+
   .progress-text {
     font-size: 13px;
     color: var(--ion-color-medium);
@@ -258,7 +258,7 @@
   height: calc(100vh - 160px); // Altura fija descontando progress y navegación
   overflow-y: auto;
   padding-bottom: 20px; // Espacio adicional al final
-  
+
   // CRÍTICO: Scroll suave y táctil optimizado
   -webkit-overflow-scrolling: touch; // Safari iOS
   scroll-behavior: smooth;
@@ -280,7 +280,7 @@
   width: 100%;
   max-width: var(--bienvenida-max-width);
   text-align: center;
-  
+
   // Animación de entrada
   &.fade-in {
     animation: fadeInUp 0.6s ease-out;
@@ -315,19 +315,19 @@
 .title-section-compact {
   flex: 0 0 auto;
   padding: var(--step3-padding-vertical) 0;
-  
+
   .step-title h2 {
     font-size: 22px;
     font-weight: 600;
     margin: 0 0 8px 0;
     color: var(--ion-color-dark);
     line-height: 1.2;
-    
+
     @media (prefers-color-scheme: dark) {
       color: var(--ion-color-light);
     }
   }
-  
+
   .step-description p {
     font-size: 15px;
     line-height: 1.3;
@@ -363,7 +363,7 @@
     margin: 0 0 20px 0;
     color: var(--ion-color-dark);
     line-height: 1.2;
-    
+
     @media (prefers-color-scheme: dark) {
       color: var(--ion-color-light);
     }
@@ -385,7 +385,7 @@
   grid-template-columns: 1fr;
   gap: 16px;
   margin-bottom: 30px;
-  
+
   .feature-card {
     display: flex;
     align-items: center;
@@ -398,32 +398,32 @@
     animation: slideInLeft 0.6s ease-out both;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     transition: var(--bienvenida-transition);
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
     }
-    
+
     .feature-icon {
       flex-shrink: 0;
-      
+
       ion-icon {
         font-size: 28px;
       }
     }
-    
+
     .feature-content {
       h3 {
         font-size: 16px;
         font-weight: 600;
         margin: 0 0 6px 0;
         color: var(--ion-color-dark);
-        
+
         @media (prefers-color-scheme: dark) {
           color: var(--ion-color-light);
         }
       }
-      
+
       p {
         font-size: 13px;
         color: var(--ion-color-medium);
@@ -456,7 +456,7 @@
   font-size: 14px;
   font-weight: 500;
   border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-  
+
   ion-icon {
     font-size: 20px;
     flex-shrink: 0;
@@ -473,51 +473,51 @@
   overflow-y: auto;
   overflow-x: hidden; // Solo scroll vertical
   padding: 8px 0;
-  
+
   // CRÍTICO: Configuración de scroll táctil para móviles
   -webkit-overflow-scrolling: touch; // Safari iOS - scroll suave
   scroll-behavior: smooth; // Scroll suave en navegadores modernos
   overscroll-behavior-y: contain; // Prevenir scroll bounce vertical
   overscroll-behavior-x: none; // Sin scroll horizontal
-  
+
   // Momentum scrolling para mejor experiencia táctil
   scrollbar-gutter: stable; // Espacio estable para scrollbar
-  
+
   // Estilos del scrollbar para dispositivos que lo soportan
   &::-webkit-scrollbar {
     width: var(--scrollbar-width);
     background: transparent;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: var(--ion-color-step-100);
     border-radius: calc(var(--scrollbar-width) / 2);
     margin: 4px 0; // Márgenes arriba y abajo
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: var(--scrollbar-thumb-color);
     border-radius: calc(var(--scrollbar-width) / 2);
     transition: background-color 0.3s ease;
-    
+
     &:hover {
       background: var(--ion-color-step-500);
     }
-    
+
     &:active {
       background: var(--ion-color-step-600);
     }
   }
-  
+
   // Indicador de scroll en modo oscuro
   @media (prefers-color-scheme: dark) {
     &::-webkit-scrollbar-track {
       background: var(--ion-color-step-200);
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: var(--ion-color-step-600);
-      
+
       &:hover {
         background: var(--ion-color-step-700);
       }
@@ -530,25 +530,25 @@
   display: grid;
   gap: var(--grid-gap);
   padding: 4px;
-  
+
   // Grid responsivo según ancho de pantalla
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  
+
   @media (max-width: 375px) {
     grid-template-columns: repeat(2, 1fr); // 2 columnas en móviles pequeños
     gap: 8px; // Gap más pequeño en pantallas pequeñas
   }
-  
+
   @media (min-width: 376px) and (max-width: 480px) {
     grid-template-columns: repeat(2, 1fr); // 2 columnas en móviles medianos
     gap: 10px;
   }
-  
+
   @media (min-width: 481px) and (max-width: 768px) {
     grid-template-columns: repeat(3, 1fr); // 3 columnas en móviles grandes/tablets pequeñas
     gap: 12px;
   }
-  
+
   @media (min-width: 769px) {
     grid-template-columns: repeat(4, 1fr); // 4 columnas en tablets grandes
     gap: 14px;
@@ -569,13 +569,13 @@
   min-height: var(--card-min-height);
   position: relative;
   overflow: hidden;
-  
+
   // CRÍTICO: Optimización para touch
   touch-action: manipulation; // Optimizar para gestos táctiles
   user-select: none; // Prevenir selección de texto accidental
   -webkit-touch-callout: none; // Prevenir callout en iOS
   -webkit-tap-highlight-color: transparent; // Remover highlight azul en tap
-  
+
   // Estado normal con hover para desktop
   @media (hover: hover) and (pointer: fine) {
     &:hover {
@@ -584,7 +584,7 @@
       border-color: var(--ion-color-step-400);
     }
   }
-  
+
   // Estado de tap para dispositivos táctiles
   @media (hover: none) and (pointer: coarse) {
     &:active {
@@ -592,7 +592,7 @@
       transition: transform 0.1s ease;
     }
   }
-  
+
   // Estado seleccionado
   &.selected {
     border-color: var(--ion-color-primary);
@@ -600,7 +600,7 @@
     transform: scale(var(--card-selected-scale));
     box-shadow: 0 8px 30px rgba(var(--ion-color-primary-rgb), 0.25);
     z-index: 2;
-    
+
     // Efecto de brillo sutil
     &::before {
       content: '';
@@ -612,14 +612,14 @@
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       animation: shimmer 2s ease-in-out infinite;
     }
-    
+
     // Estado de tap para tarjeta seleccionada
     @media (hover: none) and (pointer: coarse) {
       &:active {
         transform: scale(0.99);
       }
     }
-    
+
     .country-flag-container {
       .country-flag {
         border-color: var(--ion-color-primary);
@@ -627,23 +627,23 @@
         box-shadow: 0 4px 20px rgba(var(--ion-color-primary-rgb), 0.3);
       }
     }
-    
+
     .country-info {
       .country-name {
         color: var(--ion-color-primary);
         font-weight: 700;
       }
-      
+
       .country-currency {
         color: var(--ion-color-dark);
         font-weight: 600;
-        
+
         @media (prefers-color-scheme: dark) {
           color: var(--ion-color-light);
         }
       }
     }
-    
+
     // Icono de selección
     .selection-check {
       position: absolute;
@@ -662,7 +662,7 @@
       box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.4);
     }
   }
-  
+
   // Animación de entrada escalonada
   &:nth-child(1) { animation: cardFadeIn 0.4s ease-out 0.1s both; }
   &:nth-child(2) { animation: cardFadeIn 0.4s ease-out 0.2s both; }
@@ -698,7 +698,7 @@
 // Contenedor de la bandera
 .country-flag-container {
   margin-bottom: 12px;
-  
+
   .country-flag {
     width: 60px;
     height: 45px;
@@ -707,18 +707,18 @@
     border: var(--card-border-width) solid var(--ion-color-step-300);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: var(--bienvenida-transition);
-    
+
     // Optimización para imágenes de alta densidad
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
-    
+
     // Placeholder mientras carga la imagen
     background: var(--ion-color-step-100);
-    
+
     &[src=""], &:not([src]) {
-      background: linear-gradient(45deg, var(--ion-color-step-100) 25%, transparent 25%), 
-                  linear-gradient(-45deg, var(--ion-color-step-100) 25%, transparent 25%), 
-                  linear-gradient(45deg, transparent 75%, var(--ion-color-step-100) 75%), 
+      background: linear-gradient(45deg, var(--ion-color-step-100) 25%, transparent 25%),
+                  linear-gradient(-45deg, var(--ion-color-step-100) 25%, transparent 25%),
+                  linear-gradient(45deg, transparent 75%, var(--ion-color-step-100) 75%),
                   linear-gradient(-45deg, transparent 75%, var(--ion-color-step-100) 75%);
       background-size: 8px 8px;
       background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
@@ -740,7 +740,7 @@
 .country-info {
   text-align: center;
   pointer-events: none; // Prevenir interferencia con tap en la tarjeta
-  
+
   .country-name {
     font-size: 14px;
     font-weight: 600;
@@ -748,12 +748,12 @@
     color: var(--ion-color-dark);
     transition: var(--bienvenida-transition);
     line-height: 1.2;
-    
+
     @media (prefers-color-scheme: dark) {
       color: var(--ion-color-light);
     }
   }
-  
+
   .country-currency {
     font-size: 12px;
     color: var(--ion-color-medium);
@@ -786,26 +786,26 @@
 .pais-seleccionado {
   width: 100%;
   margin: 0;
-  
+
   .seleccion-header {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
     margin-bottom: 16px;
-    
+
     ion-icon {
       font-size: 20px;
       animation: checkmarkBounce 0.6s ease-out;
     }
-    
+
     span {
       font-size: 14px;
       font-weight: 600;
       color: var(--ion-color-success);
     }
   }
-  
+
   .seleccion-detalle {
     display: flex;
     align-items: center;
@@ -816,7 +816,7 @@
     border: 2px solid var(--ion-color-success);
     animation: pulseSuccess 0.6s ease-out;
     box-shadow: 0 4px 20px rgba(var(--ion-color-success-rgb), 0.2);
-    
+
     .bandera-seleccionada {
       width: 70px;
       height: 52px;
@@ -826,39 +826,39 @@
       flex-shrink: 0;
       box-shadow: 0 3px 15px rgba(var(--ion-color-success-rgb), 0.3);
     }
-    
+
     .seleccion-info {
       text-align: left;
       flex: 1;
-      
+
       h3 {
         font-size: 18px;
         font-weight: 600;
         margin: 0 0 8px 0;
         color: var(--ion-color-dark);
-        
+
         @media (prefers-color-scheme: dark) {
           color: var(--ion-color-light);
         }
       }
-      
+
       p {
         font-size: 13px;
         color: var(--ion-color-medium);
         margin: 0 0 4px 0;
         line-height: 1.4;
-        
+
         &:last-child {
           margin-bottom: 0;
           font-style: italic;
           color: var(--ion-color-success);
           font-weight: 500;
         }
-        
+
         strong {
           font-weight: 600;
           color: var(--ion-color-dark);
-          
+
           @media (prefers-color-scheme: dark) {
             color: var(--ion-color-light);
           }
@@ -895,33 +895,33 @@
 // Secciones del formulario
 .form-section {
   margin-bottom: 30px;
-  
+
   .section-header {
     display: flex;
     align-items: flex-start;
     gap: 16px;
     margin-bottom: 20px;
-    
+
     ion-icon {
       font-size: 24px;
       flex-shrink: 0;
       margin-top: 2px;
     }
-    
+
     div {
       flex: 1;
-      
+
       h4 {
         font-size: 18px;
         font-weight: 600;
         margin: 0 0 4px 0;
         color: var(--ion-color-dark);
-        
+
         @media (prefers-color-scheme: dark) {
           color: var(--ion-color-light);
         }
       }
-      
+
       p {
         font-size: 12px;
         color: var(--ion-color-medium);
@@ -938,35 +938,28 @@
   --border-radius: var(--bienvenida-border-radius);
   --border-color: var(--ion-color-step-200);
   --highlight-color-focused: var(--ion-color-primary);
-  
+
   // Estilos para campos con error
   &.item-error {
     --border-color: var(--ion-color-danger);
     --highlight-color-focused: var(--ion-color-danger);
   }
-  
+
   ion-label {
     font-weight: 600;
     color: var(--ion-color-dark);
     font-size: 14px;
-    
+
     @media (prefers-color-scheme: dark) {
       color: var(--ion-color-light);
     }
   }
-  
+
   ion-input {
     --padding-start: 16px;
     --padding-end: 16px;
     font-size: 16px;
     --placeholder-color: var(--ion-color-step-400);
-  }
-  
-  // Campos PIN con botón
-  &.pin-item {
-    ion-input {
-      --padding-end: 56px;
-    }
   }
 }
 
@@ -984,7 +977,7 @@
   font-size: 13px;
   animation: shakeError 0.4s ease-out;
   font-weight: 500;
-  
+
   ion-icon {
     font-size: 16px;
     flex-shrink: 0;
@@ -1003,7 +996,7 @@
   background: linear-gradient(90deg, transparent, var(--ion-color-step-200), transparent);
   margin: 30px 0;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -1028,14 +1021,14 @@
   margin-top: 16px;
   border-left: 4px solid var(--ion-color-primary);
   border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
-  
+
   ion-icon {
     font-size: 18px;
     color: var(--ion-color-primary);
     flex-shrink: 0;
     margin-top: 2px;
   }
-  
+
   span {
     font-size: 13px;
     color: var(--ion-color-medium);
@@ -1050,7 +1043,7 @@
 
 .success-container {
   margin-bottom: 30px;
-  
+
   .success-icon {
     font-size: 100px;
     filter: drop-shadow(0 6px 20px rgba(var(--ion-color-success-rgb), 0.4));
@@ -1096,7 +1089,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  
+
   .summary-item {
     display: flex;
     align-items: center;
@@ -1109,26 +1102,26 @@
     animation: slideInRight 0.6s ease-out both;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     transition: var(--bienvenida-transition);
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
-    
+
     ion-icon {
       font-size: 24px;
       flex-shrink: 0;
     }
-    
+
     span {
       font-size: 14px;
       color: var(--ion-color-dark);
       line-height: 1.4;
-      
+
       @media (prefers-color-scheme: dark) {
         color: var(--ion-color-light);
       }
-      
+
       strong {
         font-weight: 600;
         display: block;
@@ -1168,11 +1161,11 @@
   backdrop-filter: blur(20px);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
   z-index: 1000; // Asegurar que esté por encima de todo
-  
+
   .nav-spacer {
     flex: 1;
   }
-  
+
   .nav-button {
     height: 48px;
     --border-radius: 24px;
@@ -1180,34 +1173,34 @@
     font-size: 15px;
     letter-spacing: 0.5px;
     text-transform: none;
-    
+
     &.secondary {
       flex: 0 0 auto;
       min-width: 120px;
       --color: var(--ion-color-medium);
       border: 1px solid var(--ion-color-step-300);
-      
+
       &:hover {
         --color: var(--ion-color-dark);
         border-color: var(--ion-color-primary);
       }
     }
-    
+
     &.primary {
       flex: 1;
       max-width: 280px;
       box-shadow: 0 6px 20px rgba(var(--ion-color-primary-rgb), 0.3);
-      
+
       &:not(.button-disabled):hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 25px rgba(var(--ion-color-primary-rgb), 0.4);
       }
-      
+
       &:not(.button-disabled):active {
         transform: translateY(-1px);
       }
     }
-    
+
     // Estados de botón
     &.button-disabled {
       opacity: 0.5;
@@ -1230,61 +1223,61 @@
     --step3-padding-vertical: 12px;
     --scroll-area-max-height: 250px; // Altura reducida para móviles pequeños
   }
-  
+
   .title-section-compact {
     .step-title h2 {
       font-size: 20px;
     }
-    
+
     .step-description p {
       font-size: 14px;
       padding: 0 4px;
     }
   }
-  
+
   .countries-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     padding: 2px; // Menos padding para móviles pequeños
   }
-  
+
   .countries-grid-container {
     // Altura máxima específica para móviles pequeños
     max-height: var(--scroll-area-max-height);
-    
+
     // Scrollbar más delgado en móviles pequeños
     &::-webkit-scrollbar {
       width: 3px;
     }
   }
-  
+
   .country-card {
     padding: 12px 8px;
     min-height: 100px;
-    
+
     // Mejorar área de tap para móviles pequeños
     min-width: 120px;
-    
+
     .country-flag-container {
       margin-bottom: 8px;
-      
+
       .country-flag {
         width: 50px;
         height: 38px;
       }
     }
-    
+
     .country-info {
       .country-name {
         font-size: 12px;
         margin-bottom: 2px;
       }
-      
+
       .country-currency {
         font-size: 10px;
       }
     }
-    
+
     &.selected .selection-check {
       width: 20px;
       height: 20px;
@@ -1293,49 +1286,49 @@
       font-size: 12px;
     }
   }
-  
+
   .main-title h1 {
     font-size: 24px;
   }
-  
+
   .navigation-container {
     flex-direction: column;
     gap: 12px;
-    
+
     .nav-button {
       width: 100%;
       max-width: none;
-      
+
       &.secondary {
         order: 2;
         min-width: auto;
       }
-      
+
       &.primary {
         order: 1;
       }
     }
-    
+
     .nav-spacer {
       display: none;
     }
   }
-  
+
   .pais-seleccionado {
     .seleccion-detalle {
       padding: 16px;
-      
+
       .bandera-seleccionada {
         width: 60px;
         height: 45px;
       }
-      
+
       .seleccion-info {
         h3 {
           font-size: 16px;
           margin-bottom: 6px;
         }
-        
+
         p {
           font-size: 12px;
           margin-bottom: 2px;
@@ -1352,40 +1345,40 @@
     --card-min-height: 110px;
     --scroll-area-max-height: 280px;
   }
-  
+
   .countries-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  
+
   .countries-grid-container {
     max-height: var(--scroll-area-max-height);
   }
-  
+
   .country-card {
     padding: 14px 10px;
     min-height: 110px;
-    
+
     .country-flag-container {
       margin-bottom: 10px;
-      
+
       .country-flag {
         width: 55px;
         height: 41px;
       }
     }
-    
+
     .country-info {
       .country-name {
         font-size: 13px;
         margin-bottom: 3px;
       }
-      
+
       .country-currency {
         font-size: 11px;
       }
     }
-    
+
     &.selected .selection-check {
       width: 22px;
       height: 22px;
@@ -1394,12 +1387,12 @@
       font-size: 13px;
     }
   }
-  
+
   .title-section-compact {
     .step-title h2 {
       font-size: 21px;
     }
-    
+
     .step-description p {
       font-size: 14px;
     }
@@ -1413,32 +1406,32 @@
     --card-min-height: 120px;
     --scroll-area-max-height: 320px;
   }
-  
+
   .countries-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
-  
+
   .countries-grid-container {
     max-height: var(--scroll-area-max-height);
   }
-  
+
   .country-card {
     padding: 16px 12px;
     min-height: 120px;
-    
+
     .country-flag-container {
       .country-flag {
         width: 60px;
         height: 45px;
       }
     }
-    
+
     .country-info {
       .country-name {
         font-size: 14px;
       }
-      
+
       .country-currency {
         font-size: 12px;
       }
@@ -1455,45 +1448,45 @@
     --step3-padding-vertical: 20px;
     --scroll-area-max-height: 400px;
   }
-  
+
   .countries-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
   }
-  
+
   .countries-grid-container {
     max-height: var(--scroll-area-max-height);
-    
+
     // Scrollbar un poco más grande para tablets
     &::-webkit-scrollbar {
       width: 6px;
     }
   }
-  
+
   .country-card {
     padding: 20px 16px;
     min-height: 140px;
-    
+
     .country-flag-container {
       margin-bottom: 14px;
-      
+
       .country-flag {
         width: 70px;
         height: 52px;
       }
     }
-    
+
     .country-info {
       .country-name {
         font-size: 15px;
         margin-bottom: 4px;
       }
-      
+
       .country-currency {
         font-size: 13px;
       }
     }
-    
+
     &.selected .selection-check {
       width: 26px;
       height: 26px;
@@ -1502,34 +1495,34 @@
       font-size: 15px;
     }
   }
-  
+
   .title-section-compact {
     .step-title h2 {
       font-size: 24px;
     }
-    
+
     .step-description p {
       font-size: 16px;
     }
   }
-  
+
   .main-title h1 {
     font-size: 32px;
   }
-  
+
   .features-grid {
     .feature-card {
       padding: 24px;
-      
+
       .feature-icon ion-icon {
         font-size: 32px;
       }
-      
+
       .feature-content {
         h3 {
           font-size: 18px;
         }
-        
+
         p {
           font-size: 14px;
         }
@@ -1548,45 +1541,45 @@
     --step3-padding-vertical: 24px;
     --scroll-area-max-height: 450px;
   }
-  
+
   .countries-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
   }
-  
+
   .countries-grid-container {
     max-height: var(--scroll-area-max-height);
-    
+
     // Scrollbar más visible para tablets grandes
     &::-webkit-scrollbar {
       width: 8px;
     }
   }
-  
+
   .country-card {
     padding: 24px 20px;
     min-height: 160px;
-    
+
     .country-flag-container {
       margin-bottom: 16px;
-      
+
       .country-flag {
         width: 80px;
         height: 60px;
       }
     }
-    
+
     .country-info {
       .country-name {
         font-size: 16px;
         margin-bottom: 6px;
       }
-      
+
       .country-currency {
         font-size: 14px;
       }
     }
-    
+
     &.selected .selection-check {
       width: 28px;
       height: 28px;
@@ -1595,33 +1588,33 @@
       font-size: 16px;
     }
   }
-  
+
   .title-section-compact {
     .step-title h2 {
       font-size: 26px;
     }
-    
+
     .step-description p {
       font-size: 17px;
     }
   }
-  
+
   .main-title h1 {
     font-size: 36px;
   }
-  
+
   .navigation-container {
     padding: 20px var(--bienvenida-padding) calc(20px + env(safe-area-inset-bottom));
-    
+
     .nav-button {
       height: 52px;
       --border-radius: 26px;
       font-size: 16px;
-      
+
       &.secondary {
         min-width: 140px;
       }
-      
+
       &.primary {
         max-width: 320px;
       }
@@ -1640,67 +1633,67 @@
     --card-min-height: 80px;
     --scroll-area-max-height: 180px; // Muy reducido para paisaje
   }
-  
+
   .step3-layout {
     height: calc(100vh - 120px);
   }
-  
+
   .content-scroll-area {
     height: calc(100vh - 120px);
   }
-  
+
   .title-section-compact {
     padding: 8px 0;
-    
+
     .step-title h2 {
       font-size: 18px;
       margin-bottom: 4px;
     }
-    
+
     .step-description p {
       font-size: 13px;
       line-height: 1.2;
     }
   }
-  
+
   .countries-grid {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 8px;
   }
-  
+
   .countries-grid-container {
     max-height: var(--scroll-area-max-height);
-    
+
     // Scrollbar muy delgado en paisaje
     &::-webkit-scrollbar {
       width: 2px;
     }
   }
-  
+
   .country-card {
     padding: 8px 6px;
     min-height: 80px;
-    
+
     .country-flag-container {
       margin-bottom: 6px;
-      
+
       .country-flag {
         width: 40px;
         height: 30px;
       }
     }
-    
+
     .country-info {
       .country-name {
         font-size: 11px;
         margin-bottom: 2px;
       }
-      
+
       .country-currency {
         font-size: 9px;
       }
     }
-    
+
     &.selected .selection-check {
       width: 18px;
       height: 18px;
@@ -1709,57 +1702,57 @@
       font-size: 10px;
     }
   }
-  
+
   .navigation-container {
     padding: 8px var(--bienvenida-padding) calc(8px + env(safe-area-inset-bottom));
-    
+
     .nav-button {
       height: 40px;
       font-size: 14px;
     }
   }
-  
+
   .progress-container {
     padding: 12px var(--bienvenida-padding) 8px;
   }
-  
+
   .features-grid {
     margin-bottom: 16px;
-    
+
     .feature-card {
       padding: 12px;
-      
+
       .feature-icon ion-icon {
         font-size: 24px;
       }
-      
+
       .feature-content {
         h3 {
           font-size: 14px;
         }
-        
+
         p {
           font-size: 12px;
         }
       }
     }
   }
-  
+
   .pais-seleccionado {
     .seleccion-detalle {
       padding: 12px;
-      
+
       .bandera-seleccionada {
         width: 50px;
         height: 38px;
       }
-      
+
       .seleccion-info {
         h3 {
           font-size: 14px;
           margin-bottom: 4px;
         }
-        
+
         p {
           font-size: 11px;
           margin-bottom: 2px;
@@ -1784,26 +1777,26 @@
   .countries-grid-container {
     // Momentum scrolling para iOS
     -webkit-overflow-scrolling: touch;
-    
+
     // Mejor handling de scroll en Android
     overscroll-behavior: contain;
-    
+
     // Scroll más responsivo
     scroll-snap-type: y proximity;
   }
-  
+
   // Las tarjetas actúan como puntos de snap sutiles
   .country-card {
     scroll-snap-align: start;
     scroll-margin-top: 8px;
   }
-  
+
   // Scrollbar oculto en dispositivos táctiles pero funcional
   .countries-grid-container::-webkit-scrollbar {
     width: 2px;
     background: transparent;
   }
-  
+
   .countries-grid-container::-webkit-scrollbar-thumb {
     background: rgba(var(--ion-color-step-400-rgb), 0.3);
     border-radius: 1px;
@@ -1817,11 +1810,11 @@
     &::-webkit-scrollbar {
       width: var(--scrollbar-width);
     }
-    
+
     &::-webkit-scrollbar-thumb {
       opacity: 0.7;
       transition: opacity 0.3s ease;
-      
+
       &:hover {
         opacity: 1;
       }
@@ -1840,45 +1833,45 @@
   .country-card {
     animation: none;
   }
-  
+
   .progress-fill {
     transition: none;
   }
-  
+
   .splash-container {
     animation: none;
-    
+
     &.splash-exit {
       animation: none;
       opacity: 0;
     }
   }
-  
+
   .splash-logo .logo-circle {
     animation: none;
   }
-  
+
   .loading-dots .dot {
     animation: none;
   }
-  
+
   .success-icon {
     animation: none;
   }
-  
+
   .pais-seleccionado .seleccion-detalle {
     animation: none;
   }
-  
+
   .country-card.selected::before {
     animation: none;
   }
-  
+
   // Deshabilitar scroll suave si el usuario prefiere menos movimiento
   * {
     scroll-behavior: auto;
   }
-  
+
   .countries-grid-container {
     scroll-behavior: auto;
   }
@@ -1889,36 +1882,36 @@
   .form-item {
     --border-color: var(--ion-color-dark);
   }
-  
+
   .error-message {
     border-width: 3px;
   }
-  
+
   .feature-card,
   .config-summary .summary-item {
     border-left-width: 6px;
   }
-  
+
   .country-card {
     border-width: 3px;
-    
+
     &.selected {
       border-width: 4px;
     }
   }
-  
+
   .pais-seleccionado .seleccion-detalle {
     border-width: 4px;
   }
-  
+
   .progress-container {
     border-bottom-width: 3px;
   }
-  
+
   // Scrollbar más visible en alto contraste
   .countries-grid-container::-webkit-scrollbar-thumb {
     background: var(--ion-color-dark);
-    
+
     @media (prefers-color-scheme: dark) {
       background: var(--ion-color-light);
     }
@@ -1930,26 +1923,26 @@
   .country-card {
     background: var(--ion-color-step-100);
     border-color: var(--ion-color-step-400);
-    
+
     &:hover {
       background: var(--ion-color-step-150);
       border-color: var(--ion-color-step-500);
     }
-    
+
     &.selected {
       background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.15), rgba(var(--ion-color-secondary-rgb), 0.08));
     }
   }
-  
+
   // Scrollbar en modo oscuro
   .countries-grid-container {
     &::-webkit-scrollbar-track {
       background: var(--ion-color-step-200);
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: var(--ion-color-step-600);
-      
+
       &:hover {
         background: var(--ion-color-step-700);
       }

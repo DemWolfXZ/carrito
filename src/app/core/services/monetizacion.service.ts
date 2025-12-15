@@ -1,8 +1,8 @@
 /**
  * Servicio para gestionar la monetización de la aplicación Carrito
  * Maneja publicidad, sistema de donaciones y configuraciones relacionadas
- * Incluye control de tiempo, autenticación para donaciones y estadísticas
- * 
+ * Incluye control de tiempo, sistema de donaciones y estadísticas
+ *
  * @author DemWolf
  * @version 1.0
  */
@@ -334,12 +334,12 @@ export class MonetizacionService {
   private async cargarConfiguracion(): Promise<void> {
     try {
       const datosString = localStorage.getItem(this.CLAVE_CONFIGURACION);
-      
+
       if (datosString) {
         const datos = JSON.parse(datosString);
         this.configuracion = {
           ...datos,
-          ultimaAparicionBurbuja: datos.ultimaAparicionBurbuja ? 
+          ultimaAparicionBurbuja: datos.ultimaAparicionBurbuja ?
             new Date(datos.ultimaAparicionBurbuja) : null
         };
       } else {
@@ -397,12 +397,12 @@ export class MonetizacionService {
   private async cargarEstadisticas(): Promise<void> {
     try {
       const datosString = localStorage.getItem(this.CLAVE_ESTADISTICAS);
-      
+
       if (datosString) {
         const datos = JSON.parse(datosString);
         this.estadisticas = {
           ...datos,
-          ultimaDonacion: datos.ultimaDonacion ? 
+          ultimaDonacion: datos.ultimaDonacion ?
             new Date(datos.ultimaDonacion) : null
         };
       } else {
@@ -462,7 +462,7 @@ export class MonetizacionService {
     if (!this.configuracion?.donacionesHabilitadas) return;
 
     const intervaloBurbuja = this.configuracion.intervaloBurbuja * 60 * 1000; // Convertir a milisegundos
-    
+
     // Configurar nuevo timer
     this.timerBurbuja = interval(intervaloBurbuja).subscribe(() => {
       if (this.puedeAparecerBurbuja()) {
@@ -529,7 +529,7 @@ export class MonetizacionService {
    */
   private calcularTasaConversion(): number {
     if (!this.estadisticas || this.estadisticas.vecesAparecioBurbuja === 0) return 0;
-    
+
     return Number(((this.estadisticas.totalDonaciones / this.estadisticas.vecesAparecioBurbuja) * 100).toFixed(2));
   }
 

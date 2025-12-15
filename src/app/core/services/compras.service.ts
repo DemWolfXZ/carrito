@@ -2,7 +2,7 @@
  * Servicio para gestionar compras y sesiones de compra en la aplicación Carrito
  * Maneja la lógica de negocio de sesiones, productos, límites mensuales y validaciones
  * Integrado con almacenamiento offline y servicios de usuario
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
@@ -11,10 +11,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 // Importar modelos y servicios
-import { 
-  SesionCompra, 
-  EstadoSesion, 
-  NuevaSesion, 
+import {
+  SesionCompra,
+  EstadoSesion,
+  NuevaSesion,
   ActualizacionSesion,
   ResumenMensual,
   crearSesionCompra,
@@ -29,9 +29,9 @@ import {
   VALIDACION_SESION
 } from '@core/models/sesion-compra.model';
 
-import { 
-  Producto, 
-  NuevoProducto, 
+import {
+  Producto,
+  NuevoProducto,
   ActualizacionProducto,
   crearProducto,
   actualizarProducto,
@@ -230,6 +230,15 @@ export class ComprasService {
   }
 
   /**
+   * Obtener sesiones en estado borrador
+   * @returns Promise<SesionCompra[]> solo sesiones en estado borrador
+   */
+  async obtenerSesionesBorrador(): Promise<SesionCompra[]> {
+    await this.esperarInicializacion();
+    return this.sesiones.filter(sesion => sesion.estado === EstadoSesion.BORRADOR);
+  }
+
+  /**
    * Agregar producto a la sesión activa
    * @param datosProducto Datos del producto a agregar
    * @returns Promise<boolean> true si se agregó correctamente
@@ -260,7 +269,7 @@ export class ComprasService {
 
       // Actualizar sesión activa
       this.sesionActiva = sesionActualizada;
-      
+
       // Actualizar en la lista de sesiones
       const indiceSesion = this.sesiones.findIndex(s => s.id === sesionActualizada.id);
       if (indiceSesion >= 0) {
@@ -333,7 +342,7 @@ export class ComprasService {
 
       // Actualizar sesión activa
       this.sesionActiva = sesionActualizada;
-      
+
       // Actualizar en la lista de sesiones
       const indiceSesion = this.sesiones.findIndex(s => s.id === sesionActualizada.id);
       if (indiceSesion >= 0) {
@@ -379,7 +388,7 @@ export class ComprasService {
 
       // Actualizar sesión activa
       this.sesionActiva = sesionActualizada;
-      
+
       // Actualizar en la lista de sesiones
       const indiceSesion = this.sesiones.findIndex(s => s.id === sesionActualizada.id);
       if (indiceSesion >= 0) {
@@ -450,10 +459,138 @@ export class ComprasService {
   }
 
   /**
-   * Cancelar la sesión activa
-   * @returns Promise<boolean> true si se canceló correctamente
+   * Guardar la sesión activa como borrador
+   * Permite al usuario guardar una lista incompleta para completarla después
+   * @returns Promise<boolean> true si se guardó correctamente como borrador
    */
-  async cancelarSesionActiva(): Promise<boolean> {
+  async guardarSesionComoBorrador(): Promise<boolean> {
+    try {
+      await this.esperarInicializacion();
+
+      // Verificar que hay sesión activa
+      if (!this.sesionActiva) {
+        console.error('No hay sesión activa para guardar como borrador');
+        return false;
+      }
+
+      // Cambiar estado a BORRADOR sin finalizar
+      const sesionBorrador: SesionCompra = {
+        ...this.sesionActiva,
+        estado: EstadoSesion.BORRADOR,
+        fechaFinalizacion: undefined
+      };
+
+      // Actualizar en la lista de sesiones
+      const indiceSesion = this.sesiones.findIndex(s => s.id === sesionBorrador.id);
+      if (indiceSesion >= 0) {
+        this.sesiones[indiceSesion] = sesionBorrador;
+      }
+
+      // Limpiar sesión activa
+      this.sesionActiva = null;
+
+      // Guardar cambios
+      await this.guardarSesiones();
+
+      // Actualizar observables
+      this.sesionesSubject.next([...this.sesiones]);
+      this.sesionActivaSubject.next(null);
+
+      console.log('💾 Sesión guardada como borrador:', sesionBorrador.id);
+
+      return true;
+
+    } catch (error) {
+      console.error('Error al guardar sesión como borrador:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Activar un borrador para editarlo y completarlo
+   * Cambiar estado de BORRADOR a ACTIVA
+   */
+  async activarBorrador(sesionId: string): Promise<boolean> {
+    try {
+      await this.esperarInicializacion();
+
+      // Buscar el borrador
+      const borrador = this.sesiones.find(s => s.id === sesionId && s.estado === EstadoSesion.BORRADOR);
+      if (!borrador) {
+        console.error('Borrador no encontrado:', sesionId);
+        return false;
+      }
+
+      // Cambiar estado a ACTIVA
+      const sesionActivada: SesionCompra = {
+        ...borrador,
+        estado: EstadoSesion.ACTIVA,
+        fechaFinalizacion: undefined
+      };
+
+      // Actualizar en la lista de sesiones
+      const indiceSesion = this.sesiones.findIndex(s => s.id === sesionId);
+      if (indiceSesion >= 0) {
+        this.sesiones[indiceSesion] = sesionActivada;
+      }
+
+      // Establecer como sesión activa
+      this.sesionActiva = sesionActivada;
+
+      // Guardar cambios
+      await this.guardarSesiones();
+
+      // Actualizar observables
+      this.sesionesSubject.next([...this.sesiones]);
+      this.sesionActivaSubject.next(this.sesionActiva);
+
+      console.log('✅ Borrador activado:', sesionId);
+
+      return true;
+
+    } catch (error) {
+      console.error('Error al activar borrador:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Eliminar una sesión (cualquier estado)
+   */
+  async eliminarSesion(sesionId: string): Promise<boolean> {
+    try {
+      await this.esperarInicializacion();
+
+      // Buscar la sesión
+      const indice = this.sesiones.findIndex(s => s.id === sesionId);
+      if (indice < 0) {
+        console.error('Sesión no encontrada:', sesionId);
+        return false;
+      }
+
+      // Eliminar de la lista
+      const sesionEliminada = this.sesiones.splice(indice, 1)[0];
+
+      // Si era la sesión activa, limpiarla
+      if (this.sesionActiva?.id === sesionId) {
+        this.sesionActiva = null;
+        this.sesionActivaSubject.next(null);
+      }
+
+      // Guardar cambios
+      await this.guardarSesiones();
+
+      // Actualizar observables
+      this.sesionesSubject.next([...this.sesiones]);
+
+      console.log('🗑️ Sesión eliminada:', sesionEliminada.nombreSupermercado);
+
+      return true;
+
+    } catch (error) {
+      console.error('Error al eliminar sesión:', error);
+      return false;
+    }
     try {
       await this.esperarInicializacion();
 
@@ -463,16 +600,20 @@ export class ComprasService {
         return false;
       }
 
+      // Usar aserción de tipo ya que validamos que no es null
+      const sesionActiva = this.sesionActiva!;
+
       // Cambiar estado a cancelada
       const sesionCancelada: SesionCompra = {
-        ...this.sesionActiva,
+        ...sesionActiva,
+        id: sesionActiva.id,
         estado: EstadoSesion.CANCELADA,
         fechaFinalizacion: new Date(),
         horaFinalizacion: new Date().toTimeString().slice(0, 5),
         metadatos: {
-          ...this.sesionActiva.metadatos,
+          ...sesionActiva.metadatos,
           ultimaActualizacion: new Date(),
-          numeroRevision: this.sesionActiva.metadatos.numeroRevision + 1
+          numeroRevision: sesionActiva.metadatos.numeroRevision + 1
         }
       };
 
@@ -537,10 +678,10 @@ export class ComprasService {
     try {
       // Usar método personalizado para sesiones
       const datosString = localStorage.getItem(this.CLAVE_ALMACENAMIENTO);
-      
+
       if (datosString) {
         const almacenamiento: AlmacenamientoSesiones = JSON.parse(datosString);
-        
+
         // Convertir strings de fecha a objetos Date
         this.sesiones = almacenamiento.sesiones.map(sesion => ({
           ...sesion,
@@ -555,7 +696,7 @@ export class ComprasService {
             fechaAgregado: new Date(producto.fechaAgregado)
           }))
         }));
-        
+
         // Ordenar por fecha (más recientes primero)
         this.sesiones.sort((a, b) => b.fechaInicio.getTime() - a.fechaInicio.getTime());
       } else {
@@ -594,7 +735,7 @@ export class ComprasService {
    * Buscar sesión activa en la lista cargada
    */
   private buscarSesionActiva(): void {
-    this.sesionActiva = this.sesiones.find(sesion => 
+    this.sesionActiva = this.sesiones.find(sesion =>
       sesion.estado === EstadoSesion.ACTIVA || sesion.estado === EstadoSesion.PAUSADA
     ) || null;
 

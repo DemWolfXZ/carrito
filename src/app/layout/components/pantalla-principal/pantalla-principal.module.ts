@@ -2,7 +2,7 @@
  * Módulo de la pantalla principal de la aplicación Carrito
  * Configurado correctamente para el routing y los imports
  * Compatible con la estructura de carpetas actual
- * 
+ *
  * @author DemWolf
  * @version 1.0 - CORREGIDO
  */
@@ -18,17 +18,8 @@ import { IonicModule } from '@ionic/angular';
 // Importar componente principal
 import { PantallaPrincipalComponent } from './pantalla-principal.component';
 
-// Configuración de rutas del módulo
-const routes = [
-  {
-    path: '',
-    component: PantallaPrincipalComponent,
-    data: {
-      title: 'Pantalla Principal',
-      description: 'Control de gastos con tabs principales'
-    }
-  }
-];
+// Importar módulo de rutas con children
+import { PantallaPrincipalRoutingModule } from './pantalla-principal-routing.module';
 
 @NgModule({
   declarations: [
@@ -39,12 +30,12 @@ const routes = [
     // Módulos básicos de Angular
     CommonModule,
     FormsModule,
-    
+
     // Módulo de Ionic para componentes UI
     IonicModule,
-    
-    // Configuración de rutas para lazy loading
-    RouterModule.forChild(routes)
+
+    // Configuración de rutas con children tabs
+    PantallaPrincipalRoutingModule
   ],
   providers: [
     // Los servicios están registrados en CoreModule

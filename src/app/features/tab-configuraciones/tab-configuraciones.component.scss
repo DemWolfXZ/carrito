@@ -1,0 +1,101 @@
+// Estilos tab configuraciones
+.tab-configuraciones-content {
+  min-height: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px;
+  padding-bottom: 100px; // Espacio extra para que el último elemento no quede pegado a los tabs
+  background: var(--ion-background-color);
+
+  ion-list {
+    background: transparent;
+    margin-bottom: 24px;
+
+    ion-list-header {
+      margin-bottom: 8px;
+      padding-left: 16px;
+
+      ion-label {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        ion-icon {
+          font-size: 18px;
+        }
+      }
+    }
+
+    ion-item {
+      --background: var(--ion-card-background);
+      --border-radius: 12px;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      ion-label {
+        h2 {
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 4px;
+          color: var(--ion-text-color);
+        }
+
+        p {
+          font-size: 13px;
+          color: var(--ion-color-medium);
+          margin: 0;
+        }
+      }
+
+      ion-icon[slot="start"] {
+        font-size: 24px;
+        margin-right: 12px;
+      }
+
+      ion-icon[slot="end"] {
+        font-size: 20px;
+      }
+
+      ion-toggle {
+        --handle-width: 24px;
+        --handle-height: 24px;
+      }
+    }
+  }
+
+  // Estilos para sección de donaciones
+  .donacion-item {
+    --padding-start: 16px;
+    --inner-padding-end: 16px;
+    border-left: 4px solid #ff6b6b;
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.05), rgba(255, 193, 7, 0.05));
+
+    .titulo-donacion {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--ion-text-color);
+    }
+
+    .texto-donacion {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--ion-text-color-step-700);
+      margin: 0;
+    }
+  }
+
+  .btn-donacion {
+    margin: 16px 16px;
+    --border-radius: 12px;
+    font-weight: 600;
+    height: 48px;
+  }
+}

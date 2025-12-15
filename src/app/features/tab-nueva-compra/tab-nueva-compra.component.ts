@@ -1,0 +1,758 @@
+/**
+ * Componente Tab Nueva Compra
+ * Gestiona la creación de listas de compra con:
+ * - Agregar productos (nombre, cantidad, precio)
+ * - Fotos de productos (cámara/galería con compresión)
+ * - Cálculo automático de totales
+ * - Límite de 20 productos por lista
+ * - Validación de 2 listas máximas por mes
+ *
+ * @author DemWolf
+ * @version 1.0
+ */
+
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { AlertController, ActionSheetController, ToastController, LoadingController } from '@ionic/angular';
+// TODO: Implementar cámara al final
+// import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Subscription } from 'rxjs';
+
+// Importar servicios
+import { ComprasService } from '../../core/services/compras.service';
+import { UsuarioService } from '../../core/services/usuario.service';
+
+// Importar modelos existentes
+import { Producto, NuevoProducto } from '../../core/models/producto.model';
+import { SesionCompra, VALIDACION_SESION } from '../../core/models/sesion-compra.model';
+
+@Component({
+  selector: 'app-tab-nueva-compra',
+  templateUrl: './tab-nueva-compra.component.html',
+  styleUrls: ['./tab-nueva-compra.component.scss']
+})
+export class TabNuevaCompraComponent implements OnInit, OnDestroy {
+
+// Configuración y límites (usando constantes del modelo)
+  readonly MAX_PRODUCTOS = VALIDACION_SESION.productos.maximo;
+  readonly MAX_LISTAS_MES = VALIDACION_SESION.limiteMensual;
+  readonly MAX_FOTO_SIZE_MB = 5;
+  readonly FOTO_QUALITY = 60;
+
+  // Sesión activa
+  sesionActiva: SesionCompra | null = null;
+  productos: Producto[] = [];
+  totalGeneral: number = 0;
+
+  // Información de la compra
+  infoCompra: {
+    fecha: string;
+    nombreSupermercado: string;
+  } = {
+    fecha: new Date().toISOString().split('T')[0],
+    nombreSupermercado: ''
+  };
+
+  // Presupuesto estimado para la compra
+  presupuestoEstimado: number = 0;
+
+  // Fecha máxima (hoy)
+  fechaMaxima: string = new Date().toISOString().split('T')[0];
+
+  // Formulario de nuevo producto
+  nuevoProducto: Partial<NuevoProducto> = {
+    nombre: '',
+    cantidad: 1,
+    precioUnitario: 0
+  };
+  fotoTemporal: string = ''; // Foto temporal antes de crear producto
+
+  // Estados UI
+  cargando: boolean = false;
+  puedeCrearNuevaLista: boolean = true;
+  listasCreadasEsteMes: number = 0;
+
+  // Subscripciones
+  private subscriptions = new Subscription();
+
+  constructor(
+    private router: Router,
+    private alertController: AlertController,
+    private actionSheetController: ActionSheetController,
+    private toastController: ToastController,
+    private loadingController: LoadingController,
+    private comprasService: ComprasService,
+    private usuarioService: UsuarioService
+  ) {}
+
+  async ngOnInit(): Promise<void> {
+    console.log('🛒 Inicializando tab nueva compra...');
+    await this.verificarLimiteMensual();
+    await this.cargarDatos();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  /**
+   * Verificar cuántas listas se han creado este mes
+   */
+  private async verificarLimiteMensual(): Promise<void> {
+    try {
+      // Obtener resumen del mes actual
+      const resumenMes = this.comprasService.obtenerResumenMesActual();
+      this.listasCreadasEsteMes = resumenMes.sesionesUsadas;
+      this.puedeCrearNuevaLista = await this.comprasService.puedeCrearNuevaSesion();
+
+      console.log(`📊 Listas creadas este mes: ${this.listasCreadasEsteMes}/${this.MAX_LISTAS_MES}`);
+
+      if (!this.puedeCrearNuevaLista) {
+        await this.mostrarAlertaLimiteAlcanzado();
+      }
+    } catch (error) {
+      console.error('Error al verificar límite mensual:', error);
+    }
+  }
+
+  /**
+   * Cargar datos existentes si hay una sesión activa
+   */
+  private async cargarDatos(): Promise<void> {
+    try {
+      console.log('📂 Cargando datos...');
+
+      // Cargar sesión activa si existe
+      this.sesionActiva = await this.comprasService.obtenerSesionActiva();
+
+      if (this.sesionActiva) {
+        console.log('✅ Sesión activa encontrada:', this.sesionActiva.nombreSupermercado);
+        this.productos = [...this.sesionActiva.productos];
+        this.calcularTotal();
+      } else {
+        console.log('🆕 No hay sesión activa');
+      }
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+    }
+  }
+
+  /**
+   * Iniciar nueva compra (crear sesión)
+   */
+  async iniciarCompra(): Promise<void> {
+    // Validar que se haya ingresado el nombre del supermercado
+    if (!this.infoCompra.nombreSupermercado.trim()) {
+      await this.mostrarToast('Ingresa el nombre del lugar donde compraste', 'warning');
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Iniciando compra...'
+    });
+    await loading.present();
+
+    try {
+      // Crear nueva sesión con presupuesto opcional
+      const nuevaSesion = await this.comprasService.crearNuevaSesion({
+        nombreSupermercado: this.infoCompra.nombreSupermercado.trim(),
+        ubicacion: 'Chile', // Puedes expandir esto más adelante
+        presupuestoEstimado: this.presupuestoEstimado > 0 ? this.presupuestoEstimado : undefined
+      });
+
+      if (nuevaSesion) {
+        this.sesionActiva = nuevaSesion;
+
+        // Si hay presupuesto, mostrar mensaje informativo
+        if (this.presupuestoEstimado > 0) {
+          await this.mostrarToast(`Compra iniciada con presupuesto de $${this.presupuestoEstimado}`, 'success');
+        } else {
+          await this.mostrarToast('Compra iniciada exitosamente', 'success');
+        }
+
+        console.log('✅ Sesión creada:', nuevaSesion.id);
+      } else {
+        await this.mostrarToast('No se pudo crear la sesión. Verifica el límite mensual.', 'danger');
+      }
+    } catch (error) {
+      console.error('Error al iniciar compra:', error);
+      await this.mostrarToast('Error al iniciar compra', 'danger');
+    } finally {
+      await loading.dismiss();
+    }
+  }
+
+  /**
+   * Cancelar la creación de una nueva compra
+   * Limpia los datos ingresados y vuelve a mostrar la pantalla inicial
+   */
+  async cancelarNuevaCompra(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: '¿Cancelar Nueva Compra?',
+      message: 'Se descartarán todos los datos ingresados',
+      buttons: [
+        {
+          text: 'Seguir ingresando',
+          role: 'cancel'
+        },
+        {
+          text: 'Cancelar compra',
+          role: 'destructive',
+          handler: async () => {
+            // Limpiar datos
+            this.infoCompra.nombreSupermercado = '';
+            this.infoCompra.fecha = new Date().toISOString().split('T')[0];
+            this.presupuestoEstimado = 0;
+
+            await this.mostrarToast('Compra cancelada', 'warning');
+            console.log('❌ Creación de compra cancelada');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Agregar nuevo producto a la lista
+   */
+  async agregarProducto(): Promise<void> {
+    // Validar formulario
+    if (!this.validarFormularioProducto()) {
+      return;
+    }
+
+    // Verificar límite de productos
+    if (this.productos.length >= this.MAX_PRODUCTOS) {
+      await this.mostrarToast(`Máximo ${this.MAX_PRODUCTOS} productos por lista`, 'warning');
+      return;
+    }
+
+    // Verificar que haya sesión activa
+    if (!this.sesionActiva) {
+      await this.mostrarToast('Primero debes iniciar una compra', 'warning');
+      return;
+    }
+
+    // Agregar producto usando ComprasService
+    const datosProducto: NuevoProducto = {
+      nombre: this.nuevoProducto.nombre!.trim(),
+      cantidad: this.nuevoProducto.cantidad!,
+      precioUnitario: this.nuevoProducto.precioUnitario!
+    };
+
+    const agregado = await this.comprasService.agregarProducto(datosProducto);
+
+    if (agregado) {
+      // Recargar productos desde la sesión actualizada
+      this.sesionActiva = await this.comprasService.obtenerSesionActiva();
+      if (this.sesionActiva) {
+        this.productos = [...this.sesionActiva.productos];
+        this.calcularTotal();
+
+        // ✅ VALIDAR PRESUPUESTO si está definido
+        if (this.presupuestoEstimado > 0 && this.sesionActiva.totales.total > 0) {
+          const porcentajeUsado = (this.sesionActiva.totales.total / this.presupuestoEstimado) * 100;
+
+          // Mostrar alerta si se alcanza el 90% del presupuesto
+          if (porcentajeUsado >= 90 && porcentajeUsado < 100) {
+            await this.mostrarAlertaPresupuesto90();
+          } else if (porcentajeUsado >= 100) {
+            await this.mostrarAlertaPresupuestoExcedido();
+          }
+        }
+      }
+
+      // Limpiar formulario
+      this.limpiarFormulario();
+
+      // Mostrar confirmación
+      await this.mostrarToast('Producto agregado', 'success');
+      console.log('✅ Producto agregado correctamente');
+    } else {
+      await this.mostrarToast('Error al agregar producto', 'danger');
+    }
+  }
+
+  /**
+   * Eliminar producto de la lista
+   */
+  async eliminarProducto(id: string): Promise<void> {
+    const alert = await this.alertController.create({
+      header: '¿Eliminar producto?',
+      message: 'Esta acción no se puede deshacer',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            const eliminado = await this.comprasService.removerProducto(id);
+
+            if (eliminado) {
+              // Recargar productos desde la sesión actualizada
+              this.sesionActiva = await this.comprasService.obtenerSesionActiva();
+              if (this.sesionActiva) {
+                this.productos = [...this.sesionActiva.productos];
+                this.calcularTotal();
+              }
+              await this.mostrarToast('Producto eliminado', 'success');
+            } else {
+              await this.mostrarToast('Error al eliminar producto', 'danger');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Editar producto existente
+   */
+  async editarProducto(producto: Producto): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Editar Producto',
+      inputs: [
+        {
+          name: 'nombre',
+          type: 'text',
+          placeholder: 'Nombre',
+          value: producto.nombre
+        },
+        {
+          name: 'cantidad',
+          type: 'number',
+          placeholder: 'Cantidad',
+          value: producto.cantidad,
+          min: 1
+        },
+        {
+          name: 'precioUnidad',
+          type: 'number',
+          placeholder: 'Precio unitario',
+          value: producto.precioUnitario,
+          min: 0
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Guardar',
+          handler: async (data) => {
+            if (data.nombre && data.cantidad > 0 && data.precioUnitario >= 0) {
+              const actualizado = await this.comprasService.actualizarProducto(producto.id, {
+                nombre: data.nombre.trim(),
+                cantidad: parseInt(data.cantidad),
+                precioUnitario: parseFloat(data.precioUnitario)
+              });
+
+              if (actualizado) {
+                // Recargar productos desde la sesión actualizada
+                this.sesionActiva = await this.comprasService.obtenerSesionActiva();
+                if (this.sesionActiva) {
+                  this.productos = [...this.sesionActiva.productos];
+                  this.calcularTotal();
+                }
+                await this.mostrarToast('Producto actualizado', 'success');
+              } else {
+                await this.mostrarToast('Error al actualizar producto', 'danger');
+              }
+              return true;
+            }
+            return false;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Mostrar opciones para agregar foto
+   * TODO: Implementar cámara al final
+   */
+  async agregarFoto(): Promise<void> {
+    await this.mostrarToast('Funcionalidad de cámara pendiente de implementar', 'warning');
+    // TODO: Descomentar cuando se instale @capacitor/camera
+    /*
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Agregar foto',
+      buttons: [
+        {
+          text: 'Tomar foto',
+          icon: 'camera',
+          handler: () => {
+            this.tomarFoto(CameraSource.Camera);
+          }
+        },
+        {
+          text: 'Elegir de galería',
+          icon: 'images',
+          handler: () => {
+            this.tomarFoto(CameraSource.Photos);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
+    */
+  }
+
+  /**
+   * Capturar foto con la cámara o galería
+   * TODO: Implementar cuando se instale @capacitor/camera
+   */
+  private async tomarFoto(source: any): Promise<void> {
+    await this.mostrarToast('Funcionalidad de cámara pendiente', 'warning');
+    // TODO: Descomentar cuando se instale @capacitor/camera
+    /*
+    try {
+      const loading = await this.loadingController.create({
+        message: source === CameraSource.Camera ? 'Abriendo cámara...' : 'Cargando imagen...'
+      });
+      await loading.present();
+
+      const image = await Camera.getPhoto({
+        quality: this.FOTO_QUALITY,
+        allowEditing: true,
+        resultType: CameraResultType.Base64,
+        source: source,
+        width: 800,
+        height: 800
+      });
+
+      await loading.dismiss();
+
+      const imagenBase64 = `data:image/jpeg;base64,${image.base64String}`;
+      const tamañoMB = (imagenBase64.length * 0.75) / (1024 * 1024);
+
+      if (tamañoMB > this.MAX_FOTO_SIZE_MB) {
+        await this.mostrarToast(`La foto es muy grande (${tamañoMB.toFixed(1)}MB). Máximo ${this.MAX_FOTO_SIZE_MB}MB`, 'warning');
+        return;
+      }
+
+      await this.mostrarToast('Foto agregada', 'success');
+      console.log(`📸 Foto capturada - Tamaño: ${tamañoMB.toFixed(2)}MB`);
+
+    } catch (error: any) {
+      await this.loadingController.dismiss();
+      if (error.message !== 'User cancelled photos app') {
+        console.error('Error al capturar foto:', error);
+        await this.mostrarToast('Error al capturar foto', 'danger');
+      }
+    }
+    */
+  }
+
+  /**
+   * Eliminar foto del formulario
+   */
+  eliminarFoto(): void {
+    // TODO: Limpiar foto cuando se implemente en modelo
+  }
+
+  /**
+   * Guardar lista de compra
+   * Permite guardar con o sin precios/cantidades completos.
+   * El usuario puede completar los detalles después en la tienda.
+   */
+  async guardarLista(): Promise<void> {
+    if (this.productos.length === 0) {
+      await this.mostrarToast('Agrega al menos un producto', 'warning');
+      return;
+    }
+
+    // Verificar si hay productos sin precio o cantidad
+    const productosIncompletos = this.productos.some(p => !p.precioUnitario || p.precioUnitario === 0 || !p.cantidad);
+
+    // Si hay productos incompletos, mostrar opción flexible
+    if (productosIncompletos) {
+      await this.mostrarAlertaGuardarIncompleta();
+    } else {
+      // Si todos los productos están completos, finalizar directamente
+      await this.procesarGuardado(false);
+    }
+  }
+
+  /**
+   * Mostrar alerta cuando hay productos incompletos
+   * Permite guardar la lista para completarla en la tienda
+   */
+  private async mostrarAlertaGuardarIncompleta(): Promise<void> {
+    // Construir información de la sesión
+    const infoSesion = `📍 ${this.sesionActiva?.nombreSupermercado}\n📅 ${this.sesionActiva?.fechaInicio ? new Date(this.sesionActiva.fechaInicio).toLocaleDateString('es-CL') : ''}\n📦 ${this.productos.length} producto(s)${this.presupuestoEstimado > 0 ? `\n💰 Presupuesto: $${this.presupuestoEstimado.toLocaleString()}` : ''}`;
+
+    const alert = await this.alertController.create({
+      header: '💡 Esto es Importante',
+      message: `${infoSesion}\n\n━━━━━━━━━━━━━━━━\n\nTener una lista de compras te ayuda a:\n✅ No olvidar productos\n✅ Evitar compras impulsivas\n✅ Controlar tu presupuesto\n✅ Tomar mejores decisiones financieras\n\nPuedes guardar esta lista ahora y añadir los precios cuando estés en la tienda.\n\n¿Qué prefieres hacer?`,
+      buttons: [
+        {
+          text: 'Completar precios ahora',
+          role: 'secondary'
+        },
+        {
+          text: 'Guardar lista ahora',
+          handler: async () => {
+            await this.procesarGuardado(true);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Procesar guardado de la lista
+   * @param esBorrador - true para guardar incompleta (se completará en la tienda), false para finalizar
+   */
+  private async procesarGuardado(esBorrador: boolean): Promise<void> {
+    const loading = await this.loadingController.create({
+      message: esBorrador ? 'Guardando lista...' : 'Finalizando compra...'
+    });
+    await loading.present();
+
+    try {
+      let finalizado: boolean;
+
+      if (esBorrador) {
+        // Guardar sesión como borrador (sin finalizar)
+        // Se usa la misma sesión activa pero se marca el estado como BORRADOR
+        finalizado = await this.comprasService.guardarSesionComoBorrador();
+      } else {
+        // Finalizar sesión activa normalmente
+        finalizado = await this.comprasService.finalizarSesionActiva();
+      }
+
+      if (finalizado) {
+        console.log(`💾 Lista guardada exitosamente`);
+        await loading.dismiss();
+
+        const mensaje = esBorrador
+          ? '📋 Lista guardada. Ahora puedes completar los precios en la tienda'
+          : '✅ Perfecto! Tu compra ha sido registrada. Así llevas el control de tus gastos';
+
+
+        // Limpiar y redirigir al historial
+        this.productos = [];
+        this.totalGeneral = 0;
+        this.sesionActiva = null;
+        this.infoCompra.nombreSupermercado = '';
+        this.presupuestoEstimado = 0;
+        this.router.navigate(['/pantalla-principal/historial']);
+      } else {
+        await loading.dismiss();
+        await this.mostrarToast('Error al guardar la lista', 'danger');
+      }
+
+    } catch (error) {
+      await loading.dismiss();
+      console.error('Error al guardar lista:', error);
+      await this.mostrarToast('Error al guardar la lista', 'danger');
+    }
+  }
+
+  /**
+   * Calcular total general
+   */
+  private calcularTotal(): void {
+    this.totalGeneral = this.productos.reduce((sum, p) => sum + p.total, 0);
+  }
+
+  /**
+   * Validar formulario de producto
+   * Solo el nombre es requerido. Precio y cantidad son opcionales.
+   * Esto permite al usuario crear listas rápidamente y completarlas después en la tienda.
+   */
+  private validarFormularioProducto(): boolean {
+    if (!this.nuevoProducto.nombre?.trim()) {
+      this.mostrarToast('Ingresa el nombre del producto', 'warning');
+      return false;
+    }
+
+    // Si hay precio, validar que sea positivo
+    if (this.nuevoProducto.precioUnitario && this.nuevoProducto.precioUnitario < 0) {
+      this.mostrarToast('El precio no puede ser negativo', 'warning');
+      return false;
+    }
+
+    // Si hay cantidad, validar que sea mayor a 0
+    if (this.nuevoProducto.cantidad && this.nuevoProducto.cantidad < 1) {
+      this.mostrarToast('La cantidad debe ser mayor a 0', 'warning');
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Limpiar formulario
+   */
+  private limpiarFormulario(): void {
+    this.nuevoProducto = {
+      nombre: '',
+      cantidad: 1,
+      precioUnitario: 0
+    };
+  }
+
+  /**
+   * Generar ID único
+   */
+  private generarId(): string {
+    return `prod_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Mostrar alerta cuando se alcanza el 90% del presupuesto
+   */
+  private async mostrarAlertaPresupuesto90(): Promise<void> {
+    if (!this.sesionActiva || this.presupuestoEstimado <= 0) return;
+
+    const totalGastado = this.sesionActiva.totales.total;
+    const diferencia = this.presupuestoEstimado - totalGastado;
+    const porcentajeUsado = (totalGastado / this.presupuestoEstimado) * 100;
+
+    const alert = await this.alertController.create({
+      header: '⚠️ Presupuesto al 90%',
+      message: `
+Has utilizado el 90% de tu presupuesto.
+
+Gasto actual: $${totalGastado}
+Presupuesto: $${this.presupuestoEstimado}
+Saldo disponible: $${diferencia}
+
+Porcentaje usado: ${porcentajeUsado.toFixed(1)}%
+      `,
+      buttons: ['Entendido']
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Mostrar alerta cuando se excede el presupuesto
+   */
+  private async mostrarAlertaPresupuestoExcedido(): Promise<void> {
+    if (!this.sesionActiva || this.presupuestoEstimado <= 0) return;
+
+    const totalGastado = this.sesionActiva.totales.total;
+    const excedido = totalGastado - this.presupuestoEstimado;
+    const porcentajeUsado = (totalGastado / this.presupuestoEstimado) * 100;
+
+    const alert = await this.alertController.create({
+      header: '🔴 Presupuesto Excedido',
+      message: `
+¡Has superado tu presupuesto!
+
+Gasto actual: $${totalGastado}
+Presupuesto: $${this.presupuestoEstimado}
+Excedido: $${excedido}
+
+Porcentaje usado: ${porcentajeUsado.toFixed(1)}%
+      `,
+      buttons: ['Entendido']
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Mostrar alerta cuando se alcanza el límite mensual
+   */
+  private async mostrarAlertaLimiteAlcanzado(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Límite alcanzado',
+      message: `Has creado ${this.MAX_LISTAS_MES} listas este mes. Versión gratuita limitada a ${this.MAX_LISTAS_MES} listas por mes calendario.`,
+      buttons: ['Entendido']
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Mostrar toast
+   */
+  private async mostrarToast(message: string, color: string = 'medium'): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    await toast.present();
+  }
+
+  // Getters para el template
+  get puedeIniciarCompra(): boolean {
+    return this.infoCompra.nombreSupermercado.trim().length > 0 && this.puedeCrearNuevaLista;
+  }
+
+  get puedeAgregarProducto(): boolean {
+    return this.productos.length < this.MAX_PRODUCTOS && this.puedeCrearNuevaLista && this.sesionActiva !== null;
+  }
+
+  get mensajeLimite(): string {
+    if (!this.puedeCrearNuevaLista) {
+      return `Límite mensual alcanzado (${this.listasCreadasEsteMes}/${this.MAX_LISTAS_MES})`;
+    }
+    return `Productos: ${this.productos.length}/${this.MAX_PRODUCTOS}`;
+  }
+
+  /**
+   * Obtener color del presupuesto según el porcentaje usado
+   * Verde: 0-70%
+   * Naranja: 71-94%
+   * Rojo: 95-100%
+   */
+  obtenerColorPresupuesto(): string {
+    const porcentaje = this.obtenerPorcentajePresupuesto();
+
+    if (porcentaje <= 70) {
+      return 'presupuesto-verde';
+    } else if (porcentaje <= 94) {
+      return 'presupuesto-naranja';
+    } else {
+      return 'presupuesto-rojo';
+    }
+  }
+
+  /**
+   * Obtener la diferencia entre presupuesto y gasto
+   */
+  obtenerDiferenciaPresupuesto(): number {
+    if (!this.sesionActiva || this.presupuestoEstimado <= 0) return 0;
+    return this.presupuestoEstimado - this.sesionActiva.totales.total;
+  }
+
+  /**
+   * Obtener el porcentaje del presupuesto utilizado
+   */
+  obtenerPorcentajePresupuesto(): number {
+    if (!this.sesionActiva || this.presupuestoEstimado <= 0) return 0;
+    return (this.sesionActiva.totales.total / this.presupuestoEstimado) * 100;
+  }
+
+  /**
+   * TrackBy function para optimizar renderizado de lista
+   */
+  trackByFn(index: number, producto: Producto): string {
+    return producto.id;
+  }
+
+}

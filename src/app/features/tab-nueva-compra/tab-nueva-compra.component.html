@@ -1,0 +1,384 @@
+<!--
+  Template Tab Nueva Compra
+  Diseño móvil optimizado para agregar productos con fotos
+
+  @author DemWolf
+  @version 1.0
+-->
+
+<div class="tab-nueva-compra-content">
+
+  <!-- Alert límite alcanzado -->
+  <ion-card *ngIf="!puedeCrearNuevaLista" color="warning" class="card-limite">
+    <ion-card-content>
+      <div class="limite-content">
+        <ion-icon name="warning-outline" size="large"></ion-icon>
+        <div>
+          <h3>Límite mensual alcanzado</h3>
+          <p>Has creado {{listasCreadasEsteMes}}/{{MAX_LISTAS_MES}} listas este mes</p>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Información de la compra (Fecha y Lugar) -->
+  <ion-card *ngIf="puedeCrearNuevaLista && !sesionActiva" class="card-info-compra">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="information-circle-outline" color="primary"></ion-icon>
+        Información de la Compra
+      </ion-card-title>
+      <ion-card-subtitle>Completa antes de agregar productos</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <!-- Fecha de la compra -->
+      <ion-item lines="full">
+        <ion-label position="stacked">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          Fecha de la compra
+        </ion-label>
+        <ion-input
+          type="date"
+          [(ngModel)]="infoCompra.fecha"
+          [max]="fechaMaxima"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <!-- Lugar de compra -->
+      <ion-item lines="full">
+        <ion-label position="stacked">
+          <ion-icon name="storefront-outline" slot="start"></ion-icon>
+          ¿Dónde compraste? *
+        </ion-label>
+        <ion-input
+          [(ngModel)]="infoCompra.nombreSupermercado"
+          placeholder="Ej: Lider, Jumbo, Santa Isabel..."
+          maxlength="50"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <!-- Presupuesto estimado (opcional) -->
+      <ion-item lines="full">
+        <ion-label position="stacked">
+          <ion-icon name="wallet-outline" slot="start"></ion-icon>
+          Presupuesto estimado (opcional)
+        </ion-label>
+        <ion-input
+          type="number"
+          [(ngModel)]="presupuestoEstimado"
+          placeholder="Monto máximo que piensas gastar"
+          min="0"
+          step="100">
+        </ion-input>
+      </ion-item>
+
+      <!-- Botón iniciar compra -->
+      <ion-button
+        expand="block"
+        color="primary"
+        class="btn-iniciar-compra"
+        (click)="iniciarCompra()"
+        [disabled]="!puedeIniciarCompra">
+        <ion-icon name="cart-outline" slot="start"></ion-icon>
+        Iniciar Nueva Compra
+      </ion-button>
+
+      <!-- Botón cancelar -->
+      <ion-button
+        expand="block"
+        color="medium"
+        class="btn-cancelar"
+        (click)="cancelarNuevaCompra()">
+        <ion-icon name="close-outline" slot="start"></ion-icon>
+        Cancelar
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Info de sesión activa -->
+  <ion-card *ngIf="sesionActiva" class="card-sesion-activa" color="success">
+    <ion-card-content>
+      <div class="sesion-info">
+        <ion-icon name="checkmark-circle" size="large"></ion-icon>
+        <div>
+          <h3>{{ sesionActiva.nombreSupermercado }}</h3>
+          <p>{{ sesionActiva.fechaInicio | date:'dd/MM/yyyy' }} - {{ sesionActiva.horaInicio }}</p>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Card de presupuesto (si está definido) -->
+  <ion-card *ngIf="sesionActiva && presupuestoEstimado > 0" class="card-presupuesto">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="wallet-outline" color="primary"></ion-icon>
+        Control de Presupuesto
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <div class="presupuesto-info">
+        <!-- Gasto actual -->
+        <div class="presupuesto-item">
+          <span class="label">Gasto Acumulado:</span>
+          <span class="valor">${{ sesionActiva.totales.total | number:'1.0-0' }}</span>
+        </div>
+
+        <!-- Presupuesto total -->
+        <div class="presupuesto-item">
+          <span class="label">Presupuesto Total:</span>
+          <span class="valor">${{ presupuestoEstimado | number:'1.0-0' }}</span>
+        </div>
+
+        <!-- Diferencia con color dinámico -->
+        <div class="presupuesto-item diferencia-item">
+          <span class="label">Saldo Disponible:</span>
+          <span
+            class="valor-diferencia"
+            [ngClass]="obtenerColorPresupuesto()">
+            ${{ obtenerDiferenciaPresupuesto() | number:'1.0-0' }}
+          </span>
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="obtenerPorcentajePresupuesto()"
+              [ngClass]="obtenerColorPresupuesto()">
+            </div>
+          </div>
+          <span class="progress-text">{{ obtenerPorcentajePresupuesto().toFixed(1) }}% usado</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Contador de productos -->
+  <div class="contador-header">
+    <ion-chip [color]="puedeAgregarProducto ? 'primary' : 'danger'">
+      <ion-icon name="cube-outline"></ion-icon>
+      <ion-label>{{ mensajeLimite }}</ion-label>
+    </ion-chip>
+  </div>
+
+  <!-- Formulario para agregar producto -->
+  <ion-card *ngIf="puedeCrearNuevaLista" class="card-formulario">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="add-circle-outline" color="success"></ion-icon>
+        Agregar Producto
+      </ion-card-title>
+      <ion-card-subtitle>Solo el nombre es obligatorio. Precio y cantidad los puedes completar en la tienda</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <!-- Nombre del producto -->
+      <ion-item lines="full">
+        <ion-label position="stacked">Nombre del producto *</ion-label>
+        <ion-input
+          [(ngModel)]="nuevoProducto.nombre"
+          placeholder="Ej: Leche, Pan, Arroz..."
+          maxlength="50"
+          [disabled]="!puedeAgregarProducto">
+        </ion-input>
+      </ion-item>
+
+      <!-- Cantidad y Precio en grid -->
+      <ion-grid class="grid-cantidad-precio">
+        <ion-row>
+
+          <!-- Cantidad -->
+          <ion-col size="6">
+            <ion-item lines="none">
+              <ion-label position="stacked">Cantidad (Opcional)</ion-label>
+              <ion-input
+                type="number"
+                [(ngModel)]="nuevoProducto.cantidad"
+                placeholder="1"
+                min="1"
+                [disabled]="!puedeAgregarProducto">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Precio unitario -->
+          <ion-col size="6">
+            <ion-item lines="none">
+              <ion-label position="stacked">Precio ($) (Opcional)</ion-label>
+              <ion-input
+                type="number"
+                [(ngModel)]="nuevoProducto.precioUnitario"
+                placeholder="0"
+                min="0"
+                step="0.01"
+                [disabled]="!puedeAgregarProducto">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+        </ion-row>
+      </ion-grid>
+
+      <!-- Subtotal calculado -->
+      <ion-item lines="none" class="item-subtotal" *ngIf="nuevoProducto.cantidad && nuevoProducto.cantidad > 0 && nuevoProducto.precioUnitario && nuevoProducto.precioUnitario > 0">
+        <ion-label>
+          <h3>Subtotal:</h3>
+        </ion-label>
+        <ion-note slot="end" color="primary">
+          <strong>${{ (nuevoProducto.cantidad! * nuevoProducto.precioUnitario!).toLocaleString() }}</strong>
+        </ion-note>
+      </ion-item>
+
+      <!-- Foto del producto -->
+      <div class="foto-container">
+
+        <!-- Mostrar foto si existe -->
+        <!-- TODO: Implementar foto cuando el modelo lo soporte -->
+        <div *ngIf="false" class="foto-preview">
+          <img src="" alt="Foto producto" />
+          <ion-button
+            fill="clear"
+            color="danger"
+            size="small"
+            class="btn-eliminar-foto"
+            (click)="eliminarFoto()">
+            <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+
+        <!-- Botón para agregar foto -->
+        <ion-button
+          *ngIf="true"
+          expand="block"
+          fill="outline"
+          color="medium"
+          class="btn-agregar-foto"
+          (click)="agregarFoto()"
+          [disabled]="!puedeAgregarProducto">
+          <ion-icon name="camera-outline" slot="start"></ion-icon>
+          Agregar foto (opcional)
+        </ion-button>
+
+      </div>
+
+      <!-- Botón agregar producto -->
+      <ion-button
+        expand="block"
+        color="success"
+        class="btn-agregar-producto"
+        (click)="agregarProducto()"
+        [disabled]="!puedeAgregarProducto">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Agregar a la lista
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Lista de productos agregados -->
+  <div *ngIf="productos.length > 0" class="lista-productos">
+
+    <ion-list-header>
+      <ion-label>
+        <h2>Productos agregados ({{ productos.length }})</h2>
+      </ion-label>
+    </ion-list-header>
+
+    <ion-list>
+      <ion-item-sliding *ngFor="let producto of productos; trackBy: trackByFn">
+
+        <!-- Contenido del producto -->
+        <ion-item lines="full" class="item-producto">
+
+          <!-- Foto miniatura -->
+          <!-- TODO: Avatar foto -->
+          <ion-avatar *ngIf="false" slot="start">
+            <img src="" [alt]="producto.nombre" />
+          </ion-avatar>
+
+          <!-- Info del producto -->
+          <ion-label>
+            <h2>{{ producto.nombre }}</h2>
+            <p>
+              <span class="cantidad">{{ producto.cantidad }}x</span>
+              <span class="precio">${{ producto.precioUnitario.toLocaleString() }}</span>
+            </p>
+          </ion-label>
+
+          <!-- Subtotal -->
+          <ion-note slot="end" color="primary">
+            <strong>${{ producto.total.toLocaleString() }}</strong>
+          </ion-note>
+
+        </ion-item>
+
+        <!-- Opciones slide -->
+        <ion-item-options side="end">
+          <ion-item-option color="primary" (click)="editarProducto(producto)">
+            <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="eliminarProducto(producto.id)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+    </ion-list>
+
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="productos.length === 0 && puedeCrearNuevaLista" class="empty-state">
+    <ion-icon name="cart-outline" color="medium" size="large"></ion-icon>
+    <ion-text color="medium">
+      <p>Aún no has agregado productos</p>
+      <small>Completa el formulario arriba para empezar</small>
+    </ion-text>
+  </div>
+
+  <!-- Espaciador para el footer -->
+  <div class="spacer-footer"></div>
+
+  <!-- Footer con total y botones -->
+  <div *ngIf="productos.length > 0" class="footer-total">
+    <div class="toolbar-total">
+
+    <!-- Total general -->
+    <div class="total-container">
+      <div class="total-label">
+        <ion-text color="medium">
+          <small>Total ({{ productos.length }} productos)</small>
+        </ion-text>
+        <ion-text color="primary">
+          <h1>${{ totalGeneral.toLocaleString() }}</h1>
+        </ion-text>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="botones-accion">
+
+      <ion-button
+        expand="block"
+        color="success"
+        size="large"
+        (click)="guardarLista()">
+        <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+        Guardar Lista
+      </ion-button>
+
+    </div>
+
+  </div>
+  </div>
+
+</div>
