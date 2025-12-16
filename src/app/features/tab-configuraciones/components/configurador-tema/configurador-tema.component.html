@@ -1,0 +1,105 @@
+<div class="configurador-tema-container">
+  <!-- Encabezado -->
+  <div class="tema-header">
+    <ion-icon name="color-palette-outline" class="header-icon"></ion-icon>
+    <div class="header-text">
+      <h2>Tema Visual</h2>
+      <p class="tema-actual">{{ obtenerDescripcionTemaEfectivo() }}</p>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: SISTEMA (Automático) -->
+  <div class="seccion-temas">
+    <h3 class="titulo-seccion">
+      <ion-icon name="sunny-outline"></ion-icon>
+      Sistema
+    </h3>
+    <div class="opciones-grid">
+      <button
+        *ngFor="let opcion of obtenerPorCategoria('sistema')"
+        class="opcion-card"
+        [class.activa]="modoTemaActual === opcion.id"
+        (click)="seleccionarOpcion(opcion.id)"
+        type="button">
+        <div class="opcion-header">
+          <ion-icon [name]="opcion.icono" class="opcion-icono"></ion-icon>
+          <span class="opcion-badge" *ngIf="modoTemaActual === opcion.id">
+            <ion-icon name="checkmark-circle-sharp"></ion-icon>
+          </span>
+        </div>
+        <h3>{{ opcion.label }}</h3>
+        <p class="opcion-desc">{{ opcion.descripcion }}</p>
+        <div class="opcion-estado" *ngIf="modoTemaActual === opcion.id">
+          <small>Activo</small>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: ACROMÁTICOS (Claro/Oscuro) -->
+  <div class="seccion-temas">
+    <h3 class="titulo-seccion">
+      <ion-icon name="contrast"></ion-icon>
+      Acromáticos
+    </h3>
+    <div class="opciones-grid">
+      <button
+        *ngFor="let opcion of obtenerPorCategoria('acromático')"
+        class="opcion-card"
+        [class.activa]="modoTemaActual === opcion.id"
+        (click)="seleccionarOpcion(opcion.id)"
+        type="button">
+        <div class="opcion-header">
+          <ion-icon [name]="opcion.icono" class="opcion-icono"></ion-icon>
+          <span class="opcion-badge" *ngIf="modoTemaActual === opcion.id">
+            <ion-icon name="checkmark-circle-sharp"></ion-icon>
+          </span>
+        </div>
+        <h3>{{ opcion.label }}</h3>
+        <p class="opcion-desc">{{ opcion.descripcion }}</p>
+        <div class="opcion-estado" *ngIf="modoTemaActual === opcion.id">
+          <small>Activo</small>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: CROMÁTICOS (Colores) -->
+  <div class="seccion-temas">
+    <h3 class="titulo-seccion">
+      <ion-icon name="palette"></ion-icon>
+      Personalizados
+    </h3>
+    <p class="titulo-seccion-desc">Elige el color que más te guste</p>
+    <div class="opciones-grid-cromático">
+      <button
+        *ngFor="let opcion of obtenerPorCategoria('cromático')"
+        class="opcion-card opcion-cromatica"
+        [class.activa]="modoTemaActual === opcion.id"
+        [style.--tema-id]="'url(#' + opcion.id + ')'"
+        (click)="seleccionarOpcion(opcion.id)"
+        type="button">
+        <div class="opcion-header">
+          <div class="color-preview" [attr.data-theme]="opcion.id"></div>
+          <span class="opcion-badge" *ngIf="modoTemaActual === opcion.id">
+            <ion-icon name="checkmark-circle-sharp"></ion-icon>
+          </span>
+        </div>
+        <h3>{{ opcion.label }}</h3>
+        <p class="opcion-desc">{{ opcion.descripcion }}</p>
+        <div class="opcion-estado" *ngIf="modoTemaActual === opcion.id">
+          <small>Activo</small>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Información adicional -->
+  <div class="info-box">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    <div class="info-text">
+      <p *ngIf="modoTemaActual === 'automatico'">
+        El tema se cambia automáticamente según la preferencia del sistema operativo.
+      </p>
+      <p *ngIf="modoTemaActual !== 'automatico'">
+        Has seleccionado <strong>{{ obtenerNombreTema(modoTemaActual) }}</strong> en modo manual. Este tema se mantendrá independientemente de la preferencia del sistema.

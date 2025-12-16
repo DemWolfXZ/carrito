@@ -23,7 +23,7 @@ import { ComprasService } from '../../core/services/compras.service';
 import { UsuarioService } from '../../core/services/usuario.service';
 
 // Importar modelos existentes
-import { Producto, NuevoProducto } from '../../core/models/producto.model';
+import { Producto, NuevoProducto, ActualizacionProducto } from '../../core/models/producto.model';
 import { SesionCompra, VALIDACION_SESION } from '../../core/models/sesion-compra.model';
 
 @Component({
@@ -348,27 +348,59 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
         {
           text: 'Guardar',
           handler: async (data) => {
-            if (data.nombre && data.cantidad > 0 && data.precioUnitario >= 0) {
-              const actualizado = await this.comprasService.actualizarProducto(producto.id, {
-                nombre: data.nombre.trim(),
-                cantidad: parseInt(data.cantidad),
-                precioUnitario: parseFloat(data.precioUnitario)
-              });
-
-              if (actualizado) {
-                // Recargar productos desde la sesión actualizada
-                this.sesionActiva = await this.comprasService.obtenerSesionActiva();
-                if (this.sesionActiva) {
-                  this.productos = [...this.sesionActiva.productos];
-                  this.calcularTotal();
-                }
-                await this.mostrarToast('Producto actualizado', 'success');
-              } else {
-                await this.mostrarToast('Error al actualizar producto', 'danger');
-              }
-              return true;
+            // Solo el nombre es requerido. Cantidad y precio son opcionales pero si se proporcionan deben ser válidos
+            if (!data.nombre || !data.nombre.trim()) {
+              await this.mostrarToast('El nombre es obligatorio', 'warning');
+              return false;
             }
-            return false;
+
+            // Si hay cantidad, validar que sea > 0
+            if (data.cantidad !== '' && data.cantidad !== undefined && data.cantidad !== null) {
+              const cantidad = parseInt(data.cantidad);
+              if (isNaN(cantidad) || cantidad < 1) {
+                await this.mostrarToast('La cantidad debe ser mayor a 0', 'warning');
+                return false;
+              }
+            }
+
+            // Si hay precio, validar que sea >= 0
+            if (data.precioUnitario !== '' && data.precioUnitario !== undefined && data.precioUnitario !== null) {
+              const precio = parseFloat(data.precioUnitario);
+              if (isNaN(precio) || precio < 0) {
+                await this.mostrarToast('El precio no puede ser negativo', 'warning');
+                return false;
+              }
+            }
+
+            // Preparar actualización
+            const actualizacion: ActualizacionProducto = {
+              nombre: data.nombre.trim()
+            };
+
+            // Agregar cantidad solo si tiene valor
+            if (data.cantidad !== '' && data.cantidad !== undefined && data.cantidad !== null) {
+              actualizacion.cantidad = parseInt(data.cantidad);
+            }
+
+            // Agregar precio solo si tiene valor
+            if (data.precioUnitario !== '' && data.precioUnitario !== undefined && data.precioUnitario !== null) {
+              actualizacion.precioUnitario = parseFloat(data.precioUnitario);
+            }
+
+            const actualizado = await this.comprasService.actualizarProducto(producto.id, actualizacion);
+
+            if (actualizado) {
+              // Recargar productos desde la sesión actualizada
+              this.sesionActiva = await this.comprasService.obtenerSesionActiva();
+              if (this.sesionActiva) {
+                this.productos = [...this.sesionActiva.productos];
+                this.calcularTotal();
+              }
+              await this.mostrarToast('Producto actualizado', 'success');
+            } else {
+              await this.mostrarToast('Error al actualizar producto', 'danger');
+            }
+            return true;
           }
         }
       ]
@@ -494,22 +526,46 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
    * Permite guardar la lista para completarla en la tienda
    */
   private async mostrarAlertaGuardarIncompleta(): Promise<void> {
-    // Construir información de la sesión
-    const infoSesion = `📍 ${this.sesionActiva?.nombreSupermercado}\n📅 ${this.sesionActiva?.fechaInicio ? new Date(this.sesionActiva.fechaInicio).toLocaleDateString('es-CL') : ''}\n📦 ${this.productos.length} producto(s)${this.presupuestoEstimado > 0 ? `\n💰 Presupuesto: $${this.presupuestoEstimado.toLocaleString()}` : ''}`;
+    const productosIncompletos = this.productos.filter(p => !p.esCompleto).length;
+    const productosCompletos = this.productos.length - productosIncompletos;
+
+    const presupuestoText = this.presupuestoEstimado > 0
+      ? `\n💰 Presupuesto: $${this.presupuestoEstimado.toLocaleString()}`
+      : '';
+
+    const message = `
+📍 RESUMEN DE TU COMPRA
+━━━━━━━━━━━━━━━━━━━━━
+🏪 Supermercado: ${this.sesionActiva?.nombreSupermercado || 'No especificado'}
+📦 Productos: ${this.productos.length}${presupuestoText}
+
+✨ BENEFICIOS DE GUARDAR AHORA
+━━━━━━━━━━━━━━━━━━━━━
+🛒 Completa los precios en la tienda
+💰 Controla tu gasto en tiempo real
+📌 No olvidas ningún producto
+⏱️ Ahorras tiempo en la compra
+
+💡 Consejo: Puedes editar cualquier producto desde aquí o luego, desde tu lista guardada.
+    `;
 
     const alert = await this.alertController.create({
-      header: '💡 Esto es Importante',
-      message: `${infoSesion}\n\n━━━━━━━━━━━━━━━━\n\nTener una lista de compras te ayuda a:\n✅ No olvidar productos\n✅ Evitar compras impulsivas\n✅ Controlar tu presupuesto\n✅ Tomar mejores decisiones financieras\n\nPuedes guardar esta lista ahora y añadir los precios cuando estés en la tienda.\n\n¿Qué prefieres hacer?`,
+      header: '📋 Guardar Lista Incompleta',
+      subHeader: `${productosIncompletos} artículo(s) sin precio · ${productosCompletos} artículo(s) completo(s)`,
+      message: message.trim(),
+      cssClass: 'alert-guardar-incompleta',
       buttons: [
         {
-          text: 'Completar precios ahora',
-          role: 'secondary'
+          text: '← Volver',
+          role: 'cancel',
+          cssClass: 'btn-volver'
         },
         {
-          text: 'Guardar lista ahora',
+          text: '✓ Guardar Lista',
           handler: async () => {
             await this.procesarGuardado(true);
-          }
+          },
+          cssClass: 'btn-guardar'
         }
       ]
     });
@@ -565,6 +621,125 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
       console.error('Error al guardar lista:', error);
       await this.mostrarToast('Error al guardar la lista', 'danger');
     }
+  }
+
+  /**
+   * Cancelar la compra en progreso (eliminar sesión activa)
+   * Descarta todos los productos agregados
+   */
+  async cancelarCompraEnProgreso(): Promise<void> {
+    if (!this.sesionActiva) {
+      await this.mostrarToast('No hay compra en progreso', 'warning');
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: '⚠️ Cancelar Compra en Progreso',
+      message: `¿Deseas cancelar la compra en "${this.sesionActiva.nombreSupermercado}"? Se descartarán todos los ${this.productos.length} producto(s) agregado(s).`,
+      buttons: [
+        {
+          text: '← Volver',
+          role: 'cancel'
+        },
+        {
+          text: '🗑️ Cancelar Compra',
+          role: 'destructive',
+          handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Cancelando compra...'
+            });
+            await loading.present();
+
+            try {
+              // Cancelar la sesión activa
+              const cancelada = await this.comprasService.cancelarSesionActiva();
+
+              if (cancelada) {
+                console.log('❌ Compra en progreso cancelada');
+                await loading.dismiss();
+
+                // Limpiar datos
+                this.productos = [];
+                this.totalGeneral = 0;
+                this.sesionActiva = null;
+                this.infoCompra.nombreSupermercado = '';
+                this.presupuestoEstimado = 0;
+
+                await this.mostrarToast('Compra cancelada exitosamente', 'warning');
+              } else {
+                await loading.dismiss();
+                await this.mostrarToast('Error al cancelar la compra', 'danger');
+              }
+            } catch (error) {
+              await loading.dismiss();
+              console.error('Error al cancelar compra:', error);
+              await this.mostrarToast('Error al cancelar la compra', 'danger');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Eliminar una lista completamente (sesión guardada)
+   */
+  async eliminarListaSesionActiva(): Promise<void> {
+    if (!this.sesionActiva) {
+      await this.mostrarToast('No hay lista para eliminar', 'warning');
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: '🗑️ Eliminar Lista Guardada',
+      message: `¿Deseas eliminar permanentemente la lista de "${this.sesionActiva.nombreSupermercado}"? Esta acción no se puede deshacer.`,
+      buttons: [
+        {
+          text: '← Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: '🗑️ Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Eliminando lista...'
+            });
+            await loading.present();
+
+            try {
+              // Eliminar la sesión activa
+              const eliminada = await this.comprasService.eliminarSesionActiva();
+
+              if (eliminada) {
+                console.log('🗑️ Lista eliminada');
+                await loading.dismiss();
+
+                // Limpiar datos
+                this.productos = [];
+                this.totalGeneral = 0;
+                this.sesionActiva = null;
+                this.infoCompra.nombreSupermercado = '';
+                this.presupuestoEstimado = 0;
+
+                await this.mostrarToast('Lista eliminada exitosamente', 'success');
+              } else {
+                await loading.dismiss();
+                await this.mostrarToast('Error al eliminar la lista', 'danger');
+              }
+            } catch (error) {
+              await loading.dismiss();
+              console.error('Error al eliminar lista:', error);
+              await this.mostrarToast('Error al eliminar la lista', 'danger');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   /**

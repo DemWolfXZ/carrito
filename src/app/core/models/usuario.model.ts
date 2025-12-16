@@ -57,11 +57,35 @@ export interface EstadisticasUsuario {
 
 // Enums para configuraciones
 
-// Temas visuales disponibles
+// Temas visuales disponibles - 11 temas (2 acromáticos + 9 cromáticos)
 export enum TemaVisual {
-  CLARO = 'claro',
-  OSCURO = 'oscuro',
-  AUTOMATICO = 'automatico'           // Sigue el tema del sistema
+  // Temas acromáticos
+  CLARO = 'claro',                    // Blanco/Grises claros
+  OSCURO = 'oscuro',                  // Negro/Gris muy oscuro
+  AUTOMATICO = 'automatico',          // Sigue el tema del sistema
+
+  // Temas cromáticos - variantes azul
+  AZUL = 'azul',                      // Azul cielo claro (profesional)
+  AZUL_ELEGANTE = 'azul-elegante',    // Azul elegante (corporativo sofisticado)
+  AZUL_OSCURO = 'azul-oscuro',        // Azul marino oscuro (profesional nocturno)
+
+  // Temas cromáticos - variantes morado
+  MORADO = 'morado',                  // Púrpura suave (creativo)
+  MORADO_OSCURO = 'morado-oscuro',    // Púrpura oscuro (creativo nocturno)
+
+  // Temas cromáticos - variantes rosado
+  ROSADO = 'rosado',                  // Rosa elegante (cálido)
+  ROSADO_OSCURO = 'rosado-oscuro',    // Rosa oscuro (cálido nocturno)
+
+  // Temas cromáticos - variantes verde
+  VERDE = 'verde',                    // Verde bosque (natural)
+  VERDE_OSCURO = 'verde-oscuro'       // Verde oscuro (natural nocturno)
+}
+
+// Modos de tema (automático o manual)
+export enum ModoTema {
+  AUTOMATICO = 'automatico',          // Sigue preferencia del sistema
+  MANUAL = 'manual'                   // Selección manual del usuario
 }
 
 // Tamaños de fuente disponibles

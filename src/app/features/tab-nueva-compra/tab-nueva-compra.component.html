@@ -110,6 +110,18 @@
           <p>{{ sesionActiva.fechaInicio | date:'dd/MM/yyyy' }} - {{ sesionActiva.horaInicio }}</p>
         </div>
       </div>
+
+      <!-- Botón de eliminar lista -->
+      <div class="sesion-acciones">
+        <ion-button
+          expand="block"
+          color="danger"
+          size="small"
+          (click)="eliminarListaSesionActiva()">
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
+          Eliminar Lista
+        </ion-button>
+      </div>
     </ion-card-content>
   </ion-card>
 
@@ -294,44 +306,62 @@
     </ion-list-header>
 
     <ion-list>
-      <ion-item-sliding *ngFor="let producto of productos; trackBy: trackByFn">
+      <div *ngFor="let producto of productos; trackBy: trackByFn" class="producto-card">
 
         <!-- Contenido del producto -->
-        <ion-item lines="full" class="item-producto">
+        <ion-item [class.producto-incompleto]="!producto.esCompleto" class="item-producto" lines="none">
 
-          <!-- Foto miniatura -->
-          <!-- TODO: Avatar foto -->
-          <ion-avatar *ngIf="false" slot="start">
-            <img src="" [alt]="producto.nombre" />
-          </ion-avatar>
+          <!-- Badge para producto incompleto -->
+          <ion-icon
+            *ngIf="!producto.esCompleto"
+            name="warning-outline"
+            slot="start"
+            color="warning"
+            style="margin-right: 8px;">
+          </ion-icon>
 
           <!-- Info del producto -->
           <ion-label>
             <h2>{{ producto.nombre }}</h2>
             <p>
-              <span class="cantidad">{{ producto.cantidad }}x</span>
-              <span class="precio">${{ producto.precioUnitario.toLocaleString() }}</span>
+              <span class="cantidad" *ngIf="producto.cantidad > 0">{{ producto.cantidad }}x</span>
+              <span class="cantidad" *ngIf="producto.cantidad === 0" style="color: #999;">Sin cantidad</span>
+              <span class="precio" *ngIf="producto.precioUnitario > 0">${{ producto.precioUnitario.toLocaleString() }}</span>
+              <span class="precio" *ngIf="producto.precioUnitario === 0" style="color: #999;">Sin precio</span>
             </p>
           </ion-label>
 
           <!-- Subtotal -->
-          <ion-note slot="end" color="primary">
-            <strong>${{ producto.total.toLocaleString() }}</strong>
+          <ion-note slot="end" [color]="producto.esCompleto ? 'primary' : 'medium'">
+            <strong *ngIf="producto.esCompleto">${{ producto.total.toLocaleString() }}</strong>
+            <strong *ngIf="!producto.esCompleto" style="color: #999;">-</strong>
           </ion-note>
 
         </ion-item>
 
-        <!-- Opciones slide -->
-        <ion-item-options side="end">
-          <ion-item-option color="primary" (click)="editarProducto(producto)">
-            <ion-icon name="create-outline" slot="icon-only"></ion-icon>
-          </ion-item-option>
-          <ion-item-option color="danger" (click)="eliminarProducto(producto.id)">
-            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-          </ion-item-option>
-        </ion-item-options>
+        <!-- Botones de acción siempre visibles -->
+        <div class="botones-producto">
+          <ion-button
+            fill="outline"
+            size="small"
+            color="primary"
+            (click)="editarProducto(producto)"
+            class="btn-editar">
+            <ion-icon name="pencil-outline"></ion-icon>
+            Editar
+          </ion-button>
+          <ion-button
+            fill="outline"
+            size="small"
+            color="danger"
+            (click)="eliminarProducto(producto.id)"
+            class="btn-eliminar">
+            <ion-icon name="trash-outline"></ion-icon>
+            Eliminar
+          </ion-button>
+        </div>
 
-      </ion-item-sliding>
+      </div>
     </ion-list>
 
   </div>
@@ -374,6 +404,15 @@
         (click)="guardarLista()">
         <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
         Guardar Lista
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        color="danger"
+        size="large"
+        (click)="cancelarCompraEnProgreso()">
+        <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+        Cancelar Compra
       </ion-button>
 
     </div>

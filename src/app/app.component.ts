@@ -2,13 +2,19 @@
  * Componente raíz de la aplicación Carrito
  * Maneja la inicialización global y configuraciones básicas de la app
  * Punto de entrada principal para toda la aplicación
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Platform } from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { ConfiguracionService } from './core/services/configuracion.service';
+import { TemaService } from './core/services/tema.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -16,10 +22,13 @@ import { Platform } from '@ionic/angular';
   styleUrls: ['app.component.scss'],
   standalone: false,
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
   constructor(
-    private platform: Platform
+    private platform: Platform,
+    private configuracionService: ConfiguracionService,
+    private temaService: TemaService
   ) {
     // Inicializar configuraciones básicas de la plataforma
     this.inicializarApp();
@@ -28,9 +37,35 @@ export class AppComponent implements OnInit {
   /**
    * Inicialización del componente después de la construcción
    */
-  ngOnInit(): void {
-    // Configuraciones adicionales después de que Angular esté listo
-    this.configurarTemaInicial();
+  async ngOnInit(): Promise<void> {
+    console.log('🛒 AppComponent inicializado');
+
+    // Configurar Status Bar para no sobreescribir la vista
+    if (Capacitor.getPlatform() === 'android') {
+      await StatusBar.setOverlaysWebView({ overlay: false });
+      await StatusBar.setStyle({ style: Style.Dark });
+    }
+
+    // Escuchar cambios de tema y aplicarlos al DOM
+    this.temaService.temaActualObservable$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((tema: string) => {
+        console.log('🎨 AppComponent: Tema cambió a', tema);
+        // Aplicar tema al elemento ion-app para que los estilos se propaguen
+        const appElement = document.querySelector('ion-app');
+        if (appElement) {
+          appElement.setAttribute('data-theme', tema);
+        }
+      });
+  }
+
+  /**
+   * Limpiar recursos al destruir el componente
+   */
+  ngOnDestroy(): void {
+    this.temaService.destroy();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
@@ -40,27 +75,11 @@ export class AppComponent implements OnInit {
     try {
       // Esperar a que la plataforma esté lista
       await this.platform.ready();
-      
+
       console.log('🛒 Aplicación Carrito iniciada correctamente');
-      
+
     } catch (error) {
       console.error('Error al inicializar la aplicación:', error);
     }
-  }
-
-  /**
-   * Configurar tema inicial de la aplicación
-   */
-  private configurarTemaInicial(): void {
-    // Detectar preferencia de tema del sistema por defecto
-    const prefiereTemaOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    // Usar tema automático basado en preferencias del sistema
-    document.body.classList.toggle('dark', prefiereTemaOscuro);
-    
-    // Escuchar cambios en las preferencias del sistema
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      document.body.classList.toggle('dark', e.matches);
-    });
   }
 }

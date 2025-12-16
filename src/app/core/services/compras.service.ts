@@ -507,6 +507,64 @@ export class ComprasService {
   }
 
   /**
+   * Cancelar la sesión activa (descartar sin guardar)
+   * Elimina la sesión activa completamente
+   */
+  async cancelarSesionActiva(): Promise<boolean> {
+    try {
+      await this.esperarInicializacion();
+
+      if (!this.sesionActiva) {
+        console.error('No hay sesión activa para cancelar');
+        return false;
+      }
+
+      // Usar eliminarSesion para borrar la sesión activa
+      const sesionId = this.sesionActiva.id;
+      const cancelada = await this.eliminarSesion(sesionId);
+
+      if (cancelada) {
+        console.log('❌ Sesión activa cancelada:', sesionId);
+      }
+
+      return cancelada;
+
+    } catch (error) {
+      console.error('Error al cancelar sesión activa:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Eliminar la sesión activa completamente
+   * Similar a cancelarSesionActiva pero se puede llamar después de guardar
+   */
+  async eliminarSesionActiva(): Promise<boolean> {
+    try {
+      await this.esperarInicializacion();
+
+      if (!this.sesionActiva) {
+        console.error('No hay sesión activa para eliminar');
+        return false;
+      }
+
+      // Usar eliminarSesion para borrar la sesión activa
+      const sesionId = this.sesionActiva.id;
+      const eliminada = await this.eliminarSesion(sesionId);
+
+      if (eliminada) {
+        console.log('🗑️ Sesión activa eliminada:', sesionId);
+      }
+
+      return eliminada;
+
+    } catch (error) {
+      console.error('Error al eliminar sesión activa:', error);
+      return false;
+    }
+  }
+
+  /**
    * Activar un borrador para editarlo y completarlo
    * Cambiar estado de BORRADOR a ACTIVA
    */

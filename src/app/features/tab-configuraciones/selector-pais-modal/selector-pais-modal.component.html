@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Seleccionar País</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="selector-pais-content">
+  <div class="paises-grid">
+    <div
+      *ngFor="let pais of paisesDisponibles"
+      class="pais-card"
+      [class.selected]="paisSeleccionado?.codigo === pais.codigo"
+      (click)="seleccionarPais(pais)"
+    >
+      <img [src]="pais.bandera" [alt]="'Bandera de ' + pais.nombre" class="pais-bandera" />
+      <div class="pais-info">
+        <h3 class="pais-nombre">{{ pais.nombre }}</h3>
+        <p class="pais-moneda">{{ pais.simboloMoneda }} {{ pais.moneda }}</p>
+      </div>
+      <div *ngIf="paisSeleccionado?.codigo === pais.codigo" class="checkmark">
+        <ion-icon name="checkmark-circle" color="success"></ion-icon>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-padding">
+  <ion-button
+    expand="block"
+    color="primary"
+    (click)="confirmar()"
+    [disabled]="!paisSeleccionado"
+  >
+    Confirmar
+  </ion-button>
+</ion-footer>

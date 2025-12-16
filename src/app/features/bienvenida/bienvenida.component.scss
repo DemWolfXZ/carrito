@@ -62,7 +62,7 @@
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-secondary) 100%);
-  z-index: 9999;
+  z-index: 0;
 
   // Animación de entrada más lenta
   animation: splashEnter 1.2s ease-out;
@@ -202,8 +202,11 @@
 // ============================
 
 .main-content {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  overflow-y: auto;
+  width: 100%;
+  overflow: hidden; // No scrollear el contenedor principal
   animation: contentFadeIn 0.8s ease-out;
 }
 
@@ -220,9 +223,16 @@
 
 // Indicador de progreso superior mejorado
 .progress-container {
+  flex: 0 0 auto;
   padding: 20px var(--bienvenida-padding) 16px;
   background: linear-gradient(135deg, var(--ion-color-step-50), var(--ion-color-step-100));
   border-bottom: 1px solid var(--ion-color-step-200);
+  display: none; // Ocultar la barra de progreso para dejar 4 bloques claros
+
+  @media (prefers-color-scheme: dark) {
+    background: linear-gradient(135deg, #2a2a2a, #323232);
+    border-bottom: 1px solid #404040;
+  }
 
   .progress-bar {
     width: 100%;
@@ -232,6 +242,10 @@
     overflow: hidden;
     margin-bottom: 12px;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    @media (prefers-color-scheme: dark) {
+      background: #404040;
+    }
 
     .progress-fill {
       height: 100%;
@@ -247,22 +261,28 @@
     color: var(--ion-color-medium);
     text-align: center;
     display: block;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+
+    @media (prefers-color-scheme: dark) {
+      color: #b0b0b0;
+    }
   }
 }
 
-// Área de contenido con scroll optimizada
+// Área de contenido con estructura de los 4 elementos
 .content-scroll-area {
-  height: calc(100vh - 160px); // Altura fija descontando progress y navegación
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
-  padding-bottom: 20px; // Espacio adicional al final
-
-  // CRÍTICO: Scroll suave y táctil optimizado
-  -webkit-overflow-scrolling: touch; // Safari iOS
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
-  overscroll-behavior: contain; // Prevenir scroll bounce no deseado
+  touch-action: auto;
+  background: #ffffff;
+
+  @media (prefers-color-scheme: dark) {
+    background: var(--ion-color-step-100);
+  }
 }
 
 // Contenedor principal centrado
@@ -302,38 +322,56 @@
 // LAYOUT OPTIMIZADO PARA PASO 3 - SELECTOR GRID CON SCROLL TÁCTIL
 // ============================
 
-// Layout principal del paso 3 con distribución flex optimizada
+// Layout principal del paso 3 con 4 contenedores verticales sin superposición
 .step3-layout {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 160px); // Altura total disponible
+  flex: 1;
   width: 100%;
-  padding: 0 var(--bienvenida-padding);
+  height: 100%;
+  padding: 0;
+  overflow: hidden; // No scrollear el layout principal, solo el grid
+  position: relative;
+  gap: 0;
 }
 
 // Sección de título COMPACTA
 .title-section-compact {
   flex: 0 0 auto;
-  padding: var(--step3-padding-vertical) 0;
+  padding: 12px var(--bienvenida-padding);
+  padding-left: 15px;
+  padding-right: 15px;
+  background: linear-gradient(135deg, var(--ion-color-step-50), var(--ion-color-step-100));
+  border-bottom: 1px solid var(--ion-color-step-200);
+
+  @media (prefers-color-scheme: dark) {
+    background: linear-gradient(135deg, #2a2a2a, #323232);
+    border-bottom: 1px solid #404040;
+  }
 
   .step-title h2 {
     font-size: 22px;
     font-weight: 600;
     margin: 0 0 8px 0;
-    color: var(--ion-color-dark);
+    color: #1a1a1a;
     line-height: 1.2;
+    padding: 0 15px;
 
     @media (prefers-color-scheme: dark) {
-      color: var(--ion-color-light);
+      color: #ffffff;
     }
   }
 
   .step-description p {
     font-size: 15px;
     line-height: 1.3;
-    color: var(--ion-color-medium);
+    color: #666666;
     margin: 0;
-    padding: 0 8px;
+    padding: 0 15px;
+
+    @media (prefers-color-scheme: dark) {
+      color: #d0d0d0;
+    }
   }
 }
 
@@ -343,13 +381,49 @@
   display: flex;
   flex-direction: column;
   min-height: 0; // Importante para flex con scroll
-  padding: var(--step3-padding-vertical) 0;
+  padding: 12px var(--bienvenida-padding);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ion-color-step-300) var(--ion-color-step-100);
+  background-color: #ffffff;
+  z-index: 0;
+  position: relative;
+  touch-action: auto; // Permitir scroll táctil
+
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--ion-color-step-100);
+  }
 }
 
 // Sección de información del país en la parte inferior
 .country-info-section-bottom {
   flex: 0 0 auto;
-  padding-top: var(--step3-padding-vertical);
+  position: relative;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  width: 100%;
+  min-height: 80px;
+  padding: 16px var(--bienvenida-padding);
+  background-color: #f0f8f5 !important;
+  border: 3px solid var(--ion-color-success);
+  border-radius: 8px;
+  margin: 0 var(--bienvenida-padding) 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 11px;
+  z-index: 50;
+  overflow: visible;
+  box-shadow: 0 2px 8px rgba(var(--ion-color-success-rgb), 0.2);
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #1a3a32 !important;
+    border: 3px solid var(--ion-color-success);
+  }
 }
 
 // ============================
@@ -357,25 +431,33 @@
 // ============================
 
 .main-title {
+  padding: 0 15px;
+
   h1 {
     font-size: 28px;
     font-weight: 700;
     margin: 0 0 20px 0;
-    color: var(--ion-color-dark);
+    color: #1a1a1a;
     line-height: 1.2;
 
     @media (prefers-color-scheme: dark) {
-      color: var(--ion-color-light);
+      color: #ffffff;
     }
   }
 }
 
 .main-description {
+  padding: 0 15px;
+
   p {
     font-size: 16px;
     line-height: 1.5;
-    color: var(--ion-color-medium);
+    color: #666666;
     margin: 0 0 30px 0;
+
+    @media (prefers-color-scheme: dark) {
+      color: #d0d0d0;
+    }
   }
 }
 
@@ -391,13 +473,18 @@
     align-items: center;
     gap: 16px;
     padding: 20px;
-    background: var(--ion-color-step-50);
+    background: #f5f5f5;
     border-radius: var(--bienvenida-border-radius);
     border-left: 4px solid var(--ion-color-primary);
     text-align: left;
     animation: slideInLeft 0.6s ease-out both;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     transition: var(--bienvenida-transition);
+
+    @media (prefers-color-scheme: dark) {
+      background: #2a2a2a;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
 
     &:hover {
       transform: translateY(-2px);
@@ -417,18 +504,22 @@
         font-size: 16px;
         font-weight: 600;
         margin: 0 0 6px 0;
-        color: var(--ion-color-dark);
+        color: #1a1a1a;
 
         @media (prefers-color-scheme: dark) {
-          color: var(--ion-color-light);
+          color: #ffffff;
         }
       }
 
       p {
         font-size: 13px;
-        color: var(--ion-color-medium);
+        color: #666666;
         margin: 0;
         line-height: 1.4;
+
+        @media (prefers-color-scheme: dark) {
+          color: #b0b0b0;
+        }
       }
     }
   }
@@ -473,6 +564,9 @@
   overflow-y: auto;
   overflow-x: hidden; // Solo scroll vertical
   padding: 8px 0;
+  position: relative;
+  z-index: 99;
+  touch-action: auto; // Permitir scroll táctil
 
   // CRÍTICO: Configuración de scroll táctil para móviles
   -webkit-overflow-scrolling: touch; // Safari iOS - scroll suave
@@ -530,6 +624,8 @@
   display: grid;
   gap: var(--grid-gap);
   padding: 4px;
+  position: relative;
+  z-index: 0; // Debajo del país seleccionado y botones
 
   // Grid responsivo según ancho de pantalla
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -560,13 +656,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px 12px;
+  padding: 12px 10px;
   background: var(--ion-color-step-50);
   border: var(--card-border-width) solid var(--ion-color-step-200);
   border-radius: var(--bienvenida-border-radius);
   cursor: pointer;
   transition: var(--bienvenida-transition);
   min-height: var(--card-min-height);
+  overflow: hidden;
   position: relative;
   overflow: hidden;
 
@@ -599,7 +696,6 @@
     background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.08), rgba(var(--ion-color-secondary-rgb), 0.05));
     transform: scale(var(--card-selected-scale));
     box-shadow: 0 8px 30px rgba(var(--ion-color-primary-rgb), 0.25);
-    z-index: 2;
 
     // Efecto de brillo sutil
     &::before {
@@ -630,16 +726,20 @@
 
     .country-info {
       .country-name {
-        color: var(--ion-color-primary);
+        color: #1a1a1a;
         font-weight: 700;
+
+        @media (prefers-color-scheme: dark) {
+          color: #ffffff;
+        }
       }
 
       .country-currency {
-        color: var(--ion-color-dark);
+        color: #555555;
         font-weight: 600;
 
         @media (prefers-color-scheme: dark) {
-          color: var(--ion-color-light);
+          color: #cccccc;
         }
       }
     }
@@ -697,16 +797,18 @@
 
 // Contenedor de la bandera
 .country-flag-container {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 
   .country-flag {
-    width: 60px;
-    height: 45px;
+    width: 50px;
+    height: 38px;
     object-fit: cover;
     border-radius: 6px;
     border: var(--card-border-width) solid var(--ion-color-step-300);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: var(--bienvenida-transition);
+    display: block;
+    max-width: 100%;
 
     // Optimización para imágenes de alta densidad
     image-rendering: -webkit-optimize-contrast;
@@ -745,21 +847,25 @@
     font-size: 14px;
     font-weight: 600;
     margin: 0 0 4px 0;
-    color: var(--ion-color-dark);
+    color: #1a1a1a;
     transition: var(--bienvenida-transition);
     line-height: 1.2;
 
     @media (prefers-color-scheme: dark) {
-      color: var(--ion-color-light);
+      color: #ffffff;
     }
   }
 
   .country-currency {
     font-size: 12px;
-    color: var(--ion-color-medium);
+    color: #666666;
     margin: 0;
     transition: var(--bienvenida-transition);
     line-height: 1.2;
+
+    @media (prefers-color-scheme: dark) {
+      color: #d0d0d0;
+    }
   }
 }
 
@@ -784,83 +890,88 @@
 
 // Información del país seleccionado optimizada
 .pais-seleccionado {
-  width: 100%;
+  flex: 1;
   margin: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  position: relative;
+  z-index: 99;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
 
   .seleccion-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 16px;
-
-    ion-icon {
-      font-size: 20px;
-      animation: checkmarkBounce 0.6s ease-out;
-    }
-
-    span {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--ion-color-success);
-    }
+    display: none;
   }
 
   .seleccion-detalle {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 20px;
-    background: var(--ion-color-step-50);
-    border-radius: var(--bienvenida-border-radius);
+    gap: 12px;
+    padding: 10px 12px;
+    background: rgba(var(--ion-color-success-rgb), 0.1);
+    border-radius: 8px;
     border: 2px solid var(--ion-color-success);
     animation: pulseSuccess 0.6s ease-out;
-    box-shadow: 0 4px 20px rgba(var(--ion-color-success-rgb), 0.2);
+    box-shadow: 0 2px 8px rgba(var(--ion-color-success-rgb), 0.15);
+    flex: 1;
+    min-width: 0;
+
+    @media (prefers-color-scheme: dark) {
+      background: rgba(var(--ion-color-success-rgb), 0.2);
+      border-color: var(--ion-color-success);
+    }
 
     .bandera-seleccionada {
-      width: 70px;
-      height: 52px;
+      width: 50px;
+      height: 38px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 4px;
       border: 2px solid var(--ion-color-success);
       flex-shrink: 0;
-      box-shadow: 0 3px 15px rgba(var(--ion-color-success-rgb), 0.3);
+      box-shadow: 0 2px 6px rgba(var(--ion-color-success-rgb), 0.3);
     }
 
     .seleccion-info {
       text-align: left;
       flex: 1;
+      min-width: 0;
 
       h3 {
-        font-size: 18px;
-        font-weight: 600;
-        margin: 0 0 8px 0;
-        color: var(--ion-color-dark);
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+        color: #1b1b1b;
 
         @media (prefers-color-scheme: dark) {
-          color: var(--ion-color-light);
+          color: #ffffff;
         }
       }
 
       p {
-        font-size: 13px;
-        color: var(--ion-color-medium);
-        margin: 0 0 4px 0;
-        line-height: 1.4;
+        font-size: 12px;
+        color: #4a4a4a;
+        margin: 0 0 3px 0;
+        line-height: 1.3;
+
+        @media (prefers-color-scheme: dark) {
+          color: #e0e0e0;
+        }
 
         &:last-child {
           margin-bottom: 0;
           font-style: italic;
           color: var(--ion-color-success);
-          font-weight: 500;
+          font-weight: 600;
         }
 
         strong {
-          font-weight: 600;
-          color: var(--ion-color-dark);
+          font-weight: 700;
+          color: #1b1b1b;
 
           @media (prefers-color-scheme: dark) {
-            color: var(--ion-color-light);
+            color: #ffffff;
           }
         }
       }
@@ -886,6 +997,31 @@
 // PASO 4: CONFIGURACIÓN PERSONAL
 // ============================
 
+// Sección de título
+.title-section {
+  padding: 0 15px;
+
+  .step-title h2 {
+    color: var(--ion-color-dark);
+
+    @media (prefers-color-scheme: dark) {
+      color: #ffffff;
+    }
+  }
+
+  .step-description p {
+    color: var(--ion-color-medium);
+
+    @media (prefers-color-scheme: dark) {
+      color: #e0e0e0;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background: transparent;
+  }
+}
+
 // Contenedor de formularios
 .form-container {
   width: 100%;
@@ -895,6 +1031,7 @@
 // Secciones del formulario
 .form-section {
   margin-bottom: 30px;
+  padding: 0 15px;
 
   .section-header {
     display: flex;
@@ -927,6 +1064,10 @@
         color: var(--ion-color-medium);
         margin: 0;
         line-height: 1.4;
+
+        @media (prefers-color-scheme: dark) {
+          color: #b0b0b0;
+        }
       }
     }
   }
@@ -938,6 +1079,14 @@
   --border-radius: var(--bienvenida-border-radius);
   --border-color: var(--ion-color-step-200);
   --highlight-color-focused: var(--ion-color-primary);
+  --background: #f9f9f9;
+  --padding-start: 0;
+  --padding-end: 0;
+
+  @media (prefers-color-scheme: dark) {
+    --border-color: #2a2a2a;
+    --background: #252525;
+  }
 
   // Estilos para campos con error
   &.item-error {
@@ -960,6 +1109,12 @@
     --padding-end: 16px;
     font-size: 16px;
     --placeholder-color: var(--ion-color-step-400);
+    --color: var(--ion-color-dark);
+
+    @media (prefers-color-scheme: dark) {
+      --color: #e0e0e0;
+      --placeholder-color: #707070;
+    }
   }
 }
 
@@ -1022,11 +1177,21 @@
   border-left: 4px solid var(--ion-color-primary);
   border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
 
+  @media (prefers-color-scheme: dark) {
+    background: #1e3a5f;
+    border-left: 4px solid #4285f4;
+    border: 1px solid #2a5aad;
+  }
+
   ion-icon {
     font-size: 18px;
     color: var(--ion-color-primary);
     flex-shrink: 0;
     margin-top: 2px;
+
+    @media (prefers-color-scheme: dark) {
+      color: #64b5f6;
+    }
   }
 
   span {
@@ -1034,6 +1199,10 @@
     color: var(--ion-color-medium);
     line-height: 1.5;
     font-weight: 500;
+
+    @media (prefers-color-scheme: dark) {
+      color: #e0e0e0;
+    }
   }
 }
 
@@ -1148,52 +1317,81 @@
 // ============================
 
 .navigation-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16px var(--bienvenida-padding) calc(16px + env(safe-area-inset-bottom));
-  background: rgba(var(--ion-color-step-50-rgb), 0.98);
-  border-top: 1px solid var(--ion-color-step-200);
+  flex: 0 0 auto;
+  position: relative;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  width: 100%;
+  height: auto;
+  padding: 10px var(--bienvenida-padding) calc(10px + env(safe-area-inset-bottom));
+  background-color: #fafafa !important;
+  border-top: 1px solid #d0d0d0;
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 8px;
   align-items: center;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-  z-index: 1000; // Asegurar que esté por encima de todo
+  justify-content: center;
+  flex-wrap: nowrap;
+  backdrop-filter: none;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  overflow: hidden;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #212121 !important;
+    border-top: 1px solid #333333;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.25);
+  }
+
+  @media (max-width: 480px) {
+    height: auto;
+    padding: 9px var(--bienvenida-padding) calc(9px + env(safe-area-inset-bottom));
+    gap: 7px;
+  }
 
   .nav-spacer {
-    flex: 1;
+    display: none;
   }
 
   .nav-button {
-    height: 48px;
-    --border-radius: 24px;
+    height: 28px;
+    --border-radius: 50px !important;
+    border-radius: 50px !important;
     font-weight: 600;
-    font-size: 15px;
-    letter-spacing: 0.5px;
+    font-size: 10px;
+    letter-spacing: 0.3px;
     text-transform: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 28px;
 
     &.secondary {
-      flex: 0 0 auto;
-      min-width: 120px;
+      flex: 0 0 40%;
+      min-width: 70px;
       --color: var(--ion-color-medium);
-      border: 1px solid var(--ion-color-step-300);
+      border: 2px solid var(--ion-color-step-300);
+      border-radius: 50px !important;
 
       &:hover {
         --color: var(--ion-color-dark);
         border-color: var(--ion-color-primary);
+        background: rgba(var(--ion-color-primary-rgb), 0.05);
+      }
+
+      &:active {
+        transform: scale(0.98);
       }
     }
 
     &.primary {
-      flex: 1;
-      max-width: 280px;
-      box-shadow: 0 6px 20px rgba(var(--ion-color-primary-rgb), 0.3);
+      flex: 0 0 45%;
+      min-width: 85px;
+      box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
+      border-radius: 50px !important;
 
       &:not(.button-disabled):hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(var(--ion-color-primary-rgb), 0.4);
+        box-shadow: 0 8px 28px rgba(var(--ion-color-primary-rgb), 0.4);
       }
 
       &:not(.button-disabled):active {
@@ -1201,11 +1399,42 @@
       }
     }
 
-    // Estados de botón
+    /* Estados de botón */
     &.button-disabled {
       opacity: 0.5;
       box-shadow: none !important;
       transform: none !important;
+      cursor: not-allowed;
+    }
+
+    /* Mobile mediano (376px - 480px): Poco X3 Pro, etc */
+    @media (min-width: 376px) and (max-width: 480px) {
+      height: 44px;
+      font-size: 14px;
+
+      &.secondary {
+        min-width: 100px;
+      }
+
+      &.primary {
+        max-width: 240px;
+      }
+    }
+
+    /* Tablet - ajustar tamaño */
+    @media (min-width: 768px) {
+      height: 52px;
+      font-size: 16px;
+
+      &.primary {
+        max-width: 280px;
+      }
+    }
+
+    /* Pantallas grandes */
+    @media (min-width: 1024px) {
+      height: 56px;
+      font-size: 17px;
     }
   }
 }
@@ -1608,15 +1837,18 @@
 
     .nav-button {
       height: 52px;
-      --border-radius: 26px;
+      --border-radius: 50px !important; /* Botones siempre redondos */
+      border-radius: 50px !important;
       font-size: 16px;
 
       &.secondary {
         min-width: 140px;
+        border-radius: 50px !important;
       }
 
       &.primary {
-        max-width: 320px;
+        max-width: 100%;
+        border-radius: 50px !important;
       }
     }
   }
@@ -1958,7 +2190,6 @@
 .country-card:focus {
   outline: 3px solid var(--ion-color-primary);
   outline-offset: 2px;
-  z-index: 3;
 }
 
 // Focus visible solo cuando se navega por teclado
@@ -1969,5 +2200,4 @@
 .country-card:focus-visible {
   outline: 3px solid var(--ion-color-primary);
   outline-offset: 2px;
-  z-index: 3;
 }

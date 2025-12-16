@@ -2,7 +2,7 @@
  * Modelo de datos para productos en la aplicación Carrito
  * Define la estructura de productos agregados en sesiones de compra
  * Incluye validaciones, cálculos automáticos y categorías predefinidas
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
@@ -11,13 +11,14 @@
 export interface Producto {
   id: string;                          // UUID único del producto en la sesión
   nombre: string;                      // Nombre del producto (1-100 caracteres)
-  precioUnitario: number;              // Precio por unidad (0.01 - 1,000,000)
-  cantidad: number;                    // Cantidad a comprar (1-100 unidades)
+  precioUnitario: number;              // Precio por unidad (0 si no definido, 0.01 - 1,000,000)
+  cantidad: number;                    // Cantidad a comprar (0 si no definida, 1-100 unidades)
   total: number;                       // Total calculado (precio × cantidad)
   categoria?: CategoriaProducto;       // Categoría opcional del producto
   notas?: string;                      // Notas adicionales opcionales (máximo 200 caracteres)
   fechaAgregado: Date;                 // Cuándo se agregó a la sesión
   ordenEnLista: number;                // Orden en la lista (para sorting)
+  esCompleto: boolean;                 // true si tiene precio > 0 y cantidad > 0
 }
 
 // Enum con categorías predefinidas de productos
@@ -128,8 +129,8 @@ export const CATEGORIAS_INFO: InfoCategoria[] = [
 // Interface para crear un nuevo producto
 export interface NuevoProducto {
   nombre: string;                      // Nombre del producto (requerido)
-  precioUnitario: number;              // Precio unitario (requerido)
-  cantidad: number;                    // Cantidad (requerido)
+  precioUnitario?: number;             // Precio unitario (opcional - se puede agregar después)
+  cantidad?: number;                   // Cantidad (opcional - se puede agregar después)
   categoria?: CategoriaProducto;       // Categoría (opcional)
   notas?: string;                      // Notas (opcional)
 }
@@ -185,16 +186,22 @@ export function crearProducto(datosProducto: NuevoProducto): Producto | null {
     }
 
     // Crear producto con todos los campos
+    const precio = datosProducto.precioUnitario ? Number(datosProducto.precioUnitario) : 0;
+    const cantidad = datosProducto.cantidad ? Number(datosProducto.cantidad) : 0;
+    const total = precio * cantidad;
+    const esCompleto = precio > 0 && cantidad > 0;
+
     const producto: Producto = {
       id: generarIdProducto(),
       nombre: datosProducto.nombre.trim(),
-      precioUnitario: Number(datosProducto.precioUnitario),
-      cantidad: Number(datosProducto.cantidad),
-      total: Number(datosProducto.precioUnitario) * Number(datosProducto.cantidad),
+      precioUnitario: precio,
+      cantidad: cantidad,
+      total: total,
       categoria: datosProducto.categoria,
       notas: datosProducto.notas?.trim(),
       fechaAgregado: new Date(),
-      ordenEnLista: Date.now() // Usar timestamp como orden inicial
+      ordenEnLista: Date.now(), // Usar timestamp como orden inicial
+      esCompleto: esCompleto
     };
 
     return producto;
@@ -216,11 +223,11 @@ export function validarDatosProducto(datos: NuevoProducto | ActualizacionProduct
   // Validar nombre si está presente
   if ('nombre' in datos && datos.nombre !== undefined) {
     const nombre = datos.nombre.trim();
-    
+
     if (nombre.length < VALIDACION_PRODUCTO.nombre.minLongitud) {
       errores.push('El nombre del producto es obligatorio');
     }
-    
+
     if (nombre.length > VALIDACION_PRODUCTO.nombre.maxLongitud) {
       errores.push(`El nombre no puede tener más de ${VALIDACION_PRODUCTO.nombre.maxLongitud} caracteres`);
     }
@@ -232,43 +239,49 @@ export function validarDatosProducto(datos: NuevoProducto | ActualizacionProduct
     }
   }
 
-  // Validar precio unitario si está presente
-  if ('precioUnitario' in datos && datos.precioUnitario !== undefined) {
+  // Validar precio unitario si está presente (pero es OPCIONAL)
+  if ('precioUnitario' in datos && datos.precioUnitario !== undefined && datos.precioUnitario !== null) {
     const precio = Number(datos.precioUnitario);
-    
-    if (isNaN(precio) || precio <= 0) {
-      errores.push('El precio debe ser un número mayor a 0');
-    }
-    
-    if (precio < VALIDACION_PRODUCTO.precio.minimo) {
-      errores.push(`El precio mínimo es ${VALIDACION_PRODUCTO.precio.minimo}`);
-    }
-    
-    if (precio > VALIDACION_PRODUCTO.precio.maximo) {
-      errores.push(`El precio máximo es ${VALIDACION_PRODUCTO.precio.maximo.toLocaleString()}`);
-    }
 
-    // Validar máximo 2 decimales
-    const decimales = (precio.toString().split('.')[1] || '').length;
-    if (decimales > 2) {
-      errores.push('El precio no puede tener más de 2 decimales');
+    // Solo validar si el precio es un número válido y > 0
+    if (!isNaN(precio) && precio > 0) {
+      if (precio < VALIDACION_PRODUCTO.precio.minimo) {
+        errores.push(`El precio mínimo es ${VALIDACION_PRODUCTO.precio.minimo}`);
+      }
+
+      if (precio > VALIDACION_PRODUCTO.precio.maximo) {
+        errores.push(`El precio máximo es ${VALIDACION_PRODUCTO.precio.maximo.toLocaleString()}`);
+      }
+
+      // Validar máximo 2 decimales
+      const decimales = (precio.toString().split('.')[1] || '').length;
+      if (decimales > 2) {
+        errores.push('El precio no puede tener más de 2 decimales');
+      }
+    } else if (!isNaN(precio) && precio < 0) {
+      errores.push('El precio no puede ser negativo');
     }
   }
 
-  // Validar cantidad si está presente
-  if ('cantidad' in datos && datos.cantidad !== undefined) {
+  // Validar cantidad si está presente (pero es OPCIONAL)
+  if ('cantidad' in datos && datos.cantidad !== undefined && datos.cantidad !== null) {
     const cantidad = Number(datos.cantidad);
-    
-    if (isNaN(cantidad) || cantidad <= 0 || !Number.isInteger(cantidad)) {
-      errores.push('La cantidad debe ser un número entero mayor a 0');
-    }
-    
-    if (cantidad < VALIDACION_PRODUCTO.cantidad.minima) {
-      errores.push(`La cantidad mínima es ${VALIDACION_PRODUCTO.cantidad.minima}`);
-    }
-    
-    if (cantidad > VALIDACION_PRODUCTO.cantidad.maxima) {
-      errores.push(`La cantidad máxima es ${VALIDACION_PRODUCTO.cantidad.maxima}`);
+
+    // Solo validar si la cantidad es un número válido y > 0
+    if (!isNaN(cantidad) && cantidad > 0) {
+      if (!Number.isInteger(cantidad)) {
+        errores.push('La cantidad debe ser un número entero');
+      }
+
+      if (cantidad < VALIDACION_PRODUCTO.cantidad.minima) {
+        errores.push(`La cantidad mínima es ${VALIDACION_PRODUCTO.cantidad.minima}`);
+      }
+
+      if (cantidad > VALIDACION_PRODUCTO.cantidad.maxima) {
+        errores.push(`La cantidad máxima es ${VALIDACION_PRODUCTO.cantidad.maxima}`);
+      }
+    } else if (!isNaN(cantidad) && cantidad < 0) {
+      errores.push('La cantidad no puede ser negativa');
     }
   }
 
@@ -310,6 +323,9 @@ export function actualizarProducto(producto: Producto, actualizacion: Actualizac
 
     // Recalcular total
     productoActualizado.total = productoActualizado.precioUnitario * productoActualizado.cantidad;
+
+    // Recalcular esCompleto
+    productoActualizado.esCompleto = productoActualizado.precioUnitario > 0 && productoActualizado.cantidad > 0;
 
     return productoActualizado;
 
@@ -363,8 +379,8 @@ function generarIdProducto(): string {
  * @returns Número para Array.sort()
  */
 export function compararProductos(
-  a: Producto, 
-  b: Producto, 
+  a: Producto,
+  b: Producto,
   criterio: 'nombre' | 'precio' | 'total' | 'fecha' | 'categoria' = 'fecha'
 ): number {
   switch (criterio) {

@@ -28,49 +28,672 @@
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
+ * Usar .dark class (no system media queries) para control manual
  */
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+@import "@ionic/angular/css/palettes/dark.class.css";
+/* @import "@ionic/angular/css/palettes/dark.system.css"; */
 
 /**
- * Estilos globales personalizados
- * -----------------------------------------------------
+ * ============================================================
+ * IMPORTAR PALETAS DE COLORES (6 TEMAS)
+ * ============================================================
+ */
+@import './app/core/styles/paletas.scss';
+
+/**
+ * ============================================================
+ * SISTEMA DE TEMAS AVANZADO - 6 TEMAS PROFESIONALES
+ * ============================================================
+ * Sistema de variables CSS que permite cambiar entre 6 temas
+ * sin recargar la página. Soporta modo manual y automático.
+ *
+ * Temas disponibles:
+ * - Claro / Oscuro (acromáticos)
+ * - Azul / Morado / Rosado / Verde (cromáticos)
+ * - Automático (sigue preferencia del sistema)
  */
 
-// Asegurar que ion-content use el color de fondo correcto
-ion-content {
-  --background: var(--ion-background-color);
+/**
+ * Variables por defecto (tema claro)
+ */
+/**
+ * Variables por defecto (tema claro)
+ * Nota: Las paletas completas están en app/core/styles/paletas.scss
+ */
+:root {
+  --app-background: #ffffff !important;
+  --app-text-primary: #1a1a1a !important;
+  --app-text-secondary: #424242 !important;
+  --app-text-tertiary: #757575 !important;
+  --app-border-color: rgba(0, 0, 0, 0.12) !important;
+  --app-border-color-strong: rgba(0, 0, 0, 0.2) !important;
+  --app-overlay-bg: rgba(0, 0, 0, 0.04) !important;
+  --app-overlay-bg-strong: rgba(0, 0, 0, 0.08) !important;
+  --app-card-background: #f5f5f5 !important;
+  --app-input-background: #f9f9f9 !important;
+  --app-item-background: #fafafa !important;
+  --app-toolbar-background: #f8f8f8 !important;
+  --app-modal-background: #ffffff !important;
+  --app-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  --app-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12) !important;
+  --app-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  --app-shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.2) !important;
+  --ion-background-color: #ffffff !important;
+  --ion-text-color: #1a1a1a !important;
+  --ion-color-medium: #424242 !important;
+  --ion-item-background: #fafafa !important;
+  --ion-card-background: #f5f5f5 !important;
+  --ion-toolbar-background: #f8f8f8 !important;
 }
 
-// Asegurar que el body use el color de fondo correcto
+/**
+ * ============================================================
+ * APLICACIÓN DE ESTILOS BASE CON VARIABLES
+ * ============================================================
+ */
+
+html {
+  background-color: var(--app-background);
+}
+
+html {
+  background-color: var(--app-background) !important;
+}
+
 body {
-  background: var(--ion-background-color);
+  background-color: var(--app-background) !important;
+  color: var(--app-text-primary) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  padding-top: max(env(safe-area-inset-top), 0px);
+  padding-left: max(env(safe-area-inset-left), 0px);
+  padding-right: max(env(safe-area-inset-right), 0px);
 }
 
-// Estilos para listas y cards
-ion-list {
-  background: transparent;
+/**
+ * Componentes Ionic - CON !important PARA FORZAR COLORES
+ */
+
+ion-app {
+  background: var(--app-background) !important;
+  color: var(--app-text-primary) !important;
+}
+
+ion-content {
+  --background: var(--app-background) !important;
+  --padding-bottom: var(--app-overlay-bg) !important;
+}
+
+ion-toolbar {
+  --background: var(--app-toolbar-background) !important;
+  --color: var(--app-text-primary) !important;
+  --border-color: var(--app-border-color) !important;
 }
 
 ion-card {
-  background: var(--ion-card-background);
+  --background: var(--app-card-background) !important;
+  --color: var(--app-text-primary) !important;
+  box-shadow: var(--app-shadow-md) !important;
 }
 
-// Ajustes para el modo oscuro
-body.dark {
+ion-item {
+  --background: var(--app-item-background) !important;
+  --color: var(--app-text-primary) !important;
+  --border-color: var(--app-border-color) !important;
+
+  &.item-interactive:hover::after {
+    background: var(--app-overlay-bg) !important;
+  }
+}
+
+ion-input {
+  --background: var(--app-input-background) !important;
+  --color: var(--app-text-primary) !important;
+  --placeholder-color: var(--app-text-tertiary) !important;
+  --border-color: var(--app-border-color) !important;
+}
+
+ion-textarea {
+  --background: var(--app-input-background) !important;
+  --color: var(--app-text-primary) !important;
+  --placeholder-color: var(--app-text-tertiary) !important;
+  --border-color: var(--app-border-color) !important;
+}
+
+ion-button {
+  --border-radius: 10px !important;
+  --padding-start: 16px !important;
+  --padding-end: 16px !important;
+  --background: var(--app-button-background, #2196F3) !important;
+  --color: var(--app-button-text, #ffffff) !important;
+  --border-color: var(--app-button-border, #1976D2) !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    --background: var(--app-button-hover, #1976D2) !important;
+  }
+
+  &:active {
+    --background: var(--app-button-active, #1565C0) !important;
+  }
+
+  &:disabled {
+    --background: var(--app-button-disabled, rgba(33, 150, 243, 0.5)) !important;
+    opacity: 0.6 !important;
+  }
+}
+
+ion-list {
+  background: transparent !important;
+}
+
+ion-modal {
+  --background: var(--app-modal-background) !important;
+  --box-shadow: var(--app-shadow-xl) !important;
+}
+
+ion-alert {
+  --background: var(--app-modal-background) !important;
+  --text-color: var(--app-text-primary) !important;
+  --box-shadow: var(--app-shadow-xl) !important;
+}
+
+ion-tabs {
+  --background: var(--app-background) !important;
+  --color: var(--app-text-primary) !important;
+
+  ion-tab-bar {
+    --background: var(--app-toolbar-background) !important;
+    --color: var(--app-text-secondary) !important;
+    --color-selected: var(--app-text-primary) !important;
+    --border-color: var(--app-border-color) !important;
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+
+    ion-tab-button {
+      --background: transparent !important;
+      --color: var(--app-text-secondary) !important;
+      --color-selected: var(--ion-color-primary, #2196F3) !important;
+    }
+  }
+}
+
+/**
+ * ============================================================
+ * ESTILOS ESPECÍFICOS PARA ALERTAS
+ * ============================================================
+ */
+
+ion-alert {
+  .alert-wrapper {
+    background: var(--app-modal-background) !important;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .alert-head {
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade)) !important;
+    color: white;
+    padding: 20px 16px;
+
+    .alert-title {
+      color: white !important;
+      font-size: 18px;
+      font-weight: 700;
+    }
+  }
+
+  .alert-message {
+    color: var(--app-text-secondary) !important;
+    background: var(--app-modal-background) !important;
+  }
+
+  .alert-button-group {
+    background: var(--app-overlay-bg) !important;
+    border-top: 1px solid var(--app-border-color) !important;
+  }
+}
+
+/**
+ * ============================================================
+ * ESTILOS AVANZADOS PARA GUARDADO DE LISTA INCOMPLETA
+ * ============================================================
+ */
+
+.alert-guardar-incompleta {
+  --background: var(--app-modal-background);
+  --box-shadow: var(--app-shadow-xl);
+
+  .alert-wrapper {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .alert-head {
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+    color: white;
+    padding: 20px 16px;
+    border-radius: 16px 16px 0 0;
+
+    .alert-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin: 0;
+      color: white;
+    }
+
+    .alert-sub-title {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+  }
+
+  .alert-message {
+    padding: 20px 16px;
+    color: var(--app-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    max-height: 60vh;
+    overflow-y: auto;
+    background: var(--app-modal-background);
+
+    .alert-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .alert-section {
+        h3 {
+          font-size: 15px;
+          font-weight: 700;
+          color: var(--app-text-primary);
+          margin: 0 0 10px 0;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .info-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 12px;
+          background: var(--app-overlay-bg);
+          border-radius: 8px;
+          margin-bottom: 6px;
+          border-left: 3px solid var(--ion-color-primary);
+
+          .label {
+            font-weight: 600;
+            color: var(--app-text-secondary);
+            font-size: 13px;
+          }
+
+          .value {
+            font-weight: 700;
+            color: var(--ion-color-primary);
+            font-size: 14px;
+          }
+        }
+
+        .benefits-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+
+          li {
+            padding: 8px 0;
+            padding-left: 12px;
+            color: var(--app-text-primary);
+            font-size: 13px;
+            border-left: 3px solid var(--ion-color-primary);
+            margin-bottom: 6px;
+          }
+        }
+
+        &.info-box {
+          background: var(--app-overlay-bg);
+          padding: 12px 14px;
+          border-radius: 10px;
+          border-left: 4px solid var(--ion-color-primary);
+          margin: 0;
+
+          p {
+            margin: 0;
+            color: var(--app-text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+
+            strong {
+              color: var(--ion-color-primary);
+              font-weight: 700;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .alert-button-group {
+    padding: 12px 16px;
+    gap: 8px;
+    background: var(--app-overlay-bg);
+    border-top: 1px solid var(--app-border-color);
+
+    .alert-button {
+      height: 44px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+
+      &.btn-volver {
+        --color: var(--app-text-secondary);
+        --background: transparent;
+        --border-color: var(--app-text-secondary);
+        border: 2px solid var(--app-text-secondary);
+
+        &:hover {
+          background: var(--app-overlay-bg);
+        }
+      }
+
+      &.btn-guardar {
+        --color: white;
+        --background: linear-gradient(135deg, var(--ion-color-success), var(--ion-color-success-shade));
+        --border-color: var(--ion-color-success);
+        box-shadow: var(--app-shadow-md);
+
+        &:hover {
+          box-shadow: var(--app-shadow-lg);
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * ============================================================
+ * ELEMENTOS DE TEXTO Y TIPOGRAFÍA
+ * ============================================================
+ */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--app-text-primary);
+}
+
+p, span, small {
+  color: var(--app-text-secondary);
+}
+
+a {
+  color: var(--ion-color-primary);
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+/**
+ * ============================================================
+ * ELEMENTOS INTERACTIVOS
+ * ============================================================
+ */
+
+input, textarea, select {
+  background: var(--app-input-background);
+  color: var(--app-text-primary);
+  border: 1px solid var(--app-border-color);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: var(--ion-color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.1);
+  }
+
+  &::placeholder {
+    color: var(--app-text-tertiary);
+  }
+}
+
+button {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/**
+ * ============================================================
+ * SCROLLBAR PERSONALIZADO
+ * ============================================================
+ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--app-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--app-border-color-strong);
+  border-radius: 4px;
+
+  &:hover {
+    background: var(--app-text-tertiary);
+  }
+}
+
+/**
+ * ============================================================
+ * UTILIDADES Y CLASES AUXILIARES
+ * ============================================================
+ */
+
+.app-container {
+  background: var(--app-background);
+  color: var(--app-text-primary);
+}
+
+.app-card {
+  background: var(--app-card-background);
+  border: 1px solid var(--app-border-color);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--app-shadow-sm);
+}
+
+.app-divider {
+  background: var(--app-border-color);
+}
+
+.text-muted {
+  color: var(--app-text-tertiary);
+}
+
+.text-secondary {
+  color: var(--app-text-secondary);
+}
+
+.bg-overlay {
+  background: var(--app-overlay-bg);
+}
+
+.bg-overlay-strong {
+  background: var(--app-overlay-bg-strong);
+}
+/**
+ * ============================================================
+ * ESTILOS PARA TOASTS (MENSAJES)
+ * ============================================================
+ */
+
+ion-toast {
+  --background: var(--app-card-background) !important;
+  --color: var(--app-text-primary) !important;
+  --box-shadow: var(--app-shadow-lg) !important;
+
+  .toast-container {
+    background: var(--app-card-background) !important;
+    border-radius: 12px;
+    border: 1px solid var(--app-border-color) !important;
+  }
+
+  .toast-message {
+    color: var(--app-text-primary) !important;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .toast-button {
+    color: var(--ion-color-primary) !important;
+  }
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA SPINNERS Y LOADERS
+ * ============================================================
+ */
+
+ion-spinner {
+  --color: var(--ion-color-primary, #2196F3) !important;
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA SKELETON SCREENS
+ * ============================================================
+ */
+
+ion-skeleton-text {
+  --background: var(--ion-color-step-200) !important;
+  --background-rgb: var(--ion-color-step-200-rgb) !important;
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA PROGRESS BAR
+ * ============================================================
+ */
+
+ion-progress-bar {
+  --background: var(--app-overlay-bg) !important;
+  --progress-background: var(--ion-color-primary) !important;
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA POPOVERS Y TOOLTIPS
+ * ============================================================
+ */
+
+ion-popover {
+  --background: var(--app-card-background) !important;
+  --box-shadow: var(--app-shadow-lg) !important;
+  --border-radius: 12px;
+
   ion-content {
-    --background: var(--ion-background-color);
+    --background: var(--app-card-background) !important;
   }
+}
 
-  ion-toolbar {
-    --background: var(--ion-toolbar-background);
-  }
+/**
+ * ============================================================
+ * ESTILOS PARA SEGMENTO
+ * ============================================================
+ */
 
-  ion-item {
-    --background: var(--ion-item-background);
+ion-segment {
+  --background: var(--app-overlay-bg) !important;
+  --indicator-color: var(--ion-color-primary) !important;
+}
+
+ion-segment-button {
+  --color: var(--app-text-secondary) !important;
+  --color-checked: var(--app-text-primary) !important;
+  --background-checked: transparent !important;
+
+  &.segment-button-checked {
+    color: var(--app-text-primary) !important;
   }
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA BADGE
+ * ============================================================
+ */
+
+ion-badge {
+  --background: var(--ion-color-primary) !important;
+  --color: white !important;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA CHIP
+ * ============================================================
+ */
+
+ion-chip {
+  --background: var(--app-overlay-bg) !important;
+  --color: var(--app-text-primary) !important;
+  --border-color: var(--app-border-color) !important;
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA SELECTS Y PICKERS
+ * ============================================================
+ */
+
+ion-select {
+  --padding-start: 0 !important;
+  --padding-end: 0 !important;
+  --placeholder-color: var(--app-text-tertiary) !important;
+}
+
+ion-select-popover {
+  --background: var(--app-modal-background) !important;
+  --min-width: 250px;
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA SEARCHBAR
+ * ============================================================
+ */
+
+ion-searchbar {
+  --background: var(--app-input-background) !important;
+  --border-radius: 12px !important;
+  --icon-color: var(--app-text-tertiary) !important;
+  --placeholder-color: var(--app-text-tertiary) !important;
+}
+
+/**
+ * ============================================================
+ * ESTILOS PARA REFRESHER
+ * ============================================================
+ */
+
+ion-refresher-content {
+  color: var(--app-text-primary) !important;
 }

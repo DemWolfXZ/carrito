@@ -7,6 +7,10 @@
   padding-bottom: 100px; // Espacio extra para que el último elemento no quede pegado a los tabs
   background: var(--ion-background-color);
 
+  @media (prefers-color-scheme: dark) {
+    background: #1a1a1a;
+  }
+
   ion-list {
     background: transparent;
     margin-bottom: 24px;
@@ -23,6 +27,11 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        color: var(--ion-text-color);
+
+        @media (prefers-color-scheme: dark) {
+          color: #ffffff;
+        }
 
         ion-icon {
           font-size: 18px;
@@ -39,28 +48,43 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
+      @media (prefers-color-scheme: dark) {
+        --background: #252525;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
       ion-label {
         h2 {
           font-size: 16px;
           font-weight: 600;
           margin-bottom: 4px;
           color: var(--ion-text-color);
+
+          @media (prefers-color-scheme: dark) {
+            color: #ffffff;
+          }
         }
 
         p {
           font-size: 13px;
           color: var(--ion-color-medium);
           margin: 0;
+
+          @media (prefers-color-scheme: dark) {
+            color: #b0b0b0;
+          }
         }
       }
 
       ion-icon[slot="start"] {
         font-size: 24px;
         margin-right: 12px;
+        color: var(--ion-color-primary);
       }
 
       ion-icon[slot="end"] {
         font-size: 20px;
+        color: var(--ion-color-medium);
       }
 
       ion-toggle {
@@ -77,11 +101,20 @@
     border-left: 4px solid #ff6b6b;
     background: linear-gradient(135deg, rgba(255, 107, 107, 0.05), rgba(255, 193, 7, 0.05));
 
+    @media (prefers-color-scheme: dark) {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 193, 7, 0.15));
+      --background: #252525 !important;
+    }
+
     .titulo-donacion {
       font-weight: 700;
       font-size: 14px;
       margin-bottom: 8px;
       color: var(--ion-text-color);
+
+      @media (prefers-color-scheme: dark) {
+        color: #ffffff;
+      }
     }
 
     .texto-donacion {
@@ -89,6 +122,10 @@
       line-height: 1.5;
       color: var(--ion-text-color-step-700);
       margin: 0;
+
+      @media (prefers-color-scheme: dark) {
+        color: #c0c0c0;
+      }
     }
   }
 

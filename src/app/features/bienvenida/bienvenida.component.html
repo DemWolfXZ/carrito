@@ -157,28 +157,6 @@
 
           </div>
 
-          <!-- Sección de información del país seleccionado -->
-          <div class="country-info-section-bottom">
-            <div *ngIf="paisSeleccionado" class="pais-seleccionado">
-              <div class="seleccion-header">
-                <ion-icon name="checkmark-circle" color="success"></ion-icon>
-                <span>País seleccionado</span>
-              </div>
-
-              <div class="seleccion-detalle">
-                <img
-                  [src]="paisSeleccionado.bandera"
-                  [alt]="'Bandera de ' + paisSeleccionado.nombre"
-                  class="bandera-seleccionada">
-                <div class="seleccion-info">
-                  <h3>{{ paisSeleccionado.nombre }}</h3>
-                  <p><strong>Moneda:</strong> {{ paisSeleccionado.simboloMoneda }} {{ paisSeleccionado.moneda }}</p>
-                  <p><strong>{{ formatoMonedaLegible }}</strong></p>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
 
       </div>
@@ -237,7 +215,7 @@
             <!-- Información de seguridad -->
             <div class="security-info">
               <ion-icon name="shield-checkmark-outline" color="success"></ion-icon>
-              <span>Tus datos están protegidos por la seguridad de tu dispositivo (PIN/huella/Face ID)</span>
+              <span>Los datos que almacenes en esta app se guardan únicamente en tu dispositivo. Nunca se envían a servidores externos ni se comparten con terceros.</span>
             </div>
 
           </div>
@@ -292,24 +270,32 @@
 
     </div>
 
+    <!-- Sección de información del país seleccionado (PASO 3 SOLO) -->
+    <div *ngIf="pasoActual === 3" class="country-info-section-bottom">
+      <div *ngIf="paisSeleccionado" class="pais-seleccionado">
+        <div class="seleccion-header">
+          <ion-icon name="checkmark-circle" color="success"></ion-icon>
+          <span>País seleccionado</span>
+        </div>
+
+        <div class="seleccion-detalle">
+          <img
+            [src]="paisSeleccionado.bandera"
+            [alt]="'Bandera de ' + paisSeleccionado.nombre"
+            class="bandera-seleccionada">
+          <div class="seleccion-info">
+            <h3>{{ paisSeleccionado.nombre }}</h3>
+            <p><strong>Moneda:</strong> {{ paisSeleccionado.simboloMoneda }} {{ paisSeleccionado.moneda }}</p>
+            <p><strong>{{ formatoMonedaLegible }}</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Botones de navegación fijos en la parte inferior -->
     <div class="navigation-container">
 
-      <!-- Botón atrás (solo si no es el primer paso después del splash) -->
-      <ion-button
-        *ngIf="pasoActual > 2 && pasoActual < 5"
-        fill="outline"
-        color="medium"
-        (click)="pasoAnterior()"
-        class="nav-button secondary">
-        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
-        Atrás
-      </ion-button>
-
-      <!-- Spacer para centrar el botón principal cuando no hay botón atrás -->
-      <div *ngIf="pasoActual === 2 || pasoActual === 5" class="nav-spacer"></div>
-
-      <!-- Botón principal -->
+      <!-- Botón principal ARRIBA -->
       <ion-button
         [disabled]="!puedeAvanzar || cargando"
         (click)="siguientePaso()"
@@ -328,6 +314,20 @@
 
         {{ textoBotonPrincipal }}
       </ion-button>
+
+      <!-- Botón atrás ABAJO (solo si no es el primer paso después del splash) -->
+      <ion-button
+        *ngIf="pasoActual > 2 && pasoActual < 5"
+        fill="outline"
+        color="medium"
+        (click)="pasoAnterior()"
+        class="nav-button secondary">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        Atrás
+      </ion-button>
+
+      <!-- Spacer para cuando no hay botón atrás -->
+      <div *ngIf="pasoActual === 2 || pasoActual === 5" class="nav-spacer"></div>
 
     </div>
 

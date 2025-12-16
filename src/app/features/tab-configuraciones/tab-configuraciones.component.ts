@@ -4,7 +4,9 @@ import { ConfiguracionService } from '../../core/services/configuracion.service'
 import { UsuarioService } from '../../core/services/usuario.service';
 import { DonacionesService } from '../../core/services/donaciones.service';
 import { DonacionesModalComponent } from '../../shared/components/donaciones-modal/donaciones-modal.component';
+import { SelectorPaisModalComponent } from './selector-pais-modal/selector-pais-modal.component';
 import { TipoConfiguracion } from '../../core/models/configuracion.model';
+import { Pais } from '../../core/models/pais.model';
 
 @Component({
   selector: 'app-tab-configuraciones',
@@ -13,8 +15,9 @@ import { TipoConfiguracion } from '../../core/models/configuracion.model';
 })
 export class TabConfiguracionesComponent implements OnInit {
 
-  modoOscuro: boolean = false;
   nombreUsuario: string = '';
+  paisActual: Pais | null = null;
+  paisesDisponibles: Pais[] = [];
 
   constructor(
     private configuracionService: ConfiguracionService,
@@ -27,8 +30,9 @@ export class TabConfiguracionesComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     console.log('⚙️ Tab Configuraciones inicializado');
-    await this.cargarPreferenciaTema();
     await this.cargarDatosUsuario();
+    this.cargarPaisesDisponibles();
+    await this.cargarPaisActual();
   }
 
   /**
@@ -46,55 +50,76 @@ export class TabConfiguracionesComponent implements OnInit {
   }
 
   /**
-   * Cargar preferencia de tema guardada
+   * Cargar países disponibles
    */
-  private async cargarPreferenciaTema(): Promise<void> {
+  private cargarPaisesDisponibles(): void {
     try {
-      const config = await this.configuracionService.obtenerConfiguracionActual();
-      if (config?.configuraciones.tema) {
-        this.modoOscuro = config.configuraciones.tema === 'oscuro';
-        this.aplicarTema(this.modoOscuro);
-      }
+      this.paisesDisponibles = this.configuracionService.obtenerPaisesActivos();
+      console.log(`🌍 Países cargados: ${this.paisesDisponibles.length}`);
     } catch (error) {
-      console.error('Error al cargar preferencia de tema:', error);
+      console.error('Error al cargar países:', error);
     }
   }
 
   /**
-   * Cambiar tema de la aplicación
+   * Cargar país actual
    */
-  async cambiarTema(event: any): Promise<void> {
-    const oscuro = event.detail.checked;
-    console.log('🎨 Cambiando tema a:', oscuro ? 'oscuro' : 'claro');
-
-    this.modoOscuro = oscuro;
-    this.aplicarTema(oscuro);
-
-    // Guardar preferencia
+  private async cargarPaisActual(): Promise<void> {
     try {
-      const config = await this.configuracionService.obtenerConfiguracionActual();
-      if (config) {
-        const actualizacion = {
-          tipo: TipoConfiguracion.GLOBALES,
-          configuraciones: {
-            ...config.configuraciones,
-            tema: oscuro ? 'oscuro' : 'claro'
-          }
-        };
-        await this.configuracionService.actualizarConfiguracion(actualizacion);
-        console.log('✅ Preferencia de tema guardada');
+      const usuario = await this.usuarioService.obtenerUsuarioActual();
+      if (usuario?.pais) {
+        this.paisActual = this.paisesDisponibles.find(p => p.codigo === usuario.pais) || null;
+        console.log('🌍 País actual:', this.paisActual?.nombre);
       }
     } catch (error) {
-      console.error('❌ Error al guardar preferencia de tema:', error);
+      console.error('Error al cargar país actual:', error);
     }
   }
 
   /**
-   * Aplicar tema al documento
+   * Abrir selector de países
    */
-  private aplicarTema(oscuro: boolean): void {
-    document.body.classList.toggle('dark', oscuro);
-    console.log('🎨 Tema aplicado:', oscuro ? 'oscuro' : 'claro');
+  async cambiarPais(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: SelectorPaisModalComponent,
+      componentProps: {
+        paisesDisponibles: this.paisesDisponibles,
+        paisActual: this.paisActual
+      },
+      cssClass: 'selector-pais-modal'
+    });
+
+    await modal.present();
+    const result = await modal.onDidDismiss();
+
+    if (result.data) {
+      const paisSeleccionado: Pais = result.data;
+      try {
+        await this.usuarioService.actualizarPerfil({ pais: paisSeleccionado.codigo });
+        this.paisActual = paisSeleccionado;
+        console.log('✅ País actualizado:', paisSeleccionado.nombre);
+
+        // Mostrar toast de confirmación
+        const toast = await this.toastController.create({
+          message: `✅ País actualizado a: ${paisSeleccionado.nombre}`,
+          duration: 2000,
+          position: 'top',
+          color: 'success'
+        });
+        await toast.present();
+      } catch (error) {
+        console.error('Error al actualizar país:', error);
+
+        // Mostrar toast de error
+        const toast = await this.toastController.create({
+          message: '❌ Error al actualizar el país',
+          duration: 2000,
+          position: 'top',
+          color: 'danger'
+        });
+        await toast.present();
+      }
+    }
   }
 
   /**

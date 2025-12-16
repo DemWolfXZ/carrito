@@ -8,20 +8,10 @@
         Apariencia
       </ion-label>
     </ion-list-header>
-
-    <ion-item>
-      <ion-icon name="moon-outline" slot="start" color="medium"></ion-icon>
-      <ion-label>
-        <h2>Modo Oscuro</h2>
-        <p>Activa el tema oscuro para mejor visualización nocturna</p>
-      </ion-label>
-      <ion-toggle
-        slot="end"
-        [(ngModel)]="modoOscuro"
-        (ionChange)="cambiarTema($event)">
-      </ion-toggle>
-    </ion-item>
   </ion-list>
+
+  <!-- Componente de Configurador de Tema -->
+  <app-configurador-tema></app-configurador-tema>
 
   <!-- Sección de Usuario -->
   <ion-list>
@@ -37,6 +27,16 @@
       <ion-label>
         <h2>Mi Perfil</h2>
         <p>{{ nombreUsuario || 'Cambiar nombre de perfil' }}</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+    </ion-item>
+
+    <ion-item button (click)="cambiarPais()">
+      <ion-icon name="location-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>
+        <h2>País</h2>
+        <p *ngIf="paisActual">{{ paisActual.nombre }} ({{ paisActual.simboloMoneda }})</p>
+        <p *ngIf="!paisActual">Seleccionar país</p>
       </ion-label>
       <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
     </ion-item>

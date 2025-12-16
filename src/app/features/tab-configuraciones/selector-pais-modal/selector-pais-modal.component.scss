@@ -1,0 +1,128 @@
+.selector-pais-content {
+  --background: var(--ion-background-color);
+  background: var(--ion-background-color);
+}
+
+.paises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  padding: 16px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
+.pais-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px;
+  border-radius: 10px;
+  background: var(--ion-card-background);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 130px;
+  gap: 6px;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    @media (prefers-color-scheme: dark) {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  &.selected {
+    border-color: var(--ion-color-primary);
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+  }
+}
+
+.pais-bandera {
+  width: 60px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (prefers-color-scheme: dark) {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  @media (max-width: 480px) {
+    width: 55px;
+    height: 35px;
+  }
+}
+
+.pais-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  width: 100%;
+}
+
+.pais-nombre {
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ion-text-color);
+  line-height: 1.2;
+  text-align: center;
+}
+
+.pais-moneda {
+  font-size: 9px;
+  color: var(--ion-color-medium);
+  margin: 0;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.checkmark {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-footer {
+  --background: var(--ion-background-color);
+  border-top: 1px solid var(--ion-color-step-150);
+
+  ion-button {
+    --border-radius: 12px;
+    font-weight: 600;
+  }
+}
+
+ion-header {
+  --background: var(--ion-background-color);
+  border-bottom: 1px solid var(--ion-color-step-150);
+
+  ion-toolbar {
+    --background: transparent;
+  }
+
+  ion-title {
+    color: var(--ion-text-color);
+    font-weight: 600;
+  }
+
+  ion-button {
+    color: var(--ion-color-primary);
+  }
+}

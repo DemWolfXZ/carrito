@@ -97,26 +97,50 @@
   // Card sesión activa
   .card-sesion-activa {
     margin: 0 16px 16px 16px;
+    --background: var(--ion-color-success-tint, #66BB6A) !important;
+    --color: white !important;
 
     .sesion-info {
       display: flex;
       align-items: center;
       gap: 16px;
+      margin-bottom: 12px;
 
       ion-icon {
         flex-shrink: 0;
+        color: white !important;
       }
 
       h3 {
         margin: 0 0 4px 0;
         font-size: 16px;
         font-weight: 600;
+        color: white !important;
       }
 
       p {
         margin: 0;
         font-size: 13px;
-        opacity: 0.9;
+        color: rgba(255, 255, 255, 0.95) !important;
+        font-weight: 500;
+      }
+    }
+
+    // Botones de acción en la sesión activa
+    .sesion-acciones {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+      ion-button {
+        --background: rgba(255, 255, 255, 0.2) !important;
+        --color: white !important;
+        --border-radius: 8px;
+        margin: 0;
+
+        &:hover {
+          --background: rgba(255, 255, 255, 0.3) !important;
+        }
       }
     }
   }
@@ -268,14 +292,16 @@
 
     ion-list {
       background: transparent;
-      padding: 0;
+      padding: 8px 0;
     }
 
     .item-producto {
-      --background: white;
-      margin: 8px 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      --background: var(--ion-item-background);
+      --background-hover: var(--ion-color-light);
+      margin: 0;
+      border-radius: 14px 14px 0 0;
+      padding: 14px 16px;
+      transition: background-color 0.3s ease;
 
       ion-avatar {
         width: 60px;
@@ -284,31 +310,131 @@
       }
 
       ion-label {
+        margin: 0;
+        padding-left: 8px;
+
         h2 {
-          font-size: 16px;
-          font-weight: 600;
-          margin-bottom: 4px;
-          color: var(--ion-color-dark);
+          font-size: 17px;
+          font-weight: 700;
+          margin-bottom: 6px;
+          color: var(--ion-text-color);
+          letter-spacing: 0.3px;
         }
 
         p {
-          font-size: 14px;
+          font-size: 13px;
           color: var(--ion-color-medium);
+          margin: 0;
 
           .cantidad {
-            font-weight: 600;
+            font-weight: 700;
             margin-right: 8px;
+            color: var(--ion-color-primary);
+            background: rgba(var(--ion-color-primary-rgb), 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
           }
 
           .precio {
+            font-weight: 600;
             color: var(--ion-color-primary);
+            background: rgba(var(--ion-color-primary-rgb), 0.08);
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
           }
         }
       }
 
       ion-note {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 700;
+        color: var(--ion-color-primary);
+        text-align: right;
+      }
+
+      // Estilo para producto incompleto
+      &.producto-incompleto {
+        --background: linear-gradient(135deg, rgba(var(--ion-color-warning-rgb), 0.08), rgba(var(--ion-color-warning-rgb), 0.04));
+        border-left: 4px solid var(--ion-color-warning);
+
+        ion-label h2 {
+          color: var(--ion-color-warning);
+        }
+
+        .precio {
+          background: rgba(var(--ion-color-warning-rgb), 0.15) !important;
+          color: var(--ion-color-warning) !important;
+        }
+
+        ion-note {
+          color: var(--ion-color-medium);
+        }
+      }
+    }
+
+    // Contenedor de producto con botones
+    .producto-card {
+      margin: 0 16px 16px 16px;
+      background: var(--ion-background-color);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .botones-producto {
+        display: flex;
+        gap: 8px;
+        padding: 8px 12px;
+        background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.05), rgba(var(--ion-color-danger-rgb), 0.05));
+        border-top: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.08));
+        justify-content: flex-end;
+
+        ion-button {
+          --padding-start: 10px;
+          --padding-end: 10px;
+          --padding-top: 6px;
+          --padding-bottom: 6px;
+          height: 32px;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.3px;
+          border-radius: 6px;
+          text-transform: uppercase;
+          transition: all 0.3s ease;
+
+          ion-icon {
+            font-size: 16px;
+            margin-right: 4px;
+          }
+
+          &.btn-editar {
+            --color: var(--ion-color-primary);
+            --border-color: var(--ion-color-primary);
+            background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.12), rgba(var(--ion-color-primary-rgb), 0.06));
+
+            &:hover {
+              background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.2), rgba(var(--ion-color-primary-rgb), 0.12));
+              box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.3);
+            }
+          }
+
+          &.btn-eliminar {
+            --color: var(--ion-color-danger);
+            --border-color: var(--ion-color-danger);
+            background: linear-gradient(135deg, rgba(var(--ion-color-danger-rgb), 0.12), rgba(var(--ion-color-danger-rgb), 0.06));
+
+            &:hover {
+              background: linear-gradient(135deg, rgba(var(--ion-color-danger-rgb), 0.2), rgba(var(--ion-color-danger-rgb), 0.12));
+              box-shadow: 0 2px 8px rgba(var(--ion-color-danger-rgb), 0.3);
+            }
+          }
+        }
       }
     }
 
@@ -385,6 +511,10 @@
   }
 
   .botones-accion {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
     ion-button {
       height: 52px;
       font-size: 16px;
