@@ -4,9 +4,11 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 
 import { DonacionesModalComponent } from './components/donaciones-modal/donaciones-modal.component';
+import { TabBarraPrincipalComponent } from './components/tab-barra-principal/tab-barra-principal.component';
 
 const COMPONENTS = [
-  DonacionesModalComponent
+  DonacionesModalComponent,
+  TabBarraPrincipalComponent
 ];
 
 @NgModule({

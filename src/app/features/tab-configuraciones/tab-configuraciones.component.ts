@@ -185,18 +185,29 @@ export class TabConfiguracionesComponent implements OnInit {
    */
   async mostrarAyuda(): Promise<void> {
     const alert = await this.alertController.create({
-      header: '¿Qué hace Carrito?',
-      message: `Carrito es una aplicación móvil para control de gastos en tus compras.
+      header: '¿Qué hace el Sistema?',
+      message: `🛒 CARRITO - Tu Control de Compras
 
-Funcionalidades:
-• Registra hasta 2 compras al mes
-• Agrega hasta 20 productos por compra
-• Calcula totales automáticamente
-• Historial completo de compras
+¿POR QUÉ USAR CARRITO?
+Muchos olvidamos qué queremos comprar o andamos con calculadora en mano. Con Carrito:
+✓ Anotas el producto, cantidad y precio
+✓ Ves el total en tiempo real
+✓ No te pasas del presupuesto
+✓ Controlas exactamente qué gastas
+
+FUNCIONALIDADES:
+• Máximo 2 compras por mes calendario
+• Hasta 20 productos por compra
+• Cálculo automático de totales
+• Presupuesto estimado
+• Historial completo
 • Estadísticas detalladas
 • Modo claro y oscuro
 
-Todo se guarda de forma local y segura en tu dispositivo.`,
+TODO ES LOCAL:
+✓ Sin internet requerido
+✓ Datos seguros en tu dispositivo
+✓ Sin rastreo ni publicidad`,
       buttons: ['Entendido']
     });
 
@@ -235,16 +246,29 @@ Al usar esta aplicación, aceptas estos términos.`,
   async mostrarAcercaDe(): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Acerca de Carrito',
-      message: `Carrito App
+      message: `🛒 CARRITO - Control Inteligente de Compras
 
 Versión: 1.0.0
+Desarrollado por: DemWolf 🇨🇱
 
-Desarrollado por:
-DemWolf
-Chile 🇨🇱
+PROPÓSITO:
+Ayudarte a controlar tus gastos y saber exactamente qué compras. Sin olvidos, sin sorpresas en el total.
 
-Proyecto personal de código abierto.
-No es un producto comercial ni empresarial.`,
+CARACTERÍSTICAS PRINCIPALES:
+✓ Máximo 2 compras por mes calendario
+✓ Hasta 20 productos por compra
+✓ Cálculo en tiempo real
+✓ Historial y estadísticas
+✓ 100% privado y local
+✓ Gratuito
+
+PRIVACIDAD:
+• Sin rastreo de datos
+• Sin publicidad
+• Sin conexión a internet
+• Todo guardado en tu dispositivo
+
+Proyecto personal. No es comercial.`,
       buttons: [
         {
           text: 'Ver Portafolio del creador',

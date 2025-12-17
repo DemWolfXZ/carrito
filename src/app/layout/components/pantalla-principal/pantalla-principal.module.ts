@@ -15,6 +15,9 @@ import { RouterModule } from '@angular/router';
 // Importar módulos de Ionic
 import { IonicModule } from '@ionic/angular';
 
+// Importar SharedModule para usar TabBarraPrincipalComponent
+import { SharedModule } from '../../../shared/shared.module';
+
 // Importar componente principal
 import { PantallaPrincipalComponent } from './pantalla-principal.component';
 
@@ -33,6 +36,9 @@ import { PantallaPrincipalRoutingModule } from './pantalla-principal-routing.mod
 
     // Módulo de Ionic para componentes UI
     IonicModule,
+
+    // Módulo compartido (incluye TabBarraPrincipalComponent)
+    SharedModule,
 
     // Configuración de rutas con children tabs
     PantallaPrincipalRoutingModule

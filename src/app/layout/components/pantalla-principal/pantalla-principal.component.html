@@ -96,38 +96,11 @@
       <router-outlet></router-outlet>
     </div>
 
-    <!-- Barra de tabs inferior semicircular - FIJA COMO FOOTER -->
-    <div class="tab-bar-wrapper">
-      <div class="semicircle-tab-bar">
-
-        <!-- Tab Historial -->
-        <div class="semicircle-btn" [class.active]="tabActivo === 'historial'" (click)="navegarATab('historial')">
-          <div class="semicircle-content">
-            <ion-icon name="time-outline"></ion-icon>
-            <ion-label>Historial</ion-label>
-          </div>
-        </div>
-
-        <!-- Tab Nueva Compra (destacado central) -->
-        <div class="semicircle-btn tab-center" [class.active]="tabActivo === 'nueva-compra'" (click)="navegarATab('nueva-compra')">
-          <div class="center-fab">
-            <ion-fab-button color="success" size="small">
-              <ion-icon name="add"></ion-icon>
-            </ion-fab-button>
-          </div>
-          <ion-label class="center-label">Nueva</ion-label>
-        </div>
-
-        <!-- Tab Configuraciones -->
-        <div class="semicircle-btn" [class.active]="tabActivo === 'configuraciones'" (click)="navegarATab('configuraciones')">
-          <div class="semicircle-content">
-            <ion-icon name="settings-outline"></ion-icon>
-            <ion-label>Ajustes</ion-label>
-          </div>
-        </div>
-
-      </div>
-    </div>
+    <!-- Barra de tabs inferior - Componente separado -->
+    <app-tab-barra-principal
+      [tabActivo]="tabActivo"
+      (cambioTab)="onCambioTab($event)">
+    </app-tab-barra-principal>
 
   </div>
 

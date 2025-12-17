@@ -1,0 +1,202 @@
+/**
+ * Estilos Barra de Tabs Principal - Diseño Glassmorphism Moderno
+ * Basado en diseño modern glassmorphic con backdrop blur
+ * Se adapta automáticamente a los temas personalizados
+ *
+ * @author DemWolf
+ * @version 2.1 - ADAPTATIVO A TEMAS
+ */
+
+:host {
+  /* Light defaults - Fallback - Más transparente para efecto glass */
+  --tabbar-bg: rgba(255, 255, 255, 0.65);
+  --tabbar-border: rgba(15, 23, 42, 0.15);
+  --tabbar-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+
+  --tab-icon: rgba(15, 23, 42, 0.55);
+  --tab-icon-active: var(--ion-color-primary, rgba(15, 23, 42, 0.95));
+
+  --center-btn-bg: var(--ion-color-success, #22c55e);
+  --center-btn-shadow: 0 14px 40px rgba(34, 197, 94, 0.35);
+}
+
+/* Dark mode - Más aéreo y transparente */
+@media (prefers-color-scheme: dark) {
+  :host {
+    --tabbar-bg: rgba(17, 24, 39, 0.55);
+    --tabbar-border: rgba(148, 163, 184, 0.12);
+    --tabbar-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+    --tab-icon: rgba(226, 232, 240, 0.65);
+    --tab-icon-active: var(--ion-color-primary, rgba(226, 232, 240, 0.95));
+  }
+}
+
+/* Wrapper para tabs fijos como footer */
+/* Pegado abajo, respeta safe area de Android/iOS */
+.tab-bar-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: transparent;
+  pointer-events: auto;
+  padding: 0 14px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* TAB BAR "glass" - Diseño moderno glassmorphism ultra aéreo */
+/* Esquinas redondeadas SOLO en la parte superior */
+.semicircle-tab-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 74px;
+
+  border-radius: 22px 22px 0 0;
+  background: var(--tabbar-bg);
+  border: 1px solid var(--tabbar-border);
+  border-bottom: none;
+  box-shadow: var(--tabbar-shadow);
+
+  /* Efecto glass ultra pronunciado - AÉREO */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  overflow: visible; /* para que el botón flotante sobresalga */
+  padding: 0 10px;
+  position: relative;
+
+  /* Safe area (iOS) - mitad del safe area */
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) / 2);
+}
+
+/* Botones laterales */
+.semicircle-btn {
+  flex: 1;
+  max-width: 90px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  transition: all 120ms ease;
+  position: relative;
+
+  .semicircle-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 120ms ease;
+
+    ion-icon {
+      font-size: 22px;
+      transition: all 120ms ease;
+      color: var(--tab-icon);
+    }
+
+    ion-label {
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 0;
+      letter-spacing: 0.2px;
+      transition: all 120ms ease;
+      color: var(--tab-icon);
+    }
+  }
+
+  /* Estado activo */
+  &.active {
+    .semicircle-content {
+      ion-icon {
+        color: var(--tab-icon-active);
+        transform: scale(1.1);
+      }
+
+      ion-label {
+        color: var(--tab-icon-active);
+        font-weight: 600;
+      }
+    }
+  }
+
+  /* Efecto hover */
+  &:active {
+    transform: scale(0.97);
+  }
+
+  /* Tab central - botón flotante */
+  &.tab-center {
+    width: 84px;
+    flex: 0 0 84px;
+    pointer-events: none;
+
+    .center-fab {
+      pointer-events: auto;
+      position: absolute;
+      top: -30px;
+      width: 60px;
+      height: 60px;
+
+      ion-fab-button {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: var(--center-btn-bg);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: var(--center-btn-shadow);
+        --box-shadow: var(--center-btn-shadow);
+        transition: transform 120ms ease, filter 120ms ease;
+
+        ion-icon {
+          color: #fff;
+          font-size: 30px;
+        }
+
+        &:active {
+          transform: translateY(1px) scale(0.99);
+          filter: brightness(0.97);
+        }
+      }
+    }
+  }
+}
+
+/* Ajuste para pantallas muy chicas */
+@media (max-width: 360px) {
+  .tab-bar-wrapper {
+    margin: 0 10px 12px;
+    padding: 0 10px 12px 10px;
+  }
+
+  .semicircle-tab-bar {
+    height: 72px;
+  }
+
+  .semicircle-btn {
+    max-width: 80px;
+
+    &.tab-center {
+      width: 76px;
+      flex: 0 0 76px;
+
+      .center-fab {
+        width: 56px;
+        height: 56px;
+
+        ion-fab-button {
+          width: 56px;
+          height: 56px;
+          border-radius: 17px;
+        }
+      }
+    }
+  }
+}
+

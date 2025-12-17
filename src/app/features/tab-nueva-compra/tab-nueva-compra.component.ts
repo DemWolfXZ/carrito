@@ -11,7 +11,7 @@
  * @version 1.0
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ActionSheetController, ToastController, LoadingController } from '@ionic/angular';
 // TODO: Implementar cámara al final
@@ -71,6 +71,8 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
   cargando: boolean = false;
   puedeCrearNuevaLista: boolean = true;
   listasCreadasEsteMes: number = 0;
+  mesActual: string = ''; // Para mostrar en la UI
+  proximoMes: string = ''; // Para mostrar cuándo se reinicia el límite
 
   // Subscripciones
   private subscriptions = new Subscription();
@@ -82,7 +84,8 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
     private toastController: ToastController,
     private loadingController: LoadingController,
     private comprasService: ComprasService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private changeDetector: ChangeDetectorRef
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -101,11 +104,21 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
   private async verificarLimiteMensual(): Promise<void> {
     try {
       // Obtener resumen del mes actual
+      const ahora = new Date();
       const resumenMes = this.comprasService.obtenerResumenMesActual();
       this.listasCreadasEsteMes = resumenMes.sesionesUsadas;
       this.puedeCrearNuevaLista = await this.comprasService.puedeCrearNuevaSesion();
 
-      console.log(`📊 Listas creadas este mes: ${this.listasCreadasEsteMes}/${this.MAX_LISTAS_MES}`);
+      // Obtener nombre del mes en español
+      const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      this.mesActual = `${meses[ahora.getMonth()]} ${ahora.getFullYear()}`;
+
+      // Calcular próximo mes
+      const proximaFecha = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 1);
+      this.proximoMes = `1 de ${meses[proximaFecha.getMonth()]}`;
+
+      console.log(`📊 Listas creadas este mes (${this.mesActual}): ${this.listasCreadasEsteMes}/${this.MAX_LISTAS_MES}`);
 
       if (!this.puedeCrearNuevaLista) {
         await this.mostrarAlertaLimiteAlcanzado();
@@ -248,8 +261,11 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
       // Recargar productos desde la sesión actualizada
       this.sesionActiva = await this.comprasService.obtenerSesionActiva();
       if (this.sesionActiva) {
-        this.productos = [...this.sesionActiva.productos];
+        // Crear copia profunda de los productos para forzar detección de cambios
+        this.productos = this.sesionActiva.productos.map(p => ({ ...p }));
         this.calcularTotal();
+        // Forzar detección de cambios
+        this.changeDetector.markForCheck();
 
         // ✅ VALIDAR PRESUPUESTO si está definido
         if (this.presupuestoEstimado > 0 && this.sesionActiva.totales.total > 0) {
@@ -297,8 +313,11 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
               // Recargar productos desde la sesión actualizada
               this.sesionActiva = await this.comprasService.obtenerSesionActiva();
               if (this.sesionActiva) {
-                this.productos = [...this.sesionActiva.productos];
+                // Crear copia profunda de los productos para forzar detección de cambios
+                this.productos = this.sesionActiva.productos.map(p => ({ ...p }));
                 this.calcularTotal();
+                // Forzar detección de cambios
+                this.changeDetector.markForCheck();
               }
               await this.mostrarToast('Producto eliminado', 'success');
             } else {
@@ -333,7 +352,7 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
           min: 1
         },
         {
-          name: 'precioUnidad',
+          name: 'precioUnitario',
           type: 'number',
           placeholder: 'Precio unitario',
           value: producto.precioUnitario,
@@ -348,28 +367,37 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
         {
           text: 'Guardar',
           handler: async (data) => {
+            console.log('📝 [EDITAR] Dialog cerrado, datos del formulario:', data);
+
             // Solo el nombre es requerido. Cantidad y precio son opcionales pero si se proporcionan deben ser válidos
             if (!data.nombre || !data.nombre.trim()) {
               await this.mostrarToast('El nombre es obligatorio', 'warning');
               return false;
             }
 
-            // Si hay cantidad, validar que sea > 0
+            // Parsear y validar cantidad
+            let cantidadValida: number | undefined = undefined;
             if (data.cantidad !== '' && data.cantidad !== undefined && data.cantidad !== null) {
-              const cantidad = parseInt(data.cantidad);
+              const cantidad = typeof data.cantidad === 'string' ? parseInt(data.cantidad, 10) : Number(data.cantidad);
               if (isNaN(cantidad) || cantidad < 1) {
                 await this.mostrarToast('La cantidad debe ser mayor a 0', 'warning');
                 return false;
               }
+              cantidadValida = cantidad;
             }
 
-            // Si hay precio, validar que sea >= 0
+            // Parsear y validar precio
+            let precioValido: number | undefined = undefined;
             if (data.precioUnitario !== '' && data.precioUnitario !== undefined && data.precioUnitario !== null) {
-              const precio = parseFloat(data.precioUnitario);
+              const precio = typeof data.precioUnitario === 'string' ? parseFloat(data.precioUnitario) : Number(data.precioUnitario);
               if (isNaN(precio) || precio < 0) {
                 await this.mostrarToast('El precio no puede ser negativo', 'warning');
                 return false;
               }
+              precioValido = precio;
+            } else {
+              // Si está vacío, se envía 0
+              precioValido = 0;
             }
 
             // Preparar actualización
@@ -377,30 +405,59 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
               nombre: data.nombre.trim()
             };
 
-            // Agregar cantidad solo si tiene valor
-            if (data.cantidad !== '' && data.cantidad !== undefined && data.cantidad !== null) {
-              actualizacion.cantidad = parseInt(data.cantidad);
+            // Agregar cantidad solo si tiene valor válido
+            if (cantidadValida !== undefined) {
+              actualizacion.cantidad = cantidadValida;
             }
 
-            // Agregar precio solo si tiene valor
-            if (data.precioUnitario !== '' && data.precioUnitario !== undefined && data.precioUnitario !== null) {
-              actualizacion.precioUnitario = parseFloat(data.precioUnitario);
-            }
+            // Agregar precio - SIEMPRE actualizar (incluso si es 0)
+            actualizacion.precioUnitario = precioValido;
+
+            console.log('📝 [EDITAR] Datos validados y preparados:', actualizacion);
+            console.log('📝 [EDITAR] Llamando al servicio para actualizar producto ID:', producto.id);
+            console.log('📝 [EDITAR] Producto actual antes de actualizar:', producto);
 
             const actualizado = await this.comprasService.actualizarProducto(producto.id, actualizacion);
 
+            console.log('📝 [EDITAR] Respuesta del servicio - Actualizado:', actualizado);
+
             if (actualizado) {
               // Recargar productos desde la sesión actualizada
+              console.log('📝 [EDITAR] Obteniendo sesión actualizada...');
               this.sesionActiva = await this.comprasService.obtenerSesionActiva();
+
+              console.log('📝 [EDITAR] ¿Sesión activa existe?:', !!this.sesionActiva);
+
               if (this.sesionActiva) {
-                this.productos = [...this.sesionActiva.productos];
+                console.log('📝 [EDITAR] Sesión obtenida, tipo:', typeof this.sesionActiva);
+                console.log('📝 [EDITAR] ¿Tiene productos?:', !!this.sesionActiva.productos);
+                console.log('📝 [EDITAR] Longitud de productos:', this.sesionActiva.productos?.length);
+                console.log('📝 [EDITAR] Productos completo:', JSON.stringify(this.sesionActiva.productos, null, 2));
+
+                // Crear copia profunda de los productos para forzar detección de cambios
+                const productosAntiguos = this.productos.length;
+                this.productos = this.sesionActiva.productos.map(p => ({ ...p }));
+                console.log('📝 [EDITAR] Productos mapeados, cantidad:', this.productos.length);
+                console.log('📝 [EDITAR] Productos antes:', productosAntiguos, 'Productos después:', this.productos.length);
+
                 this.calcularTotal();
+                // Forzar detección de cambios
+                this.changeDetector.markForCheck();
+
+                console.log('✅ [EDITAR] Array de productos actualizado en el componente');
+                console.log('✅ [EDITAR] Nuevo array de productos:', this.productos);
+              } else {
+                console.error('❌ [EDITAR] La sesión activa es null');
               }
               await this.mostrarToast('Producto actualizado', 'success');
+              // Cerrar el alert explícitamente DESPUÉS de actualizar
+              await alert.dismiss();
+              console.log('✅ [EDITAR] Alert cerrado');
             } else {
+              console.error('❌ [EDITAR] Error al actualizar el producto');
               await this.mostrarToast('Error al actualizar producto', 'danger');
             }
-            return true;
+            return false; // No dejar que el alert se cierre automáticamente
           }
         }
       ]

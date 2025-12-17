@@ -377,11 +377,14 @@ export class PantallaPrincipalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Manejar cambio de tab
+   * Manejar cambio de tab desde TabBarraPrincipalComponent
    * @param tabSeleccionado Tab que se seleccionó
    */
   onCambioTab(tabSeleccionado: string): void {
     console.log('📱 Cambio de tab:', tabSeleccionado);
+
+    // Actualizar tab activo
+    this.tabActivo = tabSeleccionado;
 
     // Notificar al servicio de monetización sobre cambio de tab
     this.monetizacionService.activarBurbujaPorCambioTab();
@@ -416,46 +419,6 @@ export class PantallaPrincipalComponent implements OnInit, OnDestroy {
     // TODO: Implementar modal de donación
   }
 
-  /**
-   * Navegar a un tab específico
-   */
-  async navegarATab(tab: string): Promise<void> {
-    console.log('🔵 =================================');
-    console.log(`🔵 CLICK EN TAB: ${tab}`);
-    console.log('🔵 Tab activo actual:', this.tabActivo);
-    console.log('🔵 Router disponible:', !!this.router);
-    console.log('🔵 URL actual:', this.router.url);
-
-    // Actualizar tab activo
-    this.tabActivo = tab;
-    console.log('🔵 Tab activo actualizado a:', this.tabActivo);
-
-    // Navegar a la ruta correspondiente
-    try {
-      // Navegar de forma absoluta a la ruta completa
-      const rutaCompleta = `/pantalla-principal/${tab}`;
-      console.log('🔵 Intentando navegar a:', rutaCompleta);
-      console.log('🔵 RouterOutlet disponible:', document.querySelector('router-outlet') !== null);
-
-      const resultado = await this.router.navigateByUrl(rutaCompleta);
-      console.log('🔵 Resultado de navegación:', resultado);
-
-      if (resultado) {
-        console.log(`✅ Navegación exitosa a: ${tab}`);
-        console.log('✅ Nueva URL:', this.router.url);
-
-        // Notificar cambio de tab
-        this.onCambioTab(tab);
-      } else {
-        console.warn('⚠️ La navegación retornó false');
-      }
-    } catch (error) {
-      console.error('❌ Error al navegar:', error);
-      console.error('❌ Detalles del error:', JSON.stringify(error));
-    }
-
-    console.log('🔵 =================================');
-  }
 
   /**
    * Incrementar contador de anuncios visualizados

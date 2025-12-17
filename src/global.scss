@@ -191,6 +191,32 @@ ion-list {
 ion-modal {
   --background: var(--app-modal-background) !important;
   --box-shadow: var(--app-shadow-xl) !important;
+  --border-radius: 16px;
+
+  ion-content {
+    --background: var(--app-modal-background) !important;
+    --color: var(--app-text-primary) !important;
+  }
+
+  ion-header {
+    --background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade)) !important;
+    --color: white !important;
+    --border-color: transparent !important;
+
+    ion-title {
+      color: white;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--app-text-primary) !important;
+  }
+
+  p {
+    color: var(--app-text-primary) !important;
+  }
 }
 
 ion-alert {
@@ -220,43 +246,281 @@ ion-tabs {
 
 /**
  * ============================================================
- * ESTILOS ESPECÍFICOS PARA ALERTAS
+ * ESTILOS ESPECÍFICOS PARA ALERTAS - MEJORADO
  * ============================================================
  */
 
 ion-alert {
   .alert-wrapper {
     background: var(--app-modal-background) !important;
-    border-radius: 16px;
-    overflow: hidden;
+    border-radius: 20px;
+    overflow: visible;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25), 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+    margin: 16px;
+    margin-top: 20px;
+    max-width: calc(100vw - 32px);
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 480px) {
+      margin: 12px;
+      margin-top: 16px;
+      max-width: calc(100vw - 24px);
+      max-height: 88vh;
+    }
+
+    @media (max-width: 360px) {
+      margin: 10px;
+      margin-top: 12px;
+      max-width: calc(100vw - 20px);
+      max-height: 90vh;
+    }
+
+    @media (min-width: 600px) {
+      max-width: 520px;
+    }
   }
 
   .alert-head {
     background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade)) !important;
     color: white;
-    padding: 20px 16px;
+    padding: 24px 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+
+    @media (max-width: 480px) {
+      padding: 20px 16px;
+    }
+
+    @media (max-width: 360px) {
+      padding: 16px 12px;
+    }
 
     .alert-title {
       color: white !important;
-      font-size: 18px;
+      font-size: clamp(16px, 5vw, 22px);
       font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      letter-spacing: 0.3px;
+      word-break: break-word;
+      white-space: normal;
+      margin: 0;
+      padding: 0;
     }
   }
 
   .alert-message {
-    color: var(--app-text-secondary) !important;
+    color: var(--app-text-primary) !important;
     background: var(--app-modal-background) !important;
+    font-size: clamp(13px, 3.5vw, 15px) !important;
+    line-height: 1.8 !important;
+    padding: 20px !important;
+    word-break: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    flex: 0 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    max-height: 50vh;
+
+    @media (max-width: 480px) {
+      padding: 16px !important;
+      font-size: 13px !important;
+      line-height: 1.7 !important;
+      max-height: 55vh;
+    }
+
+    @media (max-width: 360px) {
+      padding: 14px !important;
+      font-size: 12px !important;
+      line-height: 1.6 !important;
+      max-height: 60vh;
+    }
+
+    /* Ocultar scrollbar visual pero permitir scroll */
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 2px;
+    }
   }
 
   .alert-button-group {
-    background: var(--app-overlay-bg) !important;
+    background: var(--app-modal-background) !important;
     border-top: 1px solid var(--app-border-color) !important;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    flex-shrink: 0;
+    min-height: 48px;
+
+    .alert-button {
+      flex: 1;
+      min-width: 80px;
+      border-right: 1px solid var(--app-border-color) !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+
+      &:last-child {
+        border-right: none !important;
+      }
+
+      @media (max-width: 480px) {
+        min-width: 70px;
+        padding: 10px 6px;
+      }
+
+      @media (max-width: 360px) {
+        min-width: 60px;
+        padding: 8px 4px;
+      }
+
+      @media (max-width: 360px) {
+        flex-basis: 50%;
+        min-width: 50%;
+
+        &:nth-child(odd) {
+          border-right: 1px solid var(--app-border-color) !important;
+        }
+
+        &:last-child {
+          border-right: none !important;
+        }
+
+        &:nth-last-child(2):nth-child(odd) {
+          border-right: none !important;
+        }
+      }
+    }
+  }
+
+  .alert-button {
+    color: var(--ion-color-primary) !important;
+    font-weight: 600 !important;
+    font-size: clamp(12px, 3vw, 14px) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 12px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: normal;
+    word-break: break-word;
+    transition: all 0.2s ease;
+
+    &:active {
+      background: rgba(33, 150, 243, 0.1);
+    }
+
+    @media (max-width: 480px) {
+      font-size: 12px !important;
+      padding: 12px 10px;
+      min-height: 44px;
+    }
+
+    @media (max-width: 360px) {
+      font-size: 11px !important;
+      padding: 10px 8px;
+      min-height: 40px;
+    }
+  }
+
+  .alert-button-destructive {
+    color: var(--ion-color-danger) !important;
+  }  .alert-button-destructive {
+    color: var(--ion-color-danger) !important;
+
+    &:active {
+      background: rgba(244, 67, 54, 0.1);
+    }
+  }
+
+  /**
+   * Estilos para inputs dentro de alertas
+   * Mejora la visibilidad del placeholder en todos los temas
+   * Responsivos y adaptativos
+   */
+  .alert-input {
+    --placeholder-opacity: 1 !important;
+    --padding-top: 14px !important;
+    --padding-bottom: 14px !important;
+    --padding-start: 14px !important;
+    --padding-end: 14px !important;
+    background: var(--app-input-background) !important;
+    color: var(--app-text-primary) !important;
+    border: 1.5px solid var(--app-border-color-strong) !important;
+    border-radius: 10px !important;
+    margin: 10px 12px !important;
+    font-size: clamp(15px, 4vw, 16px) !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    word-break: break-word;
+    overflow-wrap: break-word;
+
+    @media (max-width: 360px) {
+      --padding-top: 12px !important;
+      --padding-bottom: 12px !important;
+      --padding-start: 12px !important;
+      --padding-end: 12px !important;
+      margin: 8px 10px !important;
+      font-size: 15px !important;
+    }
+
+    &:focus {
+      border-color: var(--ion-color-primary) !important;
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1) !important;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      background: var(--app-disabled-background) !important;
+    }
+  }
+
+  .alert-input::placeholder {
+    color: var(--app-text-secondary) !important;
+    opacity: 1 !important;
+    font-weight: 500;
+  }
+
+  /* Estilos adicionales para compatibilidad con webkit */
+  .alert-input::-webkit-input-placeholder {
+    color: var(--app-text-secondary) !important;
+    opacity: 1 !important;
+    font-weight: 500;
+  }
+
+  .alert-input::-moz-placeholder {
+    color: var(--app-text-secondary) !important;
+    opacity: 1 !important;
+    font-weight: 500;
+  }
+
+  .alert-input:-ms-input-placeholder {
+    color: var(--app-text-secondary) !important;
+    opacity: 1 !important;
+    font-weight: 500;
   }
 }
 
 /**
  * ============================================================
- * ESTILOS AVANZADOS PARA GUARDADO DE LISTA INCOMPLETA
+ * ESTILOS AVANZADOS PARA GUARDADO DE LISTA INCOMPLETA - MEJORADO
  * ============================================================
  */
 
@@ -281,11 +545,12 @@ ion-alert {
       letter-spacing: 0.5px;
       margin: 0;
       color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .alert-sub-title {
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.9);
       margin-top: 4px;
       font-weight: 500;
     }
@@ -293,7 +558,7 @@ ion-alert {
 
   .alert-message {
     padding: 20px 16px;
-    color: var(--app-text-secondary);
+    color: var(--app-text-primary) !important;
     font-size: 14px;
     line-height: 1.6;
     max-height: 60vh;

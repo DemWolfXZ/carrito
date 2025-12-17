@@ -89,9 +89,9 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
         descripcion: 'Agrega productos en segundos'
       },
       {
-        icono: 'trending-down-outline',
-        titulo: 'Limita Gastos',
-        descripcion: 'Máximo 2 compras por mes para mejor control'
+        icono: 'calendar-outline',
+        titulo: 'Límite: 2 Listas por Mes',
+        descripcion: 'Del 1 al último día de cada mes calendario'
       }
     ]
   };
@@ -838,7 +838,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
       case 1:
         return 'Tu compañero inteligente para controlar gastos';
       case 2:
-        return 'Descubre cómo Carrito te ayudará a controlar tus gastos de supermercado';
+        return 'Anota los productos, cantidad y precio. Ves el total en tiempo real y nunca te pasas del presupuesto';
       case 3:
         return 'Esto nos ayudará a configurar la moneda y formato correcto para tu región';
       case 4:

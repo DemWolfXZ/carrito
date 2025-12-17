@@ -315,8 +315,9 @@ export function actualizarProducto(producto: Producto, actualizacion: Actualizac
     const productoActualizado: Producto = {
       ...producto,
       nombre: actualizacion.nombre?.trim() ?? producto.nombre,
-      precioUnitario: actualizacion.precioUnitario ?? producto.precioUnitario,
-      cantidad: actualizacion.cantidad ?? producto.cantidad,
+      // Usar una verificación más específica para precio y cantidad
+      precioUnitario: actualizacion.precioUnitario !== undefined ? actualizacion.precioUnitario : producto.precioUnitario,
+      cantidad: actualizacion.cantidad !== undefined ? actualizacion.cantidad : producto.cantidad,
       categoria: actualizacion.categoria ?? producto.categoria,
       notas: actualizacion.notas?.trim() ?? producto.notas
     };

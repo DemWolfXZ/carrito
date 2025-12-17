@@ -208,6 +208,8 @@ export class ComprasService {
    */
   async obtenerSesionActiva(): Promise<SesionCompra | null> {
     await this.esperarInicializacion();
+    console.log('📋 [OBTENER_SESION] Retornando sesión activa con', this.sesionActiva?.productos.length || 0, 'productos');
+    console.log('📋 [OBTENER_SESION] Sesión activa ID:', this.sesionActiva?.id);
     return this.sesionActiva;
   }
 
@@ -301,30 +303,44 @@ export class ComprasService {
     try {
       await this.esperarInicializacion();
 
+      console.log('🔄 [ACTUALIZAR] Iniciando actualización del producto:', idProducto);
+      console.log('🔄 [ACTUALIZAR] Datos a actualizar:', actualizacion);
+
       // Verificar que hay sesión activa
       if (!this.sesionActiva) {
-        console.error('No hay sesión activa');
+        console.error('❌ [ACTUALIZAR] No hay sesión activa');
         return false;
       }
 
+      console.log('🔄 [ACTUALIZAR] Sesión activa encontrada, productos antes:', this.sesionActiva.productos.length);
+
       // Encontrar producto en la sesión
       const indiceProducto = this.sesionActiva.productos.findIndex(p => p.id === idProducto);
+      console.log('🔄 [ACTUALIZAR] Índice del producto encontrado:', indiceProducto);
+
       if (indiceProducto === -1) {
-        console.error('Producto no encontrado en la sesión');
+        console.error('❌ [ACTUALIZAR] Producto no encontrado en la sesión');
         return false;
       }
 
       // Actualizar producto
       const productoOriginal = this.sesionActiva.productos[indiceProducto];
+      console.log('🔄 [ACTUALIZAR] Producto original:', productoOriginal);
+
       const productoActualizado = actualizarProducto(productoOriginal, actualizacion);
       if (!productoActualizado) {
-        console.error('Error al actualizar producto');
+        console.error('❌ [ACTUALIZAR] Error al actualizar producto');
         return false;
       }
 
+      console.log('✅ [ACTUALIZAR] Producto actualizado:', productoActualizado);
+
       // Crear sesión actualizada
       const productosActualizados = [...this.sesionActiva.productos];
+      console.log('🔄 [ACTUALIZAR] Copia de productos creada, longitud:', productosActualizados.length);
+
       productosActualizados[indiceProducto] = productoActualizado;
+      console.log('🔄 [ACTUALIZAR] Producto reemplazado en índice:', indiceProducto);
 
       const sesionActualizada: SesionCompra = {
         ...this.sesionActiva,
@@ -336,30 +352,46 @@ export class ComprasService {
         }
       };
 
+      console.log('🔄 [ACTUALIZAR] Nueva sesión creada, productos:', sesionActualizada.productos.length);
+
       // Recalcular totales
       sesionActualizada.totales = calcularTotalesSesion(sesionActualizada);
       sesionActualizada.estadisticas = calcularEstadisticasSesion(sesionActualizada);
 
       // Actualizar sesión activa
       this.sesionActiva = sesionActualizada;
+      console.log('🔄 [ACTUALIZAR] Sesión activa actualizada, productos ahora:', this.sesionActiva.productos.length);
 
       // Actualizar en la lista de sesiones
       const indiceSesion = this.sesiones.findIndex(s => s.id === sesionActualizada.id);
+      console.log('🔄 [ACTUALIZAR] Índice de sesión en lista:', indiceSesion);
+
       if (indiceSesion >= 0) {
         this.sesiones[indiceSesion] = sesionActualizada;
+        console.log('🔄 [ACTUALIZAR] Sesión actualizada en lista de sesiones');
       }
 
       // Guardar cambios
+      console.log('💾 [ACTUALIZAR] PRE-GUARDAR - Sesión actual tiene:', this.sesionActiva.productos.length, 'productos');
+      console.log('💾 [ACTUALIZAR] PRE-GUARDAR - Contenido de sesiones a guardar:', this.sesiones.length, 'sesiones');
+      this.sesiones.forEach((s, i) => {
+        console.log(`💾 [ACTUALIZAR] PRE-GUARDAR - Sesión ${i}:`, s.id, 'tiene', s.productos.length, 'productos');
+      });
+
       await this.guardarSesiones();
+      console.log('✅ [ACTUALIZAR] Cambios guardados en localStorage');
 
       // Actualizar observables
       this.sesionesSubject.next([...this.sesiones]);
       this.sesionActivaSubject.next(this.sesionActiva);
+      console.log('🔄 [ACTUALIZAR] Observables notificados');
 
+      console.log('✅ [ACTUALIZAR] Actualización completada exitosamente');
+      console.log('✅ [ACTUALIZAR] Sesión activa final tiene', this.sesionActiva.productos.length, 'productos');
       return true;
 
     } catch (error) {
-      console.error('Error al actualizar producto:', error);
+      console.error('❌ [ACTUALIZAR] Error al actualizar producto:', error);
       return false;
     }
   }
@@ -782,10 +814,50 @@ export class ComprasService {
         version: this.VERSION_DATOS
       };
 
-      localStorage.setItem(this.CLAVE_ALMACENAMIENTO, JSON.stringify(datosAlmacenamiento));
+      console.log('💾 [GUARDAR] Datos a guardar en localStorage:', {
+        cantidadSesiones: this.sesiones.length,
+        version: this.VERSION_DATOS,
+        clave: this.CLAVE_ALMACENAMIENTO,
+        sesionActiva: this.sesionActiva?.id,
+        productosEnSesion: this.sesionActiva?.productos.length || 0
+      });
+
+      // Mostrar la sesión completa antes de guardar
+      if (this.sesionActiva) {
+        console.log('💾 [GUARDAR] Sesión activa completa antes de guardar:', {
+          id: this.sesionActiva.id,
+          productos: this.sesionActiva.productos.length,
+          productosDetalles: this.sesionActiva.productos.map(p => ({
+            id: p.id,
+            nombre: p.nombre,
+            precio: p.precioUnitario,
+            cantidad: p.cantidad
+          }))
+        });
+      }
+
+      const jsonString = JSON.stringify(datosAlmacenamiento);
+      console.log('💾 [GUARDAR] String JSON a guardar - primeros 500 chars:', jsonString.substring(0, 500));
+
+      localStorage.setItem(this.CLAVE_ALMACENAMIENTO, jsonString);
+
+      console.log('✅ [GUARDAR] Datos guardados exitosamente en localStorage');
+
+      // Verificar que realmente se guardó
+      const datosVerificacion = localStorage.getItem(this.CLAVE_ALMACENAMIENTO);
+      if (datosVerificacion) {
+        const sesionesGuardadas = JSON.parse(datosVerificacion);
+        console.log('✅ [GUARDAR] Verificación - Sesiones guardadas en localStorage:', sesionesGuardadas.sesiones.length);
+        console.log('✅ [GUARDAR] Verificación - Primera sesión tiene:', sesionesGuardadas.sesiones[0]?.productos.length || 0, 'productos');
+        if (sesionesGuardadas.sesiones[0]?.productos.length > 0) {
+          console.log('✅ [GUARDAR] Verificación - Primer producto:', sesionesGuardadas.sesiones[0].productos[0]);
+        }
+      } else {
+        console.error('❌ [GUARDAR] ERROR: Los datos NO se guardaron en localStorage');
+      }
 
     } catch (error) {
-      console.error('Error al guardar sesiones:', error);
+      console.error('❌ [GUARDAR] Error al guardar sesiones:', error);
     }
   }
 

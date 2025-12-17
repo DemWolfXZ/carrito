@@ -15,7 +15,24 @@
         <ion-icon name="warning-outline" size="large"></ion-icon>
         <div>
           <h3>Límite mensual alcanzado</h3>
-          <p>Has creado {{listasCreadasEsteMes}}/{{MAX_LISTAS_MES}} listas este mes</p>
+          <p>Has creado {{listasCreadasEsteMes}}/{{MAX_LISTAS_MES}} listas en {{mesActual}}</p>
+          <p class="limite-info">Solo se permiten {{MAX_LISTAS_MES}} listas por mes calendario (del 1 al último día del mes)</p>
+          <p class="limite-info small">Podrás crear nuevas listas a partir del {{proximoMes}}</p>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Info límite mensual (cuando queda espacio) -->
+  <ion-card *ngIf="puedeCrearNuevaLista" class="card-info-limite">
+    <ion-card-content>
+      <div class="limite-info-content">
+        <ion-icon name="information-circle-outline" color="primary"></ion-icon>
+        <div class="limite-info-text">
+          <p><strong>Límite mensual:</strong> {{MAX_LISTAS_MES}} listas por mes calendario</p>
+          <p>Mes actual: <strong>{{mesActual}}</strong></p>
+          <p>Disponibles: <strong>{{MAX_LISTAS_MES - listasCreadasEsteMes}}/{{MAX_LISTAS_MES}}</strong></p>
+          <p class="limite-description">El límite se reinicia el primer día de cada mes</p>
         </div>
       </div>
     </ion-card-content>

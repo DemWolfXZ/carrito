@@ -135,4 +135,44 @@
     font-weight: 600;
     height: 48px;
   }
+
+  // Estilos para items de beneficios
+  .info-item {
+    --padding-start: 0 !important;
+    --padding-end: 0 !important;
+    --inner-padding-start: 0 !important;
+    --inner-padding-end: 0 !important;
+
+    .beneficio-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      width: 100%;
+
+      ion-icon {
+        flex-shrink: 0;
+        font-size: 20px;
+        margin-top: 2px;
+      }
+
+      div {
+        flex: 1;
+
+        h3 {
+          margin: 0 0 4px 0;
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--app-text-primary);
+        }
+
+        p {
+          margin: 0;
+          font-size: 12px;
+          color: var(--app-text-secondary);
+          line-height: 1.4;
+        }
+      }
+    }
+  }
 }
