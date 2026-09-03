@@ -28,6 +28,7 @@ export class TabHistorialComponent implements OnInit {
 
   sesionesCompletadas: SesionCompra[] = [];
   sesionesBorrador: SesionCompra[] = [];
+  sesionesGuardadas: SesionCompra[] = [];
   cargando: boolean = false;
 
   // Control de acordeón - ID de sesión expandida
@@ -57,9 +58,11 @@ export class TabHistorialComponent implements OnInit {
 
       // Obtener todas las sesiones en estado borrador
       this.sesionesBorrador = await this.comprasService.obtenerSesionesBorrador();
+      this.sesionesGuardadas = await this.comprasService.obtenerSesionesGuardadas();
 
       console.log(`📋 Sesiones completadas cargadas: ${this.sesionesCompletadas.length}`);
       console.log(`📝 Borradores cargados: ${this.sesionesBorrador.length}`);
+      console.log(`📌 Listas guardadas cargadas: ${this.sesionesGuardadas.length}`);
 
     } catch (error) {
       console.error('Error al cargar historial:', error);
@@ -85,6 +88,21 @@ export class TabHistorialComponent implements OnInit {
    */
   estaExpandida(sesionId: string): boolean {
     return this.sesionExpandida === sesionId;
+  }
+
+  formatearVigencia(sesion: SesionCompra): string {
+    const restante = this.comprasService.obtenerTiempoRestanteBorrador(sesion);
+    if (restante === null) return '';
+
+    const segundos = Math.ceil(restante / 1000);
+    const horasTotales = Math.floor(segundos / 3600);
+    const minutos = Math.floor(segundos / 60);
+
+    if (horasTotales >= 25) return 'Vigencia: 2 días';
+    if (horasTotales >= 12) return 'Vigencia: 1 día';
+    if (horasTotales >= 1) return `Vigencia: ${horasTotales} ${horasTotales === 1 ? 'hora' : 'horas'}`;
+    if (minutos > 0) return `Vigencia: ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+    return `Vigencia: ${segundos} ${segundos === 1 ? 'segundo' : 'segundos'}`;
   }
 
   /**

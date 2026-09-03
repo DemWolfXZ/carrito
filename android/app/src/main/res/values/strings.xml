@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">carrito</string>
-    <string name="title_activity_main">carrito</string>
-    <string name="package_name">com.carrito.app</string>
-    <string name="custom_url_scheme">com.carrito.app</string>
+    <string name="app_name">CarritoControl</string>
+    <string name="title_activity_main">CarritoControl</string>
+    <string name="package_name">com.carritocontrol.app</string>
+    <string name="custom_url_scheme">com.carritocontrol.app</string>
 </resources>

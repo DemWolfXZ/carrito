@@ -45,6 +45,7 @@ import { UsuarioService } from './usuario.service';
 interface AlmacenamientoSesiones {
   sesiones: SesionCompra[];
   ultimaActualizacion: Date;
+  ultimoTimestampObservado?: number;
   version: string;
 }
 
@@ -67,6 +68,7 @@ export class ComprasService {
   private sesiones: SesionCompra[] = [];
   private sesionActiva: SesionCompra | null = null;
   private inicializado: boolean = false;
+  private ultimoTimestampObservado = 0;
 
   // Constantes
   private readonly CLAVE_ALMACENAMIENTO = 'carrito_sesiones';
@@ -130,6 +132,7 @@ export class ComprasService {
   async puedeCrearNuevaSesion(): Promise<boolean> {
     try {
       await this.esperarInicializacion();
+      await this.verificarSesionesExpiradas();
 
       // Obtener resumen del mes actual
       const ahora = new Date();
@@ -237,7 +240,31 @@ export class ComprasService {
    */
   async obtenerSesionesBorrador(): Promise<SesionCompra[]> {
     await this.esperarInicializacion();
+    await this.verificarSesionesExpiradas();
     return this.sesiones.filter(sesion => sesion.estado === EstadoSesion.BORRADOR);
+  }
+
+  async obtenerSesionesGuardadas(): Promise<SesionCompra[]> {
+    await this.esperarInicializacion();
+    await this.verificarSesionesExpiradas();
+    return this.sesiones.filter(sesion => sesion.estado === EstadoSesion.GUARDADA);
+  }
+
+  obtenerTiempoRestanteBorrador(sesion: SesionCompra): number | null {
+    if (!sesion.fechaPrimerGuardadoTemporal || sesion.estado === EstadoSesion.GUARDADA) {
+      return null;
+    }
+
+    return Math.max(
+      0,
+      VALIDACION_SESION.tiempoMaximoBorrador -
+      (this.obtenerTiempoInterno() - new Date(sesion.fechaPrimerGuardadoTemporal).getTime())
+    );
+  }
+
+  async verificarVigenciaSesiones(): Promise<void> {
+    await this.esperarInicializacion();
+    await this.verificarSesionesExpiradas();
   }
 
   /**
@@ -509,6 +536,8 @@ export class ComprasService {
       const sesionBorrador: SesionCompra = {
         ...this.sesionActiva,
         estado: EstadoSesion.BORRADOR,
+        fechaPrimerGuardadoTemporal: this.sesionActiva.fechaPrimerGuardadoTemporal
+          ?? new Date(this.obtenerTiempoInterno()),
         fechaFinalizacion: undefined
       };
 
@@ -771,12 +800,16 @@ export class ComprasService {
 
       if (datosString) {
         const almacenamiento: AlmacenamientoSesiones = JSON.parse(datosString);
+        this.ultimoTimestampObservado = almacenamiento.ultimoTimestampObservado || 0;
 
         // Convertir strings de fecha a objetos Date
         this.sesiones = almacenamiento.sesiones.map(sesion => ({
           ...sesion,
           fechaInicio: new Date(sesion.fechaInicio),
           fechaFinalizacion: sesion.fechaFinalizacion ? new Date(sesion.fechaFinalizacion) : undefined,
+          fechaPrimerGuardadoTemporal: sesion.fechaPrimerGuardadoTemporal
+            ? new Date(sesion.fechaPrimerGuardadoTemporal)
+            : undefined,
           metadatos: {
             ...sesion.metadatos,
             ultimaActualizacion: new Date(sesion.metadatos.ultimaActualizacion)
@@ -792,6 +825,8 @@ export class ComprasService {
       } else {
         this.sesiones = [];
       }
+
+      this.actualizarRelojInterno();
 
       // Actualizar observable
       this.sesionesSubject.next([...this.sesiones]);
@@ -811,6 +846,7 @@ export class ComprasService {
       const datosAlmacenamiento: AlmacenamientoSesiones = {
         sesiones: this.sesiones,
         ultimaActualizacion: new Date(),
+        ultimoTimestampObservado: this.actualizarRelojInterno(),
         version: this.VERSION_DATOS
       };
 
@@ -879,10 +915,8 @@ export class ComprasService {
     let hayChangios = false;
 
     this.sesiones.forEach(sesion => {
-      if (esSesionExpirada(sesion)) {
-        sesion.estado = EstadoSesion.EXPIRADA;
-        sesion.fechaFinalizacion = new Date();
-        sesion.horaFinalizacion = new Date().toTimeString().slice(0, 5);
+      if (esSesionExpirada(sesion, new Date(this.obtenerTiempoInterno()))) {
+        sesion.estado = EstadoSesion.GUARDADA;
         hayChangios = true;
       }
     });
@@ -891,6 +925,15 @@ export class ComprasService {
       await this.guardarSesiones();
       this.sesionesSubject.next([...this.sesiones]);
     }
+  }
+
+  private actualizarRelojInterno(): number {
+    this.ultimoTimestampObservado = Math.max(this.ultimoTimestampObservado, Date.now());
+    return this.ultimoTimestampObservado;
+  }
+
+  private obtenerTiempoInterno(): number {
+    return this.actualizarRelojInterno();
   }
 
   /**

@@ -19,6 +19,9 @@ import { ComprasService } from '../../../core/services/compras.service';
 import { MonetizacionService } from '../../../core/services/monetizacion.service';
 import { ConfiguracionService } from '../../../core/services/configuracion.service';
 import { AlmacenamientoService } from '../../../core/services/almacenamiento.service';
+import { DonacionesService } from '../../../core/services/donaciones.service';
+import { ModalController } from '@ionic/angular';
+import { DonacionesModalComponent } from '../../../shared/components/donaciones-modal/donaciones-modal.component';
 
 // Importar modelos usando rutas relativas
 import { Usuario } from '../../../core/models/usuario.model';
@@ -84,6 +87,8 @@ export class PantallaPrincipalComponent implements OnInit, OnDestroy {
     private monetizacionService: MonetizacionService,
     private configuracionService: ConfiguracionService,
     private almacenamientoService: AlmacenamientoService,
+    private donacionesService: DonacionesService,
+    private modalController: ModalController,
     private cdr: ChangeDetectorRef // ✅ AGREGAR PARA DETECTAR CAMBIOS
   ) {
     console.log('🏗️ PantallaPrincipalComponent constructor ejecutado');
@@ -414,9 +419,13 @@ export class PantallaPrincipalComponent implements OnInit, OnDestroy {
   /**
    * Abrir modal de donación
    */
-  abrirModalDonacion(): void {
+  async abrirModalDonacion(): Promise<void> {
     console.log('💝 Abriendo modal de donación');
-    // TODO: Implementar modal de donación
+    const modal = await this.modalController.create({
+      component: DonacionesModalComponent,
+      cssClass: 'donaciones-modal'
+    });
+    await modal.present();
   }
 
 

@@ -18,6 +18,7 @@ export class TabConfiguracionesComponent implements OnInit {
   nombreUsuario: string = '';
   paisActual: Pais | null = null;
   paisesDisponibles: Pais[] = [];
+  mostrarBeneficios: boolean = false; // Colapsable
 
   constructor(
     private configuracionService: ConfiguracionService,
@@ -185,28 +186,40 @@ export class TabConfiguracionesComponent implements OnInit {
    */
   async mostrarAyuda(): Promise<void> {
     const alert = await this.alertController.create({
-      header: '¿Qué hace el Sistema?',
-      message: `🛒 CARRITO - Tu Control de Compras
+      header: 'Guía de Uso - Ayuda',
+      message: `🛒 CarritoControl - Tus compras bajo control
 
-¿POR QUÉ USAR CARRITO?
-Muchos olvidamos qué queremos comprar o andamos con calculadora en mano. Con Carrito:
-✓ Anotas el producto, cantidad y precio
-✓ Ves el total en tiempo real
-✓ No te pasas del presupuesto
-✓ Controlas exactamente qué gastas
+CÓMO USAR CarritoControl:
 
-FUNCIONALIDADES:
-• Máximo 2 compras por mes calendario
-• Hasta 20 productos por compra
-• Cálculo automático de totales
-• Presupuesto estimado
-• Historial completo
-• Estadísticas detalladas
-• Modo claro y oscuro
+1. CREAR UNA COMPRA:
+   • Ve a "Nueva Compra"
+   • Selecciona la fecha y lugar
+   • Ingresa presupuesto estimado
+   • Máximo 2 compras por mes calendario
 
-TODO ES LOCAL:
-✓ Sin internet requerido
-✓ Datos seguros en tu dispositivo
+2. AGREGAR PRODUCTOS:
+   • Escribe nombre del producto
+   • Ingresa cantidad y precio unitario
+   • El sistema calcula automáticamente
+   • Máximo 20 productos por compra
+
+3. CONTROLAR TU GASTO:
+   • Observa el total en tiempo real
+   • Compara con presupuesto estimado
+   • Recibe alerta si te excedes
+   • Presiona botón para confirmar compra
+
+4. REVISAR HISTORIAL:
+   • Accede a "Mis Compras"
+   • Observa estadísticas mensuales
+   • Analiza tus patrones de gasto
+
+CARACTERÍSTICAS:
+✓ Cálculo automático en tiempo real
+✓ Historial completo de compras
+✓ Estadísticas detalladas
+✓ Modo claro y oscuro
+✓ 100% privado - sin datos en la nube
 ✓ Sin rastreo ni publicidad`,
       buttons: ['Entendido']
     });
@@ -220,7 +233,7 @@ TODO ES LOCAL:
   async mostrarTerminos(): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Términos y Condiciones',
-      message: `Carrito es una aplicación 100% gratuita.
+      message: `CarritoControl es una aplicación 100% gratuita.
 
 Uso:
 • Versión gratuita con límites de uso
@@ -234,7 +247,18 @@ Privacidad:
 • Almacenamiento local únicamente
 
 Al usar esta aplicación, aceptas estos términos.`,
-      buttons: ['Aceptar']
+      buttons: [
+        {
+          text: 'Hacer una Donación',
+          handler: () => {
+            this.abrirDonaciones();
+          }
+        },
+        {
+          text: 'Aceptar',
+          role: 'confirm'
+        }
+      ]
     });
 
     await alert.present();
@@ -245,30 +269,37 @@ Al usar esta aplicación, aceptas estos términos.`,
    */
   async mostrarAcercaDe(): Promise<void> {
     const alert = await this.alertController.create({
-      header: 'Acerca de Carrito',
-      message: `🛒 CARRITO - Control Inteligente de Compras
+      header: 'Acerca de CarritoControl',
+      message: `🛒 CarritoControl - Tus compras bajo control
 
+📱 INFORMACIÓN DE LA APP:
 Versión: 1.0.0
 Desarrollado por: DemWolf 🇨🇱
+Plataforma: Android
 
-PROPÓSITO:
-Ayudarte a controlar tus gastos y saber exactamente qué compras. Sin olvidos, sin sorpresas en el total.
+🎯 PROPÓSITO:
+Eliminar olvidos al comprar y evitar sorpresas en el total. CarritoControl es tu asistente personal para controlar exactamente qué gastas, producto por producto.
 
-CARACTERÍSTICAS PRINCIPALES:
-✓ Máximo 2 compras por mes calendario
-✓ Hasta 20 productos por compra
-✓ Cálculo en tiempo real
-✓ Historial y estadísticas
-✓ 100% privado y local
-✓ Gratuito
+💡 MISIÓN:
+Empoderar a los usuarios para tomar decisiones de compra conscientes y presupuestadas, sin calculadora en mano.
 
-PRIVACIDAD:
-• Sin rastreo de datos
-• Sin publicidad
-• Sin conexión a internet
-• Todo guardado en tu dispositivo
+🔒 POLÍTICA DE PRIVACIDAD:
+✓ Cero datos enviados a servidores
+✓ Cero rastreo de comportamiento
+✓ Cero publicidad intrusiva
+✓ 100% almacenamiento local
+✓ Tú controlas tus datos
 
-Proyecto personal. No es comercial.`,
+💰 MODELO:
+• Completamente gratuito
+• Desarrollo independiente
+• Soportado por donaciones voluntarias
+• Sin modelos de suscripción
+
+📧 CONTACTO Y SOPORTE:
+Pregunta, comenta o reporta un error en ajustes.
+
+Gracias por usar CarritoControl 🙏`,
       buttons: [
         {
           text: 'Ver Portafolio del creador',

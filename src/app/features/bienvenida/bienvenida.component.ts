@@ -13,11 +13,12 @@ import { AlertController, LoadingController, ToastController, Platform } from '@
 import { Subscription } from 'rxjs';
 
 // ✅ IMPORTAR MODELOS Y SERVICIOS USANDO RUTAS RELATIVAS (CORREGIDO)
-import { DatosConfiguracionInicial } from '../../core/models/usuario.model';
+import { DatosConfiguracionInicial, TemaVisual } from '../../core/models/usuario.model';
 import { Pais } from '../../core/models/pais.model';
 import { ConfiguracionService } from '../../core/services/configuracion.service';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { AlmacenamientoService } from '../../core/services/almacenamiento.service';
+import { TemaService } from '../../core/services/tema.service';
 
 // ✅ Importar ScreenOrientation de Capacitor 7 (ya instalado en tu proyecto)
 import { ScreenOrientation } from '@capacitor/screen-orientation';
@@ -55,6 +56,10 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
   cargando: boolean = false;
   formularioValido: boolean = false;
 
+  temaAccesibilidadSeleccionado: TemaVisual | null = null;
+  readonly temaAltoContraste = TemaVisual.ALTO_CONTRASTE;
+  readonly temaDaltonismoSeguro = TemaVisual.DALTONISMO_SEGURO;
+
   // Validaciones por campo
   validaciones = {
     nombre: { valido: false, mensaje: '' },
@@ -69,9 +74,9 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Información de la aplicación para el splash
   infoApp = {
-    nombre: 'Carrito',
+    nombre: 'CarritoControl',
     version: '1.0',
-    descripcion: 'Tu compañero inteligente para controlar gastos',
+    descripcion: 'Tus compras bajo control',
     caracteristicas: [
       {
         icono: 'shield-checkmark-outline',
@@ -105,6 +110,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     private configuracionService: ConfiguracionService,
     private usuarioService: UsuarioService,
     private almacenamientoService: AlmacenamientoService,
+    private temaService: TemaService,
     private platform: Platform
   ) {
     console.log('🏗️ CONSTRUCTOR de BienvenidaComponent ejecutado');
@@ -478,6 +484,20 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  async seleccionarTemaAccesibilidad(tema: TemaVisual): Promise<void> {
+    const aplicado = await this.temaService.cambiarTema(tema);
+    if (aplicado) {
+      this.temaAccesibilidadSeleccionado = tema;
+      this.datosConfiguracion.configuracionesIniciales.temaVisual = tema;
+    }
+  }
+
+  async omitirTemaAccesibilidad(): Promise<void> {
+    this.temaAccesibilidadSeleccionado = null;
+    delete this.datosConfiguracion.configuracionesIniciales.temaVisual;
+    await this.temaService.activarTemaAutomatico();
+  }
+
   /**
    * Retroceder al paso anterior
    */
@@ -818,7 +838,7 @@ export class BienvenidaComponent implements OnInit, OnDestroy, AfterViewInit {
       case 1:
         return '¡Bienvenido!';
       case 2:
-        return '¿Qué es Carrito?';
+        return '¿Qué es CarritoControl?';
       case 3:
         return 'Selecciona el país donde resides actualmente';
       case 4:

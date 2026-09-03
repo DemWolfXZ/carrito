@@ -1,5 +1,5 @@
 /**
- * Componente raíz de la aplicación Carrito
+ * Componente raíz de la aplicación CarritoControl
  * Maneja la inicialización global y configuraciones básicas de la app
  * Punto de entrada principal para toda la aplicación
  *
@@ -15,6 +15,7 @@ import { ConfiguracionService } from './core/services/configuracion.service';
 import { TemaService } from './core/services/tema.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,8 @@ import { takeUntil } from 'rxjs/operators';
 export class AppComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
+
+
   constructor(
     private platform: Platform,
     private configuracionService: ConfiguracionService,
@@ -32,7 +35,18 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {
     // Inicializar configuraciones básicas de la plataforma
     this.inicializarApp();
+    // Mostrar splash screen personalizado
+    this.showSplash();
+
   }
+  async showSplash(){
+  await SplashScreen.show({
+  autoHide: true,
+  showDuration: 3000,
+});
+
+}
+
 
   /**
    * Inicialización del componente después de la construcción
@@ -76,10 +90,13 @@ export class AppComponent implements OnInit, OnDestroy {
       // Esperar a que la plataforma esté lista
       await this.platform.ready();
 
-      console.log('🛒 Aplicación Carrito iniciada correctamente');
+      console.log('🛒 Aplicación CarritoControl iniciada correctamente');
 
     } catch (error) {
       console.error('Error al inicializar la aplicación:', error);
     }
+
+
+
   }
 }

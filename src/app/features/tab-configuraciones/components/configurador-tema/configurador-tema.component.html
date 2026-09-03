@@ -67,7 +67,7 @@
   <!-- SECCIÓN: CROMÁTICOS (Colores) -->
   <div class="seccion-temas">
     <h3 class="titulo-seccion">
-      <ion-icon name="palette"></ion-icon>
+      <ion-icon name="color-palette-outline"></ion-icon>
       Personalizados
     </h3>
     <p class="titulo-seccion-desc">Elige el color que más te guste</p>
@@ -81,6 +81,35 @@
         type="button">
         <div class="opcion-header">
           <div class="color-preview" [attr.data-theme]="opcion.id"></div>
+          <span class="opcion-badge" *ngIf="modoTemaActual === opcion.id">
+            <ion-icon name="checkmark-circle-sharp"></ion-icon>
+          </span>
+        </div>
+        <h3>{{ opcion.label }}</h3>
+        <p class="opcion-desc">{{ opcion.descripcion }}</p>
+        <div class="opcion-estado" *ngIf="modoTemaActual === opcion.id">
+          <small>Activo</small>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: ACCESIBILIDAD -->
+  <div class="seccion-temas">
+    <h3 class="titulo-seccion">
+      <ion-icon name="accessibility"></ion-icon>
+      Accesibilidad
+    </h3>
+    <p class="titulo-seccion-desc">Temas diseñados para mejorar la accesibilidad visual</p>
+    <div class="opciones-grid">
+      <button
+        *ngFor="let opcion of obtenerPorCategoria('accesibilidad')"
+        class="opcion-card opcion-accesibilidad"
+        [class.activa]="modoTemaActual === opcion.id"
+        (click)="seleccionarOpcion(opcion.id)"
+        type="button">
+        <div class="opcion-header">
+          <ion-icon [name]="opcion.icono" class="opcion-icono"></ion-icon>
           <span class="opcion-badge" *ngIf="modoTemaActual === opcion.id">
             <ion-icon name="checkmark-circle-sharp"></ion-icon>
           </span>

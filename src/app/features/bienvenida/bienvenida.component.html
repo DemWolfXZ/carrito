@@ -89,6 +89,61 @@
             <ion-icon name="information-circle-outline" color="primary"></ion-icon>
             <span>La configuración inicial solo toma 2 minutos</span>
           </div>
+
+          <section class="accessibility-section" aria-labelledby="accessibility-title">
+            <div class="accessibility-heading">
+              <ion-icon name="accessibility-outline" color="primary"></ion-icon>
+              <div>
+                <h2 id="accessibility-title">¿Necesitas una vista más cómoda?</h2>
+                <p>Elige una ayuda visual ahora o continúa con la configuración normal.</p>
+              </div>
+            </div>
+
+            <div class="accessibility-options">
+              <button
+                type="button"
+                class="accessibility-option"
+                [class.selected]="temaAccesibilidadSeleccionado === temaAltoContraste"
+                (click)="seleccionarTemaAccesibilidad(temaAltoContraste)">
+                <ion-icon name="contrast-outline"></ion-icon>
+                <span>
+                  <strong>Alto contraste</strong>
+                  <small>Más diferencia entre fondo y texto</small>
+                </span>
+                <ion-icon
+                  class="accessibility-check"
+                  *ngIf="temaAccesibilidadSeleccionado === temaAltoContraste"
+                  name="checkmark-circle-outline">
+                </ion-icon>
+              </button>
+
+              <button
+                type="button"
+                class="accessibility-option"
+                [class.selected]="temaAccesibilidadSeleccionado === temaDaltonismoSeguro"
+                (click)="seleccionarTemaAccesibilidad(temaDaltonismoSeguro)">
+                <ion-icon name="eye-outline"></ion-icon>
+                <span>
+                  <strong>Vista para daltonismo</strong>
+                  <small>Colores más fáciles de distinguir</small>
+                </span>
+                <ion-icon
+                  class="accessibility-check"
+                  *ngIf="temaAccesibilidadSeleccionado === temaDaltonismoSeguro"
+                  name="checkmark-circle-outline">
+                </ion-icon>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              class="accessibility-skip"
+              [class.selected]="!temaAccesibilidadSeleccionado"
+              (click)="omitirTemaAccesibilidad()">
+              <ion-icon name="arrow-forward-outline"></ion-icon>
+              Omitir por ahora
+            </button>
+          </section>
         </div>
 
       </div>

@@ -2,7 +2,7 @@
  * Módulo de rutas para el layout principal - versión simplificada
  * Solo define la ruta básica sin lazy loading de tabs por ahora
  * Para probar paso a paso antes de crear todos los componentes
- * 
+ *
  * @author DemWolf
  * @version 1.0
  */
@@ -16,7 +16,7 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./components/pantalla-principal/pantalla-principal.module').then(m => m.PantallaPrincipalModule),
     data: {
-      title: 'Carrito - Control de Gastos',
+      title: 'CarritoControl - Tus compras bajo control',
       description: 'Pantalla principal con navegación por tabs'
     }
   },

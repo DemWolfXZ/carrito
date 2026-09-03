@@ -15,6 +15,7 @@ export interface SesionCompra {
   nombreSupermercado: string;          // Nombre del supermercado (1-50 caracteres)
   fechaInicio: Date;                   // Cuándo se creó la sesión
   fechaFinalizacion?: Date;            // Cuándo se completó (null si está activa)
+  fechaPrimerGuardadoTemporal?: Date;  // Inicio fijo de la ventana de 48 horas
   horaInicio: string;                  // Hora de inicio (HH:mm format)
   horaFinalizacion?: string;           // Hora de finalización (HH:mm format)
   presupuestoEstimado?: number;        // Presupuesto opcional para la compra
@@ -32,7 +33,8 @@ export enum EstadoSesion {
   PAUSADA = 'pausada',                 // Temporalmente pausada
   COMPLETADA = 'completada',           // Finalizada exitosamente
   CANCELADA = 'cancelada',             // Cancelada por el usuario
-  EXPIRADA = 'expirada',               // Expirada por tiempo (24h)
+  EXPIRADA = 'expirada',               // Estado antiguo conservado por compatibilidad
+  GUARDADA = 'guardada',               // Borrador que superó la ventana de 48 horas
   BORRADOR = 'borrador'                // Borrador sin precios/cantidades completos
 }
 
@@ -128,7 +130,7 @@ export const VALIDACION_SESION = {
   productos: {
     maximo: 20                         // Máximo productos por sesión
   },
-  tiempoMaximo: 24 * 60 * 60 * 1000,   // 24 horas en milisegundos
+  tiempoMaximoBorrador: 48 * 60 * 60 * 1000, // 48 horas desde el primer guardado temporal
   limiteMensual: 2                     // Máximo 2 sesiones por mes
 } as const;
 
@@ -347,7 +349,9 @@ export function removerProductoDeSesion(sesion: SesionCompra, idProducto: string
 export function finalizarSesion(sesion: SesionCompra): SesionCompra | null {
   try {
     // Verificar que la sesión pueda ser finalizada
-    if (sesion.estado === EstadoSesion.COMPLETADA || sesion.estado === EstadoSesion.CANCELADA) {
+    if (sesion.estado === EstadoSesion.COMPLETADA ||
+      sesion.estado === EstadoSesion.CANCELADA ||
+      sesion.estado === EstadoSesion.GUARDADA) {
       console.error('La sesión ya está finalizada');
       return null;
     }
@@ -479,18 +483,20 @@ export function calcularEstadisticasSesion(sesion: SesionCompra): EstadisticasSe
 }
 
 /**
- * Verificar si una sesión ha expirado (más de 24 horas)
+ * Verificar si un borrador superó las 48 horas desde su primer guardado
  * @param sesion Sesión a verificar
  * @returns true si la sesión ha expirado
  */
-export function esSesionExpirada(sesion: SesionCompra): boolean {
-  if (sesion.estado !== EstadoSesion.ACTIVA && sesion.estado !== EstadoSesion.PAUSADA) {
-    return false; // Sesiones finalizadas no expiran
+export function esSesionExpirada(sesion: SesionCompra, ahora: Date = new Date()): boolean {
+  if ((sesion.estado !== EstadoSesion.BORRADOR &&
+       sesion.estado !== EstadoSesion.ACTIVA &&
+       sesion.estado !== EstadoSesion.PAUSADA) ||
+      !sesion.fechaPrimerGuardadoTemporal) {
+    return false;
   }
 
-  const ahora = new Date();
-  const tiempoTranscurrido = ahora.getTime() - sesion.fechaInicio.getTime();
-  return tiempoTranscurrido > VALIDACION_SESION.tiempoMaximo;
+  const tiempoTranscurrido = ahora.getTime() - new Date(sesion.fechaPrimerGuardadoTemporal).getTime();
+  return tiempoTranscurrido >= VALIDACION_SESION.tiempoMaximoBorrador;
 }
 
 /**
@@ -510,9 +516,11 @@ export function obtenerResumenMensual(sesiones: SesionCompra[], ano: number, mes
   const sesionesCreadas = sesionesMes.length;
   const sesionesCompletadas = sesionesMes.filter(s => s.estado === EstadoSesion.COMPLETADA).length;
 
-  // Solo cuentan para el límite las sesiones completadas y canceladas (que se usaron)
+  // Las listas completadas, canceladas o guardadas consumen un uso mensual.
   const sesionesUsadas = sesionesMes.filter(s =>
-    s.estado === EstadoSesion.COMPLETADA || s.estado === EstadoSesion.CANCELADA
+    s.estado === EstadoSesion.COMPLETADA ||
+    s.estado === EstadoSesion.CANCELADA ||
+    s.estado === EstadoSesion.GUARDADA
   ).length;
 
   const limiteAlcanzado = sesionesUsadas >= VALIDACION_SESION.limiteMensual;

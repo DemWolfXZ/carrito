@@ -63,6 +63,29 @@
  * Nota: Las paletas completas están en app/core/styles/paletas.scss
  */
 :root {
+  /**
+   * ============================================================
+   * CONGELAR TEMA A MODO CLARO (CRÍTICO)
+   * ============================================================
+   * Esto IMPIDE que Ionic auto-aplique dark mode cuando SO cambia
+   * Cada TEMA define sus propios colores sin interferencia de Ionic
+   * El TemaService bloquea COMPLETAMENTE cambios del SO
+   */
+  color-scheme: light !important;
+
+  --cc-bg-secondary: #f5f5f5 !important;
+  --cc-text-primary: #1a1a1a !important;
+  --cc-text-secondary: #424242 !important;
+  --cc-text-tertiary: #757575 !important;
+  --cc-border: rgba(0, 0, 0, 0.12) !important;
+  --cc-border-strong: rgba(0, 0, 0, 0.2) !important;
+  --cc-overlay: rgba(0, 0, 0, 0.04) !important;
+  --cc-overlay-strong: rgba(0, 0, 0, 0.08) !important;
+
+  /**
+   * VARIABLES COMPATIBILIDAD CON APP EXISTENTE
+   * (mantiene los nombres antiguos apuntando a los nuevos)
+   */
   --app-background: #ffffff !important;
   --app-text-primary: #1a1a1a !important;
   --app-text-secondary: #424242 !important;
@@ -109,6 +132,18 @@ body {
   padding-top: max(env(safe-area-inset-top), 0px);
   padding-left: max(env(safe-area-inset-left), 0px);
   padding-right: max(env(safe-area-inset-right), 0px);
+}
+
+/* Los componentes deben heredar el tema seleccionado, no el del sistema. */
+ion-app,
+ion-content,
+ion-page,
+main,
+section,
+article,
+h1, h2, h3, h4, h5, h6,
+p, span, label {
+  color: var(--app-text-primary);
 }
 
 /**
@@ -223,6 +258,59 @@ ion-alert {
   --background: var(--app-modal-background) !important;
   --text-color: var(--app-text-primary) !important;
   --box-shadow: var(--app-shadow-xl) !important;
+}
+
+ion-alert.alert-editar-producto {
+  .alert-message {
+    white-space: pre-line !important;
+    color: var(--app-text-primary) !important;
+    font-weight: 600;
+  }
+
+  .alert-sub-title {
+    color: var(--app-text-secondary) !important;
+    font-size: 13px !important;
+  }
+
+  .alert-input {
+    color: var(--app-text-primary) !important;
+    background: var(--app-input-background) !important;
+    border-color: var(--app-border-color-strong) !important;
+  }
+}
+
+ion-modal.modal-editar-producto {
+  --width: min(92vw, 420px);
+  --height: min(80vh, 520px);
+  --max-height: 90vh;
+  --border-radius: 16px;
+
+  .campo-edicion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+
+    ion-label {
+      color: var(--app-text-primary) !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+    }
+
+    ion-input {
+      --background: var(--app-input-background) !important;
+      --color: var(--app-text-primary) !important;
+      --placeholder-color: var(--app-text-tertiary) !important;
+      --border-color: var(--app-border-color-strong) !important;
+    }
+  }
+
+  .acciones-edicion {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+  }
 }
 
 ion-tabs {
@@ -961,4 +1049,276 @@ ion-searchbar {
 
 ion-refresher-content {
   color: var(--app-text-primary) !important;
+}
+
+/**
+ * ============================================================
+ * GARANTIZAR APLICACION DE TEMAS DE ACCESIBILIDAD
+ * ============================================================
+ */
+
+body.high-contrast,
+body.theme-high-contrast {
+  --ion-color-primary: #000000 !important;
+  --ion-color-primary-contrast: #ffff00 !important;
+  --ion-color-success: #003300 !important;
+  --ion-color-success-contrast: #ffff00 !important;
+  --ion-color-warning: #660000 !important;
+  --ion-color-warning-contrast: #ffff00 !important;
+  --ion-color-danger: #330000 !important;
+  --ion-color-danger-contrast: #ffff00 !important;
+  --ion-background-color: #ffffff !important;
+  --ion-text-color: #000000 !important;
+
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.daltonism-safe,
+body.theme-daltonism-safe {
+  --ion-color-primary: #e74c3c !important;
+  --ion-color-primary-contrast: #ffffff !important;
+  --ion-color-success: #27ae60 !important;
+  --ion-color-success-contrast: #ffffff !important;
+  --ion-color-warning: #f39c12 !important;
+  --ion-color-warning-contrast: #ffffff !important;
+  --ion-color-danger: #d35400 !important;
+  --ion-color-danger-contrast: #ffffff !important;
+  --ion-color-secondary: #1abc9c !important;
+  --ion-color-secondary-contrast: #ffffff !important;
+  --ion-background-color: #ecf0f1 !important;
+  --ion-text-color: #2c3e50 !important;
+
+  background-color: #ecf0f1 !important;
+  color: #2c3e50 !important;
+}
+
+/**
+ * ============================================================
+ * PROTECCIÓN CONTRA MODO OSCURO DEL SISTEMA
+ * TEMAS DE ACCESIBILIDAD NUNCA HEREDAN dark.class.css
+ * ============================================================
+ *
+ * Estos estilos garantizan que:
+ * 1. Los temas de accesibilidad NO SE VEN AFECTADOS por dark mode
+ * 2. Ionic's dark.class.css es anulado para estos temas
+ * 3. Los colores accesibles permanecen consistentes en cualquier
+ *    configuración del sistema operativo (Android/iOS)
+ */
+
+body.high-contrast,
+body.theme-high-contrast {
+  /* Anular cualquier efecto de dark.class.css */
+  color-scheme: light !important;
+
+  /* Forzar colores Ionic base para modo claro */
+  --ion-background-color: #ffffff !important;
+  --ion-background-color-rgb: 255, 255, 255 !important;
+  --ion-text-color: #000000 !important;
+  --ion-text-color-rgb: 0, 0, 0 !important;
+  --ion-border-color: #c8c7cc !important;
+  --app-button-background: #000000 !important;
+  --app-button-text: #ffff00 !important;
+  --app-button-border: #000000 !important;
+  --app-button-hover: #333333 !important;
+  --app-button-active: #000000 !important;
+
+  /* Asegurar que las paletas oscuras de Ionic NO se apliquen */
+  --ion-color-step-50: #fff !important;
+  --ion-color-step-100: #f2f2f2 !important;
+  --ion-color-step-150: #e6e6e6 !important;
+  --ion-color-step-200: #d9d9d9 !important;
+  --ion-color-step-250: #cccccc !important;
+  --ion-color-step-300: #bfbfbf !important;
+  --ion-color-step-350: #b2b2b2 !important;
+  --ion-color-step-400: #a6a6a6 !important;
+  --ion-color-step-450: #999 !important;
+  --ion-color-step-500: #8c8c8c !important;
+  --ion-color-step-550: #808080 !important;
+  --ion-color-step-600: #737373 !important;
+  --ion-color-step-650: #666 !important;
+  --ion-color-step-700: #595959 !important;
+  --ion-color-step-750: #4d4d4d !important;
+  --ion-color-step-800: #404040 !important;
+  --ion-color-step-850: #333 !important;
+  --ion-color-step-900: #262626 !important;
+  --ion-color-step-950: #0d0d0d !important;
+}
+
+body.daltonism-safe,
+body.theme-daltonism-safe {
+  /* Anular cualquier efecto de dark.class.css */
+  color-scheme: light !important;
+
+  /* Forzar colores Ionic base para modo claro */
+  --ion-background-color: #ecf0f1 !important;
+  --ion-background-color-rgb: 236, 240, 241 !important;
+  --ion-text-color: #2c3e50 !important;
+  --ion-text-color-rgb: 44, 62, 80 !important;
+  --ion-border-color: #bdc3c7 !important;
+  --app-button-background: #0072b2 !important;
+  --app-button-text: #ffffff !important;
+  --app-button-border: #004c78 !important;
+  --app-button-hover: #004c78 !important;
+  --app-button-active: #003b5f !important;
+
+  /* Asegurar que las paletas oscuras de Ionic NO se apliquen */
+  --ion-color-step-50: #f9f9f9 !important;
+  --ion-color-step-100: #f2f2f2 !important;
+  --ion-color-step-150: #ecf0f1 !important;
+  --ion-color-step-200: #e0e6e8 !important;
+  --ion-color-step-250: #d4dce0 !important;
+  --ion-color-step-300: #c8d1d8 !important;
+  --ion-color-step-350: #bcc7d0 !important;
+  --ion-color-step-400: #b0bcc8 !important;
+  --ion-color-step-450: #a4b2c0 !important;
+  --ion-color-step-500: #98a8b8 !important;
+  --ion-color-step-550: #8c9eb0 !important;
+  --ion-color-step-600: #8094a8 !important;
+  --ion-color-step-650: #748aa0 !important;
+  --ion-color-step-700: #688098 !important;
+  --ion-color-step-750: #5c7690 !important;
+  --ion-color-step-800: #506c88 !important;
+  --ion-color-step-850: #446280 !important;
+  --ion-color-step-900: #385878 !important;
+  --ion-color-step-950: #2c3e50 !important;
+}
+
+/**
+ * ============================================================
+ * PROTECCIÓN TOTAL CONTRA IONIC DARK MODE
+ * ============================================================
+ * Estos estilos RECHAZAN COMPLETAMENTE dark.class.css
+ * para temas de accesibilidad aplicando color-scheme: light
+ * en el elemento HTML raíz, lo que es MÁS FUERTE que el CSS
+ */
+
+html:has(body.high-contrast),
+html:has(body.theme-high-contrast),
+html:has(body.daltonism-safe),
+html:has(body.theme-daltonism-safe) {
+  color-scheme: light !important;
+}
+
+/**
+ * Componentes Ionic - Protección adicional para temas accesibles
+ * Evitar que hereden valores de dark mode del sistema
+ */
+
+body.high-contrast,
+body.theme-high-contrast,
+body.daltonism-safe,
+body.theme-daltonism-safe {
+  /* Rechazar completamente dark mode a nivel HTML */
+  color-scheme: light !important;
+
+  /* Anular la clase dark de Ionic si se aplica */
+  &.dark {
+    color-scheme: light !important;
+    background-color: var(--ion-background-color) !important;
+    color: var(--ion-text-color) !important;
+  }
+
+  /* Alertas */
+  ion-alert {
+    --background: var(--ion-background-color) !important;
+    --text-color: var(--ion-text-color) !important;
+  }
+
+  /* Modal */
+  ion-modal {
+    --background: var(--ion-background-color) !important;
+  }
+
+  /* Popover */
+  ion-popover {
+    --background: var(--ion-background-color) !important;
+  }
+
+  /* Menu */
+  ion-menu {
+    --background: var(--ion-background-color) !important;
+  }
+
+  /* Toolbar */
+  ion-toolbar {
+    --background: var(--ion-background-color) !important;
+    --color: var(--ion-text-color) !important;
+  }
+
+  /* Tab Bar */
+  ion-tab-bar {
+    --background: var(--ion-background-color) !important;
+    --color: var(--ion-text-color) !important;
+  }
+
+  /* Content */
+  ion-content {
+    --background: var(--ion-background-color) !important;
+  }
+
+  /* Input */
+  ion-input {
+    --background: var(--ion-color-step-100) !important;
+    --color: var(--ion-text-color) !important;
+  }
+
+  /* Textarea */
+  ion-textarea {
+    --background: var(--ion-color-step-100) !important;
+    --color: var(--ion-text-color) !important;
+  }
+
+  /* Select */
+  ion-select {
+    --background: var(--ion-color-step-100) !important;
+    --color: var(--ion-text-color) !important;
+  }
+
+  /* Item */
+  ion-item {
+    --background: var(--ion-background-color) !important;
+    --color: var(--ion-text-color) !important;
+  }
+
+  /* Card */
+  ion-card {
+    --background: var(--ion-color-step-50) !important;
+  }
+
+  /* Spinner */
+  ion-spinner {
+    --color: var(--ion-color-primary) !important;
+  }
+}
+
+/**
+ * ============================================================
+ * BLOQUEO FINAL: Rechazar COMPLETAMENTE la clase .dark de Ionic
+ * ============================================================
+ * Aunque Ionic intente agregar .dark a body, esto lo rechaza
+ * Los colores vienen del tema seleccionado en variables.scss
+ */
+body.dark {
+  color-scheme: light !important;
+  /* Revertir TODOS los tokens a valores claros */
+  --app-background: #ffffff !important;
+  --app-text-primary: #1a1a1a !important;
+  --app-text-secondary: #424242 !important;
+  --app-text-tertiary: #757575 !important;
+  --app-border-color: rgba(0, 0, 0, 0.12) !important;
+  --app-border-color-strong: rgba(0, 0, 0, 0.2) !important;
+  --app-overlay-bg: rgba(0, 0, 0, 0.04) !important;
+  --app-overlay-bg-strong: rgba(0, 0, 0, 0.08) !important;
+  --app-card-background: #f5f5f5 !important;
+  --app-input-background: #f9f9f9 !important;
+  --app-item-background: #fafafa !important;
+  --app-toolbar-background: #f8f8f8 !important;
+  --app-modal-background: #ffffff !important;
+  --ion-background-color: #ffffff !important;
+  --ion-text-color: #1a1a1a !important;
+  --ion-color-medium: #424242 !important;
+  --ion-item-background: #fafafa !important;
+  --ion-card-background: #f5f5f5 !important;
+  --ion-toolbar-background: #f8f8f8 !important;
 }

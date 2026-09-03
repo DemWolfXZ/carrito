@@ -40,6 +40,7 @@
               <ion-icon name="list-outline"></ion-icon>
               Lista con {{ sesion.productos.length }} producto(s) - Completa los precios
             </p>
+            <p class="vigencia-borrador">{{ formatearVigencia(sesion) }}</p>
           </ion-label>
 
           <ion-badge slot="end" color="warning">
@@ -86,6 +87,28 @@
       </div>
     </ion-list>
 
+  </div>
+
+  <div *ngIf="!cargando && sesionesGuardadas.length > 0" class="borradores-seccion listas-guardadas-seccion">
+    <ion-list-header>
+      <ion-label>
+        <h2>Listas guardadas</h2>
+        <p>Su plazo temporal terminó y cuentan como uso mensual</p>
+      </ion-label>
+    </ion-list-header>
+
+    <ion-list class="acordeon-list">
+      <ion-item *ngFor="let sesion of sesionesGuardadas; trackBy: trackBySesion" class="sesion-item">
+        <ion-icon name="lock-closed-outline" slot="start" color="medium"></ion-icon>
+        <ion-label>
+          <h2>{{ sesion.nombreSupermercado }}</h2>
+          <p>{{ sesion.productos.length }} producto(s) · Lista guardada</p>
+        </ion-label>
+        <ion-note slot="end" color="medium" *ngIf="sesion.presupuestoEstimado">
+          Presupuesto: ${{ sesion.presupuestoEstimado | number:'1.0-0' }}
+        </ion-note>
+      </ion-item>
+    </ion-list>
   </div>
 
   <!-- Mensaje si no hay borradores pero sí hay compras -->

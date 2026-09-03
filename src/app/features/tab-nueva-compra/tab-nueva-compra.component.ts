@@ -2,7 +2,6 @@
  * Componente Tab Nueva Compra
  * Gestiona la creación de listas de compra con:
  * - Agregar productos (nombre, cantidad, precio)
- * - Fotos de productos (cámara/galería con compresión)
  * - Cálculo automático de totales
  * - Límite de 20 productos por lista
  * - Validación de 2 listas máximas por mes
@@ -13,9 +12,7 @@
 
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, ActionSheetController, ToastController, LoadingController } from '@ionic/angular';
-// TODO: Implementar cámara al final
-// import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { AlertController, ToastController, LoadingController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 // Importar servicios
@@ -36,8 +33,6 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
 // Configuración y límites (usando constantes del modelo)
   readonly MAX_PRODUCTOS = VALIDACION_SESION.productos.maximo;
   readonly MAX_LISTAS_MES = VALIDACION_SESION.limiteMensual;
-  readonly MAX_FOTO_SIZE_MB = 5;
-  readonly FOTO_QUALITY = 60;
 
   // Sesión activa
   sesionActiva: SesionCompra | null = null;
@@ -65,7 +60,13 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
     cantidad: 1,
     precioUnitario: 0
   };
-  fotoTemporal: string = ''; // Foto temporal antes de crear producto
+
+  productoEditando: Producto | null = null;
+  edicionProducto = {
+    nombre: '',
+    cantidad: 1,
+    precioUnitario: 0
+  };
 
   // Estados UI
   cargando: boolean = false;
@@ -73,6 +74,8 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
   listasCreadasEsteMes: number = 0;
   mesActual: string = ''; // Para mostrar en la UI
   proximoMes: string = ''; // Para mostrar cuándo se reinicia el límite
+  tiempoRestanteTemporal: number | null = null;
+  private temporizadorVigencia: number | null = null;
 
   // Subscripciones
   private subscriptions = new Subscription();
@@ -80,7 +83,6 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private alertController: AlertController,
-    private actionSheetController: ActionSheetController,
     private toastController: ToastController,
     private loadingController: LoadingController,
     private comprasService: ComprasService,
@@ -96,6 +98,58 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+    this.detenerCuentaRegresiva();
+  }
+
+  private iniciarCuentaRegresiva(): void {
+    this.detenerCuentaRegresiva();
+    void this.actualizarCuentaRegresiva();
+    if (this.comprasService.obtenerTiempoRestanteBorrador(this.sesionActiva!) === null) return;
+
+    this.temporizadorVigencia = window.setInterval(() => {
+      void this.actualizarCuentaRegresiva();
+    }, 1000);
+  }
+
+  private detenerCuentaRegresiva(): void {
+    if (this.temporizadorVigencia !== null) {
+      window.clearInterval(this.temporizadorVigencia);
+      this.temporizadorVigencia = null;
+    }
+  }
+
+  private async actualizarCuentaRegresiva(): Promise<void> {
+    if (!this.sesionActiva) {
+      this.tiempoRestanteTemporal = null;
+      this.detenerCuentaRegresiva();
+      return;
+    }
+
+    this.tiempoRestanteTemporal = this.comprasService.obtenerTiempoRestanteBorrador(this.sesionActiva);
+    if (this.tiempoRestanteTemporal === 0) {
+      await this.comprasService.verificarVigenciaSesiones();
+      this.detenerCuentaRegresiva();
+      this.tiempoRestanteTemporal = null;
+      this.productos = [];
+      this.sesionActiva = null;
+      this.presupuestoEstimado = 0;
+      await this.mostrarToast('La lista superó las 48 horas y quedó guardada.', 'warning');
+      await this.router.navigate(['/pantalla-principal/historial']);
+    }
+  }
+
+  get mensajeVigenciaTemporal(): string {
+    if (this.tiempoRestanteTemporal === null) return '';
+    const totalSegundos = Math.ceil(this.tiempoRestanteTemporal / 1000);
+    const horasTotales = Math.floor(totalSegundos / 3600);
+    const minutos = Math.floor(totalSegundos / 60);
+    const segundos = totalSegundos % 60;
+
+    if (horasTotales >= 25) return 'Te quedan 2 días para completar esta lista temporal.';
+    if (horasTotales >= 12) return 'Te queda 1 día para completar esta lista temporal.';
+    if (horasTotales >= 1) return `Te quedan ${horasTotales} ${horasTotales === 1 ? 'hora' : 'horas'} para completar esta lista temporal.`;
+    if (minutos > 0) return `Te quedan ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'} para completar esta lista temporal.`;
+    return `Te quedan ${segundos} ${segundos === 1 ? 'segundo' : 'segundos'} para completar esta lista temporal.`;
   }
 
   /**
@@ -141,7 +195,9 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
       if (this.sesionActiva) {
         console.log('✅ Sesión activa encontrada:', this.sesionActiva.nombreSupermercado);
         this.productos = [...this.sesionActiva.productos];
+        this.presupuestoEstimado = this.sesionActiva.presupuestoEstimado ?? 0;
         this.calcularTotal();
+        this.iniciarCuentaRegresiva();
       } else {
         console.log('🆕 No hay sesión activa');
       }
@@ -335,8 +391,20 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
    * Editar producto existente
    */
   async editarProducto(producto: Producto): Promise<void> {
+    this.productoEditando = producto;
+    this.edicionProducto = {
+      nombre: producto.nombre,
+      cantidad: producto.cantidad,
+      precioUnitario: producto.precioUnitario
+    };
+    return;
+
+    /*
     const alert = await this.alertController.create({
       header: 'Editar Producto',
+      subHeader: 'Actualiza los datos del producto',
+      message: 'Campos a editar:\n1. Nombre del producto\n2. Cantidad\n3. Precio unitario',
+      cssClass: 'alert-editar-producto',
       inputs: [
         {
           name: 'nombre',
@@ -464,95 +532,49 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
     });
 
     await alert.present();
-  }
-
-  /**
-   * Mostrar opciones para agregar foto
-   * TODO: Implementar cámara al final
-   */
-  async agregarFoto(): Promise<void> {
-    await this.mostrarToast('Funcionalidad de cámara pendiente de implementar', 'warning');
-    // TODO: Descomentar cuando se instale @capacitor/camera
-    /*
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Agregar foto',
-      buttons: [
-        {
-          text: 'Tomar foto',
-          icon: 'camera',
-          handler: () => {
-            this.tomarFoto(CameraSource.Camera);
-          }
-        },
-        {
-          text: 'Elegir de galería',
-          icon: 'images',
-          handler: () => {
-            this.tomarFoto(CameraSource.Photos);
-          }
-        },
-        {
-          text: 'Cancelar',
-          icon: 'close',
-          role: 'cancel'
-        }
-      ]
-    });
-    await actionSheet.present();
     */
   }
 
-  /**
-   * Capturar foto con la cámara o galería
-   * TODO: Implementar cuando se instale @capacitor/camera
-   */
-  private async tomarFoto(source: any): Promise<void> {
-    await this.mostrarToast('Funcionalidad de cámara pendiente', 'warning');
-    // TODO: Descomentar cuando se instale @capacitor/camera
-    /*
-    try {
-      const loading = await this.loadingController.create({
-        message: source === CameraSource.Camera ? 'Abriendo cámara...' : 'Cargando imagen...'
-      });
-      await loading.present();
+  cerrarEdicionProducto(): void {
+    this.productoEditando = null;
+  }
 
-      const image = await Camera.getPhoto({
-        quality: this.FOTO_QUALITY,
-        allowEditing: true,
-        resultType: CameraResultType.Base64,
-        source: source,
-        width: 800,
-        height: 800
-      });
-
-      await loading.dismiss();
-
-      const imagenBase64 = `data:image/jpeg;base64,${image.base64String}`;
-      const tamañoMB = (imagenBase64.length * 0.75) / (1024 * 1024);
-
-      if (tamañoMB > this.MAX_FOTO_SIZE_MB) {
-        await this.mostrarToast(`La foto es muy grande (${tamañoMB.toFixed(1)}MB). Máximo ${this.MAX_FOTO_SIZE_MB}MB`, 'warning');
-        return;
-      }
-
-      await this.mostrarToast('Foto agregada', 'success');
-      console.log(`📸 Foto capturada - Tamaño: ${tamañoMB.toFixed(2)}MB`);
-
-    } catch (error: any) {
-      await this.loadingController.dismiss();
-      if (error.message !== 'User cancelled photos app') {
-        console.error('Error al capturar foto:', error);
-        await this.mostrarToast('Error al capturar foto', 'danger');
-      }
+  async guardarEdicionProducto(): Promise<void> {
+    if (!this.productoEditando || !this.edicionProducto.nombre.trim()) {
+      await this.mostrarToast('El nombre del producto es obligatorio', 'warning');
+      return;
     }
-    */
-  }
 
-  /**
-   * Eliminar foto del formulario
-   */
-  eliminarFoto(): void {
-    // TODO: Limpiar foto cuando se implemente en modelo
+    const cantidad = Number(this.edicionProducto.cantidad);
+    const precioUnitario = Number(this.edicionProducto.precioUnitario);
+    if (!Number.isInteger(cantidad) || cantidad < 1) {
+      await this.mostrarToast('La cantidad debe ser mayor a 0', 'warning');
+      return;
+    }
+    if (isNaN(precioUnitario) || precioUnitario < 0) {
+      await this.mostrarToast('El precio no puede ser negativo', 'warning');
+      return;
+    }
+
+    const actualizado = await this.comprasService.actualizarProducto(this.productoEditando.id, {
+      nombre: this.edicionProducto.nombre.trim(),
+      cantidad,
+      precioUnitario
+    });
+
+    if (!actualizado) {
+      await this.mostrarToast('Error al actualizar producto', 'danger');
+      return;
+    }
+
+    this.sesionActiva = await this.comprasService.obtenerSesionActiva();
+    if (this.sesionActiva) {
+      this.productos = this.sesionActiva.productos.map(p => ({ ...p }));
+      this.calcularTotal();
+      this.changeDetector.markForCheck();
+    }
+    this.cerrarEdicionProducto();
+    await this.mostrarToast('Producto actualizado', 'success');
   }
 
   /**
@@ -569,22 +591,16 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
     // Verificar si hay productos sin precio o cantidad
     const productosIncompletos = this.productos.some(p => !p.precioUnitario || p.precioUnitario === 0 || !p.cantidad);
 
-    // Si hay productos incompletos, mostrar opción flexible
-    if (productosIncompletos) {
-      await this.mostrarAlertaGuardarIncompleta();
-    } else {
-      // Si todos los productos están completos, finalizar directamente
-      await this.procesarGuardado(false);
-    }
+    await this.mostrarOpcionesGuardado(productosIncompletos);
   }
 
   /**
    * Mostrar alerta cuando hay productos incompletos
    * Permite guardar la lista para completarla en la tienda
    */
-  private async mostrarAlertaGuardarIncompleta(): Promise<void> {
-    const productosIncompletos = this.productos.filter(p => !p.esCompleto).length;
-    const productosCompletos = this.productos.length - productosIncompletos;
+  private async mostrarOpcionesGuardado(hayProductosIncompletos: boolean): Promise<void> {
+    const cantidadProductosIncompletos = this.productos.filter(p => !p.esCompleto).length;
+    const productosCompletos = this.productos.length - cantidadProductosIncompletos;
 
     const presupuestoText = this.presupuestoEstimado > 0
       ? `\n💰 Presupuesto: $${this.presupuestoEstimado.toLocaleString()}`
@@ -607,8 +623,10 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
     `;
 
     const alert = await this.alertController.create({
-      header: '📋 Guardar Lista Incompleta',
-      subHeader: `${productosIncompletos} artículo(s) sin precio · ${productosCompletos} artículo(s) completo(s)`,
+      header: '📋 Guardar lista',
+      subHeader: hayProductosIncompletos
+        ? `${cantidadProductosIncompletos} artículo(s) sin precio · Se guardará como temporal`
+        : 'Todos los artículos están completos · Puedes finalizar o guardar temporalmente',
       message: message.trim(),
       cssClass: 'alert-guardar-incompleta',
       buttons: [
@@ -618,12 +636,19 @@ export class TabNuevaCompraComponent implements OnInit, OnDestroy {
           cssClass: 'btn-volver'
         },
         {
-          text: '✓ Guardar Lista',
+          text: '📌 Guardar temporal',
           handler: async () => {
             await this.procesarGuardado(true);
           },
           cssClass: 'btn-guardar'
-        }
+        },
+        ...(!hayProductosIncompletos ? [{
+          text: '✓ Finalizar compra',
+          handler: async () => {
+            await this.procesarGuardado(false);
+          },
+          cssClass: 'btn-finalizar'
+        }] : [])
       ]
     });
 

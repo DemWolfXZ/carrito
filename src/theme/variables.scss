@@ -185,3 +185,386 @@ body.dark {
   --ion-tab-bar-background: #1f2937;
   --ion-tab-bar-border-color: #374151;
 }
+
+// ============================================
+// TEMA ALTO CONTRASTE
+// ============================================
+body.high-contrast {
+  // Colores principales - Blanco y negro puro para máximo contraste
+  --ion-color-primary: #000000;
+  --ion-color-primary-rgb: 0, 0, 0;
+  --ion-color-primary-contrast: #ffff00;
+  --ion-color-primary-contrast-rgb: 255, 255, 0;
+  --ion-color-primary-shade: #000000;
+  --ion-color-primary-tint: #333333;
+
+  // Color secundario - Negro con amarillo
+  --ion-color-secondary: #000000;
+  --ion-color-secondary-rgb: 0, 0, 0;
+  --ion-color-secondary-contrast: #ffff00;
+  --ion-color-secondary-contrast-rgb: 255, 255, 0;
+  --ion-color-secondary-shade: #000000;
+  --ion-color-secondary-tint: #333333;
+
+  // Color terciario
+  --ion-color-tertiary: #ffffff;
+  --ion-color-tertiary-rgb: 255, 255, 255;
+  --ion-color-tertiary-contrast: #000000;
+  --ion-color-tertiary-contrast-rgb: 0, 0, 0;
+  --ion-color-tertiary-shade: #cccccc;
+  --ion-color-tertiary-tint: #ffffff;
+
+  // Success - Verde oscuro + amarillo
+  --ion-color-success: #003300;
+  --ion-color-success-rgb: 0, 51, 0;
+  --ion-color-success-contrast: #ffff00;
+  --ion-color-success-contrast-rgb: 255, 255, 0;
+  --ion-color-success-shade: #000000;
+  --ion-color-success-tint: #1a4d1a;
+
+  // Warning - Rojo oscuro + amarillo
+  --ion-color-warning: #660000;
+  --ion-color-warning-rgb: 102, 0, 0;
+  --ion-color-warning-contrast: #ffff00;
+  --ion-color-warning-contrast-rgb: 255, 255, 0;
+  --ion-color-warning-shade: #330000;
+  --ion-color-warning-tint: #990000;
+
+  // Danger - Rojo oscuro + amarillo
+  --ion-color-danger: #330000;
+  --ion-color-danger-rgb: 51, 0, 0;
+  --ion-color-danger-contrast: #ffff00;
+  --ion-color-danger-contrast-rgb: 255, 255, 0;
+  --ion-color-danger-shade: #000000;
+  --ion-color-danger-tint: #660000;
+
+  // Light - Blanco puro
+  --ion-color-light: #ffffff;
+  --ion-color-light-rgb: 255, 255, 255;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #e6e6e6;
+  --ion-color-light-tint: #ffffff;
+
+  // Medium - Gris oscuro
+  --ion-color-medium: #333333;
+  --ion-color-medium-rgb: 51, 51, 51;
+  --ion-color-medium-contrast: #ffff00;
+  --ion-color-medium-contrast-rgb: 255, 255, 0;
+  --ion-color-medium-shade: #000000;
+  --ion-color-medium-tint: #4d4d4d;
+
+  // Dark - Negro puro
+  --ion-color-dark: #000000;
+  --ion-color-dark-rgb: 0, 0, 0;
+  --ion-color-dark-contrast: #ffff00;
+  --ion-color-dark-contrast-rgb: 255, 255, 0;
+  --ion-color-dark-shade: #000000;
+  --ion-color-dark-tint: #1a1a1a;
+
+  // Backgrounds y superficies
+  --ion-background-color: #ffffff;
+  --ion-background-color-rgb: 255, 255, 255;
+  --ion-text-color: #000000;
+  --ion-text-color-rgb: 0, 0, 0;
+  --ion-card-background: #ffffff;
+
+  // Borders - Negro grueso
+  --ion-border-color: #000000;
+  --ion-item-background: #ffffff;
+
+  // Toolbar y header
+  --ion-toolbar-background: #000000;
+  --ion-toolbar-border-color: #000000;
+  --ion-toolbar-color: #ffff00;
+
+  // Tab bar
+  --ion-tab-bar-background: #000000;
+  --ion-tab-bar-border-color: #ffff00;
+
+  // Headers profesionales
+  h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+
+  // Botones profesionales
+  ion-button {
+    font-weight: bold;
+    font-size: 1rem;
+    --border-radius: 24px;
+    --border-width: 2px;
+    --border-style: solid;
+    --border-color: #000000;
+
+    &[color="primary"] {
+      --background: #000000;
+      --color: #ffff00;
+      --border-color: #000000;
+    }
+
+    &[color="success"] {
+      --background: #003300;
+      --color: #ffff00;
+      --border-color: #003300;
+    }
+
+    &[color="danger"] {
+      --background: #330000;
+      --color: #ffff00;
+      --border-color: #330000;
+    }
+  }
+
+  // Input y campos de texto
+  ion-input, ion-textarea {
+    --background: #ffffff;
+    --color: #000000;
+    --border-color: #000000 !important;
+    border: 2px solid #000000 !important;
+    border-radius: 8px;
+  }
+
+  // Cards y contenedores
+  ion-card {
+    background: #ffffff;
+    border: 2px solid #000000;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  // Items de lista
+  ion-item {
+    --background: #ffffff;
+    --color: #000000;
+    border-bottom: 1px solid #000000;
+    --border-color: #000000;
+  }
+
+  // Toolbar profesional
+  ion-toolbar {
+    --background: #000000;
+    --color: #ffff00;
+    --border-color: #000000;
+    border-bottom: 2px solid #ffff00;
+  }
+}
+
+// ============================================
+// TEMA PARA DALTÓNICOS - OKABE-ITO COLOR UNIVERSAL DESIGN
+// ============================================
+// Colores científicamente validados por Okabe & Ito (2008)
+// Estos colores son distinguibles para TODOS, incluyendo:
+// - Protanopia (ceguera al rojo)
+// - Deuteranopia (ceguera al verde)
+// - Tritanopia (ceguera al azul-amarillo)
+//
+// Referencia: https://jfly.uni-koeln.de/color/
+body.daltonism-safe {
+  // Paleta Okabe-Ito oficial - Colores primarios
+  // Black #000000 (omitido, usado por defecto)
+  // Orange #E69F00
+  // Light Blue #56B4E9 (Blue)
+  // Green #009E73
+  // Yellow #F0E442
+  // Blue #0072B2
+  // Red #D55E00
+  // Purple #CC79A7
+
+  // Color primario - Rojo Okabe-Ito (D55E00)
+  --ion-color-primary: #D55E00;
+  --ion-color-primary-rgb: 213, 94, 0;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #B84A00;
+  --ion-color-primary-tint: #DA7319;
+
+  // Color secundario - Naranja Okabe-Ito (E69F00)
+  --ion-color-secondary: #E69F00;
+  --ion-color-secondary-rgb: 230, 159, 0;
+  --ion-color-secondary-contrast: #000000;
+  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary-shade: #C88400;
+  --ion-color-secondary-tint: #EAB019;
+
+  // Color terciario - Azul claro Okabe-Ito (56B4E9)
+  --ion-color-tertiary: #56B4E9;
+  --ion-color-tertiary-rgb: 86, 180, 233;
+  --ion-color-tertiary-contrast: #000000;
+  --ion-color-tertiary-contrast-rgb: 0, 0, 0;
+  --ion-color-tertiary-shade: #4A9CCC;
+  --ion-color-tertiary-tint: #6FBCEC;
+
+  // Success - Verde Okabe-Ito (009E73)
+  --ion-color-success: #009E73;
+  --ion-color-success-rgb: 0, 158, 115;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #008660;
+  --ion-color-success-tint: #1BA882;
+
+  // Warning - Amarillo Okabe-Ito (F0E442)
+  --ion-color-warning: #F0E442;
+  --ion-color-warning-rgb: 240, 228, 66;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #D4C939;
+  --ion-color-warning-tint: #F2E860;
+
+  // Danger - Rojo Okabe-Ito oscuro (D55E00 más oscuro)
+  --ion-color-danger: #B84A00;
+  --ion-color-danger-rgb: 184, 74, 0;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #A03F00;
+  --ion-color-danger-tint: #BF6219;
+
+  // Light - Muy claro
+  --ion-color-light: #F5F5F5;
+  --ion-color-light-rgb: 245, 245, 245;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #DCDCDC;
+  --ion-color-light-tint: #F7F7F7;
+
+  // Medium - Gris neutro
+  --ion-color-medium: #888888;
+  --ion-color-medium-rgb: 136, 136, 136;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #737373;
+  --ion-color-medium-tint: #949494;
+
+  // Dark - Azul oscuro Okabe-Ito (0072B2)
+  --ion-color-dark: #0072B2;
+  --ion-color-dark-rgb: 0, 114, 178;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #006399;
+  --ion-color-dark-tint: #1A82BC;
+
+  // Backgrounds y superficies
+  --ion-background-color: #FFFFFF;
+  --ion-background-color-rgb: 255, 255, 255;
+  --ion-text-color: #000000;
+  --ion-text-color-rgb: 0, 0, 0;
+  --ion-card-background: #FFFFFF;
+
+  // Borders y separadores
+  --ion-border-color: #DDDDDD;
+  --ion-item-background: #FFFFFF;
+
+  // Toolbar y header - Azul oscuro Okabe-Ito
+  --ion-toolbar-background: #0072B2;
+  --ion-toolbar-border-color: #E69F00;
+  --ion-toolbar-color: #ffffff;
+
+  // Tab bar
+  --ion-tab-bar-background: #FFFFFF;
+  --ion-tab-bar-border-color: #DDDDDD;
+
+  // Headers profesionales
+  h1, h2, h3, h4, h5, h6 {
+    color: #0072B2 !important;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+
+  // Botones profesionales con patrones
+  ion-button {
+    font-weight: bold;
+    font-size: 1rem;
+    --border-radius: 24px;
+    --border-width: 1px;
+    --border-style: solid;
+    --border-color: transparent;
+
+    &[color="primary"] {
+      --background: #D55E00;
+      --color: #ffffff;
+      --border-color: #B84A00;
+    }
+
+    &[color="success"] {
+      --background: #009E73;
+      --color: #ffffff;
+      --border-color: #008660;
+    }
+
+    &[color="danger"] {
+      --background: #B84A00;
+      --color: #ffffff;
+      --border-color: #A03F00;
+    }
+
+    &[color="warning"] {
+      --background: #F0E442;
+      --color: #000000;
+      --border-color: #D4C939;
+    }
+  }
+
+  // Input y campos de texto
+  ion-input, ion-textarea {
+    --background: #FFFFFF;
+    --color: #000000;
+    --border-color: #DDDDDD !important;
+    border: 1px solid #DDDDDD !important;
+    border-radius: 8px;
+  }
+
+  // Cards y contenedores
+  ion-card {
+    background: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  // Items de lista
+  ion-item {
+    --background: #FFFFFF;
+    --color: #000000;
+    border-bottom: 1px solid #F0F0F0;
+    --border-color: #DDDDDD;
+  }
+
+  // Toolbar profesional
+  ion-toolbar {
+    --background: #0072B2;
+    --color: #ffffff;
+    --border-color: #E69F00;
+    border-bottom: 2px solid #E69F00;
+  }
+
+  // Patrones visuales adicionales para máxima diferenciación
+  // Estos patrones ayudan incluso si alguien tiene visión reducida
+  ion-button[color="primary"]::after {
+    content: "█";
+    font-size: 0.5em;
+    margin-left: 4px;
+    opacity: 0.6;
+  }
+
+  ion-button[color="success"]::after {
+    content: "●";
+    font-size: 0.8em;
+    margin-left: 4px;
+    opacity: 0.6;
+  }
+
+  ion-button[color="danger"]::after {
+    content: "▲";
+    font-size: 0.8em;
+    margin-left: 4px;
+    opacity: 0.6;
+  }
+
+  ion-button[color="warning"]::after {
+    content: "◆";
+    font-size: 0.8em;
+    margin-left: 4px;
+    opacity: 0.6;
+  }
+}

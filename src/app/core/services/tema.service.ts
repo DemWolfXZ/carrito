@@ -8,8 +8,10 @@ export class TemaService {
   private readonly TEMA_CLARO = 'claro';
   private readonly TEMA_OSCURO = 'oscuro';
   private readonly TEMA_AUTOMATICO = 'automatico';
+  private readonly TEMA_ALTO_CONTRASTE = 'high-contrast';
+  private readonly TEMA_DALTONICO = 'daltonism-safe';
 
-  private readonly TEMAS_DISPONIBLES = ['claro', 'oscuro', 'azul', 'azul-elegante', 'azul-oscuro', 'morado', 'morado-oscuro', 'rosado', 'rosado-oscuro', 'verde', 'verde-oscuro'];
+  private readonly TEMAS_DISPONIBLES = ['claro', 'oscuro', 'azul', 'azul-elegante', 'azul-oscuro', 'morado', 'morado-oscuro', 'rosado', 'rosado-oscuro', 'verde', 'verde-oscuro', 'high-contrast', 'daltonism-safe'];
 
   private temaActualSubject = new BehaviorSubject<string>(this.TEMA_CLARO);
   private modoTemaSubject = new BehaviorSubject<string>(this.TEMA_AUTOMATICO);
@@ -50,15 +52,37 @@ export class TemaService {
     try {
       this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       this.listener = (e: MediaQueryListEvent) => {
-        if (this.modoTemaSubject.value === this.TEMA_AUTOMATICO) {
+        const temaActual = this.modoTemaSubject.value;
+
+        console.log('📱 TemaService: Sistema operativo cambió preferencia dark mode:', e.matches);
+        console.log('📱 TemaService: Modo tema actual:', temaActual);
+        console.log('📱 TemaService: Tema visual actual:', this.temaActualSubject.value);
+
+        // REGLA 1: Si el tema actual es de accesibilidad, RECHAZAR COMPLETAMENTE el cambio
+        if (['high-contrast', 'daltonism-safe'].includes(this.temaActualSubject.value)) {
+          console.log(`🔒 TemaService: BLOQUEADO - Tema de accesibilidad activo: "${this.temaActualSubject.value}"`);
+          console.log('🔒 TemaService: El sistema operativo NO puede cambiar temas de accesibilidad');
+          return;
+        }
+
+        // REGLA 2: Si modo es AUTOMÁTICO y tema es normal, permitir cambio
+        if (temaActual === this.TEMA_AUTOMATICO) {
           const tema = e.matches ? this.TEMA_OSCURO : this.TEMA_CLARO;
-          console.log('🎨 TemaService: Tema del sistema cambió a:', tema);
+          console.log('🎨 TemaService: Modo automático - aplicando tema del sistema:', tema);
           this.aplicarTema(tema);
+        } else {
+          // REGLA 3: Si el usuario seleccionó un tema manualmente, RECHAZAR cambios del SO
+          console.log('🔒 TemaService: BLOQUEADO - Usuario seleccionó tema manual, SO no puede interferir');
+          console.log('🔒 TemaService: Tema seleccionado: "' + this.temaActualSubject.value + '"');
         }
       };
+
       if (this.mediaQuery) {
         this.mediaQuery.addEventListener('change', this.listener);
-        console.log('🎨 TemaService: Listener de sistema configurado');
+        console.log('✅ TemaService: Listener del SO configurado con protecciones');
+        console.log('   - Temas accesibilidad: BLOQUEADOS COMPLETAMENTE');
+        console.log('   - Temas manuales: BLOQUEADOS COMPLETAMENTE');
+        console.log('   - Modo automático: PERMITIDO');
       }
     } catch (error) {
       console.error('❌ TemaService: Error al configurar listener:', error);
@@ -78,15 +102,30 @@ export class TemaService {
         return;
       }
 
+      // Limpiar todas las clases de tema anteriores
       document.documentElement.removeAttribute('data-theme');
       document.body.classList.remove('dark');
-      this.TEMAS_DISPONIBLES.forEach(t => document.body.classList.remove(`theme-${t}`));
+      this.TEMAS_DISPONIBLES.forEach(t => {
+        document.body.classList.remove(`theme-${t}`);
+        document.body.classList.remove(t);
+      });
 
+      // Aplicar nuevo tema
       document.documentElement.setAttribute('data-theme', tema);
+      document.body.classList.add(tema);
       document.body.classList.add(`theme-${tema}`);
 
-      if (tema.includes('oscuro')) {
+      // PROTECCIÓN: Los temas de accesibilidad NUNCA obtienen la clase 'dark'
+      // Esto previene que Ionic dark.class.css afecte los colores
+      const esTemaNormal = !['high-contrast', 'daltonism-safe'].includes(tema);
+      if (tema.includes('oscuro') && esTemaNormal) {
         document.body.classList.add('dark');
+      }
+
+      // Asegurar que no exista la clase dark para temas accesibles
+      if (['high-contrast', 'daltonism-safe'].includes(tema)) {
+        document.body.classList.remove('dark');
+        console.log('🔒 TemaService: Tema de accesibilidad protegido - clase dark rechazada:', tema);
       }
 
       this.temaEfectivoSubject.next(tema);
@@ -163,6 +202,8 @@ export class TemaService {
       'rosado-oscuro': { nombre: 'Rosado Oscuro', descripcion: 'Elegancia en tonos oscuros', icono: 'heart-outline', categoria: 'cromático' },
       'verde': { nombre: 'Verde', descripcion: 'Natural y equilibrado', icono: 'leaf', categoria: 'cromático' },
       'verde-oscuro': { nombre: 'Verde Oscuro', descripcion: 'Bosque profundo y tranquilo', icono: 'leaf', categoria: 'cromático' },
+      'high-contrast': { nombre: 'Alto Contraste', descripcion: 'Negro #000000 + Amarillo #ffff00. Contraste 19.56:1 (WCAG AAA). Para personas con baja visión o astigmatismo. 100% protegido del dark mode del SO.', icono: 'contrast', categoria: 'accesibilidad' },
+      'daltonism-safe': { nombre: 'Daltónico-Seguro', descripcion: 'Paleta Okabe-Ito (2008). Colores: Rojo #D55E00, Naranja #E69F00, Azul #56B4E9, Verde #009E73, Amarillo #F0E442. Científicamente validado para Protanopia, Deuteranopia y Tritanopia. Con patrones visuales (█●▲◆). 100% protegido del dark mode del SO.', icono: 'accessibility', categoria: 'accesibilidad' },
       'automatico': { nombre: 'Automático', descripcion: 'Sigue la preferencia del sistema', icono: 'sunny', categoria: 'sistema' }
     };
     return infoTemas[tema] || null;

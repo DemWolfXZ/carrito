@@ -1,6 +1,6 @@
 /**
  * Módulo del tab Nueva Compra
- * Permite crear listas de compra con productos, fotos y cálculos automáticos
+ * Permite crear listas de compra con productos y cálculos automáticos
  *
  * @author DemWolf
  * @version 1.0

@@ -79,7 +79,11 @@ export enum TemaVisual {
 
   // Temas cromáticos - variantes verde
   VERDE = 'verde',                    // Verde bosque (natural)
-  VERDE_OSCURO = 'verde-oscuro'       // Verde oscuro (natural nocturno)
+  VERDE_OSCURO = 'verde-oscuro',      // Verde oscuro (natural nocturno)
+
+  // Temas de accesibilidad
+  ALTO_CONTRASTE = 'high-contrast',
+  DALTONISMO_SEGURO = 'daltonism-safe'
 }
 
 // Modos de tema (automático o manual)

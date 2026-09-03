@@ -11,7 +11,7 @@ interface OptionTema {
   descripcion: string;
   icono: string;
   activo: boolean;
-  categoria: 'sistema' | 'acromático' | 'cromático';
+  categoria: 'sistema' | 'acromático' | 'cromático' | 'accesibilidad';
 }
 
 @Component({
@@ -127,6 +127,23 @@ export class ConfiguradorTemaComponent implements OnInit, OnDestroy {
       icono: 'leaf',
       activo: false,
       categoria: 'cromático'
+    },
+    // ACCESIBILIDAD
+    {
+      id: 'high-contrast',
+      label: 'Alto Contraste',
+      descripcion: 'Máximo contraste para baja visión',
+      icono: 'contrast-outline',
+      activo: false,
+      categoria: 'accesibilidad'
+    },
+    {
+      id: 'daltonism-safe',
+      label: 'Accesible (Daltónicos)',
+      descripcion: 'Diseñado para personas con daltonismo',
+      icono: 'eye-outline',
+      activo: false,
+      categoria: 'accesibilidad'
     }
   ];
 

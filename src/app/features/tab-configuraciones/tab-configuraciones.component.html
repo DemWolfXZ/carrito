@@ -1,135 +1,6 @@
 <div class="tab-configuraciones-content">
 
-  <!-- Sección de Apariencia -->
-  <ion-list>
-    <ion-list-header>
-      <ion-label color="primary">
-        <ion-icon name="color-palette-outline"></ion-icon>
-        Apariencia
-      </ion-label>
-    </ion-list-header>
-  </ion-list>
-
-  <!-- Componente de Configurador de Tema -->
-  <app-configurador-tema></app-configurador-tema>
-
-  <!-- Sección de Usuario -->
-  <ion-list>
-    <ion-list-header>
-      <ion-label color="primary">
-        <ion-icon name="person-outline"></ion-icon>
-        Usuario
-      </ion-label>
-    </ion-list-header>
-
-    <ion-item button (click)="cambiarNombrePerfil()">
-      <ion-icon name="person-circle-outline" slot="start" color="medium"></ion-icon>
-      <ion-label>
-        <h2>Mi Perfil</h2>
-        <p>{{ nombreUsuario || 'Cambiar nombre de perfil' }}</p>
-      </ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
-    </ion-item>
-
-    <ion-item button (click)="cambiarPais()">
-      <ion-icon name="location-outline" slot="start" color="medium"></ion-icon>
-      <ion-label>
-        <h2>País</h2>
-        <p *ngIf="paisActual">{{ paisActual.nombre }} ({{ paisActual.simboloMoneda }})</p>
-        <p *ngIf="!paisActual">Seleccionar país</p>
-      </ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
-    </ion-item>
-  </ion-list>
-
-  <!-- Sección de Información -->
-  <ion-list>
-    <ion-list-header>
-      <ion-label color="primary">
-        <ion-icon name="information-circle-outline"></ion-icon>
-        Información
-      </ion-label>
-    </ion-list-header>
-
-    <ion-item button (click)="mostrarAyuda()">
-      <ion-icon name="help-circle-outline" slot="start" color="medium"></ion-icon>
-      <ion-label>
-        <h2>Ayuda</h2>
-        <p>¿Qué hace el sistema?</p>
-      </ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
-    </ion-item>
-
-    <ion-item button (click)="mostrarTerminos()">
-      <ion-icon name="document-text-outline" slot="start" color="medium"></ion-icon>
-      <ion-label>
-        <h2>Términos y Condiciones</h2>
-        <p>Sistema gratuito con opción de donación</p>
-      </ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
-    </ion-item>
-
-    <ion-item button (click)="mostrarAcercaDe()">
-      <ion-icon name="information-outline" slot="start" color="medium"></ion-icon>
-      <ion-label>
-        <h2>Acerca de Carrito</h2>
-        <p>Versión 1.0.0 - By DemWolf 🇨🇱</p>
-      </ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
-    </ion-item>
-  </ion-list>
-
-  <!-- Card: ¿Por qué usar Carrito? -->
-  <ion-list>
-    <ion-list-header>
-      <ion-label color="primary">
-        <ion-icon name="lightbulb-outline"></ion-icon>
-        ¿Por qué usar Carrito?
-      </ion-label>
-    </ion-list-header>
-
-    <ion-item class="info-item">
-      <ion-label class="beneficio-label">
-        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-        <div>
-          <h3>Control Total de Gastos</h3>
-          <p>Visualiza en tiempo real el total de tu compra para no pasarte del presupuesto</p>
-        </div>
-      </ion-label>
-    </ion-item>
-
-    <ion-item class="info-item">
-      <ion-label class="beneficio-label">
-        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-        <div>
-          <h3>Nunca Olvides Nada</h3>
-          <p>Anota todos los productos que necesitas en una lista organizada antes de ir al supermercado</p>
-        </div>
-      </ion-label>
-    </ion-item>
-
-    <ion-item class="info-item">
-      <ion-label class="beneficio-label">
-        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-        <div>
-          <h3>Adiós a la Calculadora</h3>
-          <p>Ingresa nombre, precio y cantidad - la app calcula automáticamente los totales</p>
-        </div>
-      </ion-label>
-    </ion-item>
-
-    <ion-item class="info-item">
-      <ion-label class="beneficio-label">
-        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-        <div>
-          <h3>Decisiones Inteligentes</h3>
-          <p>Sabe exactamente qué compras y cuánto gastas. Toma decisiones conscientes de tu dinero</p>
-        </div>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-
-  <!-- Sección de Donaciones -->
+  <!-- Sección de Donaciones (al inicio) -->
   <ion-list>
     <ion-list-header>
       <ion-label color="primary">
@@ -156,6 +27,144 @@
       <ion-icon name="heart" slot="start"></ion-icon>
       Hacer una Donación
     </ion-button>
+  </ion-list>
+
+  <!-- Sección de Apariencia -->
+  <ion-list class="list-apariencia">
+    <ion-list-header>
+      <ion-label color="primary">
+        <ion-icon name="color-palette-outline"></ion-icon>
+        Apariencia
+      </ion-label>
+    </ion-list-header>
+
+    <!-- Componente de Configurador de Tema -->
+    <div class="configurador-tema-wrapper">
+      <app-configurador-tema></app-configurador-tema>
+    </div>
+  </ion-list>
+
+  <!-- Sección de Usuario -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label color="primary">
+        <ion-icon name="person-outline"></ion-icon>
+        Usuario
+      </ion-label>
+    </ion-list-header>
+
+    <ion-item button detail="false" (click)="cambiarNombrePerfil()">
+      <ion-icon name="person-circle-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>
+        <h2>Mi Perfil</h2>
+        <p>{{ nombreUsuario || 'Cambiar nombre de perfil' }}</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+    </ion-item>
+
+    <ion-item button detail="false" (click)="cambiarPais()">
+      <ion-icon name="location-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>
+        <h2>País</h2>
+        <p *ngIf="paisActual">{{ paisActual.nombre }} ({{ paisActual.simboloMoneda }})</p>
+        <p *ngIf="!paisActual">Seleccionar país</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <!-- Sección de Información -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label color="primary">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        Información
+      </ion-label>
+    </ion-list-header>
+
+    <ion-item button detail="false" (click)="mostrarAyuda()">
+      <ion-icon name="help-circle-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>
+        <h2>Ayuda</h2>
+        <p>¿Qué hace el sistema?</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+    </ion-item>
+
+    <ion-item button detail="false" (click)="mostrarTerminos()">
+      <ion-icon name="document-text-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>
+        <h2>Términos y Condiciones</h2>
+        <p>Sistema gratuito con opción de donación</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+    </ion-item>
+
+    <ion-item button detail="false" (click)="mostrarAcercaDe()">
+      <ion-icon name="information-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>
+        <h2>Acerca de CarritoControl</h2>
+        <p>Versión 1.0.0 - By DemWolf 🇨🇱</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <!-- Card: ¿Por qué usar Carrito? (COLAPSABLE) -->
+  <ion-list>
+    <ion-item button detail="false" (click)="mostrarBeneficios = !mostrarBeneficios" class="list-header-button">
+      <ion-label color="primary">
+        <ion-icon name="lightbulb-outline"></ion-icon>
+        ¿Por qué usar CarritoControl?
+      </ion-label>
+      <ion-icon
+        [name]="mostrarBeneficios ? 'chevron-up-outline' : 'chevron-down-outline'"
+        color="primary"
+        slot="end">
+      </ion-icon>
+    </ion-item>
+
+    <div *ngIf="mostrarBeneficios" class="beneficios-container">
+      <ion-item class="info-item">
+        <ion-label class="beneficio-label">
+          <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+          <div>
+            <h3>Control Total de Gastos</h3>
+            <p>Visualiza en tiempo real el total de tu compra para no pasarte del presupuesto</p>
+          </div>
+        </ion-label>
+      </ion-item>
+
+      <ion-item class="info-item">
+        <ion-label class="beneficio-label">
+          <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+          <div>
+            <h3>Nunca Olvides Nada</h3>
+            <p>Anota todos los productos que necesitas en una lista organizada antes de ir al supermercado</p>
+          </div>
+        </ion-label>
+      </ion-item>
+
+      <ion-item class="info-item">
+        <ion-label class="beneficio-label">
+          <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+          <div>
+            <h3>Adiós a la Calculadora</h3>
+            <p>Ingresa nombre, precio y cantidad - la app calcula automáticamente los totales</p>
+          </div>
+        </ion-label>
+      </ion-item>
+
+      <ion-item class="info-item">
+        <ion-label class="beneficio-label">
+          <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+          <div>
+            <h3>Decisiones Inteligentes</h3>
+            <p>Sabe exactamente qué compras y cuánto gastas. Toma decisiones conscientes de tu dinero</p>
+          </div>
+        </ion-label>
+      </ion-item>
+    </div>
   </ion-list>
 
 </div>

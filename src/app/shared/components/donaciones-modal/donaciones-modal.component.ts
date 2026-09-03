@@ -1,72 +1,134 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, ToastController, LoadingController } from '@ionic/angular';
-import { DonacionesService, OpcionDonacion } from '../../../core/services/donaciones.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ModalController, ToastController } from '@ionic/angular';
+import { DonacionesService, OpcionDonacion, ResultadoPago } from '../../../core/services/donaciones.service';
+import { UsuarioService } from '../../../core/services/usuario.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-donaciones-modal',
   templateUrl: './donaciones-modal.component.html',
   styleUrls: ['./donaciones-modal.component.scss']
 })
-export class DonacionesModalComponent implements OnInit {
-  @Input() titulo: string = 'Apoyo a la App';
-  @Input() mensaje: string = 'Si quieres apoyar el desarrollo, puedes hacer una donación voluntaria.';
+export class DonacionesModalComponent implements OnInit, OnDestroy {
 
   opcionesDonacion: OpcionDonacion[] = [];
   procesando: boolean = false;
+  montoSeleccionado: number | null = null;
+  resultadoPago: ResultadoPago | null = null;
+  monedaLocal = 'CLP';
+  simboloMonedaLocal = '$';
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private modalController: ModalController,
     private donacionesService: DonacionesService,
-    private toastController: ToastController,
-    private loadingController: LoadingController
-  ) { }
+    private usuarioService: UsuarioService,
+    private toastController: ToastController
+  ) {}
 
   ngOnInit(): void {
+    console.log('✅ DonacionesModalComponent - ngOnInit');
     this.opcionesDonacion = this.donacionesService.getOpcionesDonacion();
+    void this.cargarMonedaLocal();
+    console.log('💰 Opciones de donación cargadas:', this.opcionesDonacion);
+
+    // Suscribirse a cambios de estado
+    this.subscriptions.push(
+      this.donacionesService.getLoadingPago().subscribe(loading => {
+        this.procesando = loading;
+      })
+    );
+
+    this.subscriptions.push(
+      this.donacionesService.getResultadoPago().subscribe(resultado => {
+        this.resultadoPago = resultado;
+        if (resultado && resultado.exito) {
+          console.log('✅ Donación exitosa:', resultado.transaccionId);
+          this.mostrarToast('¡Gracias por tu donación! 🎉', 'success');
+        } else if (resultado && !resultado.exito) {
+          console.warn('⚠️ Error en donación:', resultado.error);
+          this.mostrarToast(resultado.error || 'Error procesando donación', 'danger');
+        }
+      })
+    );
   }
 
-  async procesarDonacion(opcion: OpcionDonacion): Promise<void> {
-    this.procesando = true;
-
-    const loading = await this.loadingController.create({
-      message: `Procesando donación de $${opcion.monto}...`
-    });
-    await loading.present();
-
-    try {
-      await this.donacionesService.procesarDonacion(opcion.monto);
-
-      await loading.dismiss();
-
-      const toast = await this.toastController.create({
-        message: `¡Gracias por tu donación de $${opcion.monto}! 🙏`,
-        duration: 3000,
-        position: 'top',
-        color: 'success'
-      });
-      await toast.present();
-
-      // Cerrar modal después de 2 segundos
-      setTimeout(() => {
-        this.cerrarModal();
-      }, 2000);
-
-    } catch (error) {
-      await loading.dismiss();
-
-      const toast = await this.toastController.create({
-        message: 'Error al procesar la donación. Intenta de nuevo.',
-        duration: 3000,
-        position: 'top',
-        color: 'danger'
-      });
-      await toast.present();
-
-      this.procesando = false;
+  private async cargarMonedaLocal(): Promise<void> {
+    const usuario = await this.usuarioService.obtenerUsuarioActual();
+    if (usuario) {
+      this.monedaLocal = usuario.moneda || 'CLP';
+      const informacion = this.donacionesService.obtenerInformacionMoneda(this.monedaLocal);
+      this.simboloMonedaLocal = informacion.simbolo;
     }
   }
 
-  cerrarModal(): void {
-    this.modalController.dismiss();
+  obtenerConversion(opcion: OpcionDonacion): string {
+    const usd = opcion.monto / 950;
+    const local = this.donacionesService.convertirDesdeClp(opcion.monto, this.monedaLocal);
+    const valorLocal = new Intl.NumberFormat('es-CL', {
+      maximumFractionDigits: this.monedaLocal === 'CLP' ? 0 : 2
+    }).format(local);
+
+    if (this.monedaLocal === 'CLP') {
+      return `Aprox. US$${usd.toFixed(2)}`;
+    }
+    return `Aprox. US$${usd.toFixed(2)} · ${this.simboloMonedaLocal}${valorLocal}`;
+  }
+
+  /**
+   * Usuario selecciona un monto de donación
+   */
+  async seleccionarMonto(opcion: OpcionDonacion): Promise<void> {
+    this.procesando = true;
+    const abierto = await this.donacionesService.abrirEnlaceDonacion(opcion);
+    this.procesando = false;
+    if (abierto) {
+      await this.mostrarToast('Mercado Pago se abrió para completar la donación.', 'success');
+    }
+  }
+
+  /**
+   * Volver a la pantalla de opciones
+   */
+  volverAOpciones(): void {
+    console.log('◄ Volviendo a opciones de donación');
+    this.resultadoPago = null;
+    this.montoSeleccionado = null;
+  }
+
+  /**
+   * Cerrar modal
+   */
+  async cerrarModal(): Promise<void> {
+    console.log('✖ Cerrando modal de donaciones');
+    await this.modalController.dismiss();
+  }
+
+  /**
+   * Mostrar toast con mensaje
+   */
+  private async mostrarToast(mensaje: string, color: string = 'primary'): Promise<void> {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 3000,
+      position: 'bottom',
+      color: color,
+      buttons: [
+        {
+          text: '✕',
+          role: 'cancel'
+        }
+      ]
+    });
+    await toast.present();
+  }
+
+  /**
+   * Limpiar suscripciones
+   */
+  ngOnDestroy(): void {
+    console.log('🧹 Limpiando suscripciones de DonacionesModalComponent');
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }
