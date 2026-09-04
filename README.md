@@ -4,414 +4,682 @@
 
 ### Tus compras bajo control
 
-Aplicación móvil para Android desarrollada con **Ionic + Angular + Capacitor**, diseñada para crear listas de compra, registrar productos, controlar un presupuesto en tiempo real y mantener un historial detallado de las compras realizadas.
+Aplicación móvil para Android diseñada para organizar compras, controlar presupuestos en tiempo real y mantener un historial detallado de gastos.
 
 <br>
 
-[![Android](https://img.shields.io/badge/Android-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DemWolfXZ/carrito/raw/refs/heads/main/Carrito%20Control.apk)
-[![Ionic](https://img.shields.io/badge/Ionic-8.4.3-3880FF?style=for-the-badge&logo=ionic&logoColor=white)](https://ionicframework.com/)
-[![Angular](https://img.shields.io/badge/Angular-18-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
-[![Capacitor](https://img.shields.io/badge/Capacitor-7.4.4-119EFF?style=for-the-badge&logo=capacitor&logoColor=white)](https://capacitorjs.com/)
+![Ionic](https://img.shields.io/badge/Ionic-8-3880FF?style=for-the-badge&logo=ionic&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-18-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Capacitor](https://img.shields.io/badge/Capacitor-7-119EFF?style=for-the-badge&logo=capacitor&logoColor=white)
+![Android](https://img.shields.io/badge/Android-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 
 <br>
 
-### 📲 APK disponible para Android
+## 📲 Probar CarritoControl
 
-[**⬇️ DESCARGAR CARRITOCONTROL APK**](https://github.com/DemWolfXZ/carrito/raw/refs/heads/main/Carrito%20Control.apk)
+La versión actual puede instalarse directamente en dispositivos Android.
+
+[![Descargar APK](https://img.shields.io/badge/⬇️_DESCARGAR-CARRITOCONTROL_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DemWolfXZ/carrito/raw/refs/heads/main/Carrito%20Control.apk)
 
 </div>
 
 ---
 
-## 📱 Sobre CarritoControl
+# 📱 ¿Qué es CarritoControl?
 
-**CarritoControl** nace como una aplicación pensada para ayudar a organizar las compras de una manera sencilla y visual.
+**CarritoControl** es una aplicación móvil creada para facilitar la organización de compras y ayudar a mantener un mayor control sobre el dinero utilizado durante ellas.
 
-La aplicación permite preparar una lista antes de ir a comprar y posteriormente completar cantidades y precios mientras se realiza la compra, manteniendo en todo momento un control sobre el presupuesto disponible.
+La idea parte de una situación cotidiana: muchas veces una lista de compras permite recordar qué necesitamos, pero no necesariamente nos ayuda a saber cuánto llevamos gastado mientras estamos comprando.
 
-El objetivo principal es responder de manera sencilla a preguntas como:
+CarritoControl combina ambas necesidades:
 
+```text
+Lista de compras
+        +
+Control de presupuesto
+        +
+Registro de productos
+        +
+Historial
+        +
+Estadísticas
+```
+
+El objetivo es poder responder rápidamente preguntas como:
+
+- ¿Qué productos necesito comprar?
+- ¿Cuánto dinero tengo disponible?
 - ¿Cuánto llevo gastado?
 - ¿Cuánto presupuesto me queda?
-- ¿Qué productos tengo pendientes?
-- ¿Cuántas unidades compré?
+- ¿Cuántos productos diferentes compré?
+- ¿Cuántas unidades compré en total?
 - ¿Cuánto terminé pagando?
-- ¿Qué compré en ocasiones anteriores?
-
-Todo desde una aplicación móvil centrada en una experiencia de uso rápida, clara y adaptable.
+- ¿Qué compré anteriormente?
 
 ---
 
-# ✨ Características principales
+# ✨ Funcionalidades principales
 
 ## 🛒 Creación de compras
 
-Cada compra permite registrar información como:
+La aplicación permite iniciar una compra registrando información como:
 
-- Fecha de la compra.
-- Lugar o supermercado.
-- Presupuesto estimado.
-- Productos que se desea comprar.
-- Cantidad de cada producto.
-- Precio unitario.
+- 📅 Fecha.
+- 🏪 Lugar o supermercado.
+- 💰 Presupuesto estimado.
 
-El nombre del producto es el único dato obligatorio al crear inicialmente una lista, permitiendo preparar la compra antes de llegar al establecimiento y completar precios o cantidades posteriormente.
+Una vez creada la compra, es posible comenzar a incorporar los productos que se necesitan.
 
 ---
 
-## 💰 Control de presupuesto
+## 📋 Preparación de listas
 
-CarritoControl permite establecer un presupuesto para cada compra.
+CarritoControl permite utilizar la aplicación tanto **antes de realizar la compra** como durante ella.
 
-Durante la compra se calcula automáticamente:
+El nombre del producto puede registrarse inicialmente sin necesidad de completar inmediatamente su precio.
 
-- **Gasto acumulado**.
-- **Presupuesto total**.
-- **Saldo disponible**.
-- **Porcentaje del presupuesto utilizado**.
+Esto permite preparar previamente una lista como:
 
-Esto permite visualizar de manera inmediata cuánto dinero se ha gastado y cuánto queda disponible.
+```text
+Leche
+Arroz
+Pan
+Huevos
+Carne
+```
+
+y posteriormente completar cantidades y precios directamente durante la compra.
 
 ---
 
-## 📦 Gestión de productos
+# 💰 Control de presupuesto
 
-Los productos pueden incorporar:
+Una de las principales funcionalidades de CarritoControl es el seguimiento del presupuesto.
 
-- Nombre.
-- Cantidad.
-- Precio unitario.
-- Total calculado según cantidad y precio.
+Durante la compra la aplicación calcula automáticamente:
 
-También es posible:
-
-- ➕ Agregar productos.
-- ✏️ Editarlos.
-- 🗑️ Eliminarlos.
-- Actualizar cantidades.
-- Completar precios durante la compra.
-
-La aplicación diferencia entre **productos distintos** e **ítems totales**.
+- **Gasto acumulado**
+- **Presupuesto total**
+- **Saldo disponible**
+- **Porcentaje del presupuesto utilizado**
 
 Por ejemplo:
 
 ```text
-Leche   5 unidades
-Arroz   4 unidades
-Pan     1 unidad
+Presupuesto total:     $30.000
+Gasto acumulado:        $7.500
+Saldo disponible:      $22.500
 
+Presupuesto utilizado: 25 %
+```
+
+La información se actualiza a medida que se agregan o modifican productos.
+
+---
+
+# 📦 Gestión de productos
+
+Cada producto puede incluir:
+
+- Nombre.
+- Cantidad.
+- Precio unitario.
+- Precio total calculado.
+
+Por ejemplo:
+
+```text
+Leche
+
+Cantidad: 5
+Precio unitario: $1.500
+
+Total: $7.500
+```
+
+La aplicación permite además:
+
+- ➕ Agregar productos.
+- ✏️ Editar productos.
+- 🗑️ Eliminar productos.
+- Modificar cantidades.
+- Completar precios posteriormente.
+
+---
+
+## 📊 Productos vs. ítems
+
+CarritoControl diferencia entre **productos diferentes** y la **cantidad total de unidades compradas**.
+
+Ejemplo:
+
+```text
+Leche    5 unidades
+Arroz    4 unidades
+Pan      1 unidad
+```
+
+Resultado:
+
+```text
 Productos diferentes: 3
 Ítems totales: 10
 ```
 
+Esto permite obtener un resumen más preciso de cada compra.
+
 ---
 
-## 📌 Listas temporales
+# 📌 Guardado temporal
 
-Una compra puede guardarse temporalmente sin necesidad de finalizarla inmediatamente.
+Una compra no tiene que finalizarse inmediatamente.
 
-Esto permite preparar una lista con anticipación y continuar trabajando sobre ella posteriormente.
+CarritoControl permite guardar una lista temporalmente para continuar trabajando en ella posteriormente.
 
-El flujo permite:
+El flujo puede ser:
 
 ```text
-Crear lista
-    ↓
+Crear compra
+     ↓
 Agregar productos
-    ↓
+     ↓
 Guardar temporalmente
-    ↓
-Continuar la compra
-    ↓
-Completar precios y cantidades
-    ↓
+     ↓
+Ir al supermercado
+     ↓
+Completar cantidades y precios
+     ↓
+Controlar presupuesto
+     ↓
 Finalizar compra
 ```
 
----
-
-## ✅ Finalización de compras
-
-Cuando todos los datos están preparados, la compra puede marcarse como finalizada.
-
-Una vez completada pasa al historial, donde queda almacenada junto con su información y productos.
+Esto permite utilizar la misma aplicación tanto para **planificación** como para **registro en tiempo real**.
 
 ---
 
-## 📜 Historial de compras
+# ✅ Finalización de compras
 
-CarritoControl dispone de un historial donde se pueden consultar compras anteriores.
+Cuando la compra ha terminado, puede marcarse como completada.
 
-Cada registro puede mostrar:
+La información pasa al historial y queda disponible para futuras consultas.
 
-- Supermercado o lugar.
+Una compra finalizada puede conservar información como:
+
+- Lugar.
 - Fecha.
-- Horario de la compra.
-- Ubicación configurada.
+- Horario.
+- Ubicación.
+- Productos.
+- Cantidades.
+- Precios.
+- Total pagado.
+- Estadísticas.
+
+---
+
+# 📜 Historial de compras
+
+CarritoControl incorpora un historial donde se pueden consultar las compras realizadas anteriormente.
+
+Cada registro muestra un resumen general y permite visualizar el detalle completo.
+
+Entre la información disponible se encuentra:
+
+- 🏪 Lugar de compra.
+- 📅 Fecha.
+- 🕐 Hora.
+- 📍 Ubicación.
+- 📦 Cantidad de productos.
+- 🧱 Cantidad de ítems.
+- 💵 Total pagado.
+
+También es posible consultar nuevamente todos los productos pertenecientes a la compra.
+
+---
+
+# 📊 Estadísticas
+
+Las compras completadas generan estadísticas básicas que ayudan a comprender mejor lo comprado.
+
+Actualmente pueden mostrarse datos como:
+
+### 💰 Producto más caro
+
+Identifica el producto con mayor precio unitario registrado.
+
+### 📦 Producto más comprado
+
+Identifica el producto cuya cantidad fue mayor dentro de la compra.
+
+### 🧮 Resumen general
+
+La aplicación también entrega:
+
 - Cantidad de productos diferentes.
-- Cantidad total de ítems.
+- Cantidad total de unidades.
 - Total pagado.
-- Productos comprados.
-- Cantidad comprada.
-- Precio unitario.
-- Total por producto.
 
 ---
 
-## 📊 Estadísticas
+# 🌎 País y moneda
 
-Las compras completadas generan información adicional para facilitar su análisis.
+CarritoControl permite seleccionar el país donde reside el usuario.
 
-Entre los datos mostrados se encuentran:
+La aplicación utiliza esta información para adaptar la representación monetaria.
 
-- Producto más caro.
-- Producto del que se compró mayor cantidad.
-- Número de productos.
-- Número total de ítems.
-- Total pagado.
+La interfaz muestra:
 
-Esto permite que el historial no sea solamente una lista de compras, sino también una forma rápida de entender cómo se distribuyó el gasto.
+- Bandera.
+- País.
+- Código de moneda.
+- Símbolo monetario.
+- Ejemplo del formato utilizado.
 
----
-
-## 🌎 País y moneda
-
-CarritoControl permite seleccionar el país de residencia para adaptar la visualización monetaria.
-
-La aplicación dispone de una interfaz de selección con información como:
+Por ejemplo:
 
 ```text
-País
-Bandera
-Código de moneda
-Símbolo monetario
-Ejemplo de formato
+Chile
+
+Moneda: $ CLP
+Ejemplo: $1,234
 ```
 
-Esto permite adaptar la experiencia a diferentes monedas y formatos regionales.
+La aplicación contempla diferentes países y monedas de Latinoamérica.
 
 ---
 
-## 🎨 Personalización visual
+# 🎨 Personalización visual
 
-La aplicación incorpora distintos temas para modificar su apariencia.
+CarritoControl incorpora diferentes temas para personalizar la apariencia de la aplicación.
 
-Entre las variantes disponibles se encuentran diferentes estilos basados en colores como:
+Entre los estilos disponibles se encuentran variantes como:
 
-- Azul.
-- Azul elegante.
-- Azul oscuro.
-- Morado.
-- Morado oscuro.
-- Rosado.
-- Rosado oscuro.
-- Verde.
-- Verde oscuro.
+- 🔵 Azul.
+- 🌊 Azul elegante.
+- 🌑 Azul oscuro.
+- 🟣 Morado.
+- 🌌 Morado oscuro.
+- 🌸 Rosado.
+- 🌑 Rosado oscuro.
+- 🟢 Verde.
+- 🌲 Verde oscuro.
 
-El objetivo es permitir que el usuario pueda adaptar la apariencia de la aplicación a sus preferencias.
+Cada tema modifica distintos elementos visuales manteniendo la misma estructura funcional de la aplicación.
 
 ---
 
-## ♿ Accesibilidad
+# ♿ Accesibilidad
 
-CarritoControl incluye opciones visuales orientadas a mejorar la accesibilidad.
+La personalización no está enfocada únicamente en estética.
+
+CarritoControl incorpora opciones destinadas específicamente a mejorar la accesibilidad visual.
+
+## ◐ Alto contraste
+
+Tema con mayor diferenciación entre elementos para facilitar la lectura y visualización.
+
+## 👁️ Accesible para daltonismo
+
+Configuración visual diseñada para mejorar la experiencia de personas con distintos tipos de daltonismo.
+
+La aplicación también puede considerar preferencias visuales configuradas en el sistema operativo.
+
+---
+
+# 👤 Perfil y configuración
+
+La aplicación incluye un área de configuración desde donde el usuario puede administrar diferentes preferencias.
 
 Entre ellas:
 
-### ◐ Alto contraste
-
-Tema diseñado para ofrecer mayor diferenciación visual entre los distintos elementos de la interfaz.
-
-### 👁️ Tema accesible para daltonismo
-
-Configuración visual diseñada específicamente para mejorar la identificación de elementos por parte de personas con daltonismo.
-
-La aplicación también puede adaptar determinados elementos visuales según las preferencias configuradas en el sistema operativo.
-
----
-
-## 👤 Perfil del usuario
-
-La aplicación incorpora un área destinada a las preferencias y datos básicos del usuario.
-
-Esto permite personalizar diferentes aspectos de la experiencia dentro de CarritoControl.
+- Perfil.
+- País.
+- Moneda.
+- Apariencia.
+- Accesibilidad.
+- Información de la aplicación.
+- Ayuda.
+- Opciones adicionales.
 
 ---
 
-## 🤝 Donaciones
+# 🤝 Donaciones
 
-El proyecto incluye una sección de apoyo mediante donaciones.
+CarritoControl incorpora una sección destinada a quienes quieran apoyar voluntariamente el proyecto.
 
-El repositorio contiene además documentación relacionada con la implementación segura de un backend para la integración de **PayPal**, separando las credenciales sensibles y operaciones críticas del frontend.
+Para esta funcionalidad se trabajó en una arquitectura que evita gestionar operaciones sensibles directamente desde el frontend.
+
+El proyecto contempla integración mediante un backend independiente para operaciones asociadas a **PayPal**, evitando almacenar credenciales privadas dentro de la aplicación móvil.
 
 ---
 
-# 📱 Capturas de pantalla
+# 📱 Capturas de la aplicación
 
-## Inicio y nueva compra
+## 🚀 Inicio y nueva compra
 
 <p align="center">
-    <img src="capturas/01-splash.jpeg" width="250" alt="Pantalla Splash de CarritoControl">
+    <img src="capturas/01-splash.jpeg" width="250" alt="Pantalla de inicio de CarritoControl">
     &nbsp;&nbsp;
-    <img src="capturas/02-nueva-compra.jpeg" width="250" alt="Nueva compra en CarritoControl">
+    <img src="capturas/02-nueva-compra.jpeg" width="250" alt="Creación de una nueva compra">
     &nbsp;&nbsp;
-    <img src="capturas/03-presupuesto.jpeg" width="250" alt="Control de presupuesto en CarritoControl">
+    <img src="capturas/03-presupuesto.jpeg" width="250" alt="Control de presupuesto de CarritoControl">
 </p>
 
 ---
 
-## Productos y gestión de la compra
+## 🛒 Productos y compra
 
 <p align="center">
-    <img src="capturas/04-productos.jpeg" width="250" alt="Productos de una compra en CarritoControl">
+    <img src="capturas/04-productos.jpeg" width="250" alt="Registro y administración de productos">
     &nbsp;&nbsp;
-    <img src="capturas/05-guardar-compra.jpeg" width="250" alt="Guardar o finalizar una compra">
+    <img src="capturas/05-guardar-compra.jpeg" width="250" alt="Opciones para guardar o finalizar la compra">
 </p>
 
 ---
 
-## Historial y estadísticas
+## 📜 Historial
 
 <p align="center">
-    <img src="capturas/06-historial.jpeg" width="250" alt="Historial de compras">
+    <img src="capturas/06-historial.jpeg" width="250" alt="Historial de compras de CarritoControl">
     &nbsp;&nbsp;
-    <img src="capturas/07-estadisticas.jpeg" width="250" alt="Estadísticas de una compra">
+    <img src="capturas/07-estadisticas.jpeg" width="250" alt="Resumen y estadísticas de una compra">
 </p>
 
 ---
 
-## Personalización y configuración regional
+## 🎨 Personalización y accesibilidad
 
 <p align="center">
-    <img src="capturas/08-temas-accesibilidad.jpeg" width="250" alt="Temas y accesibilidad de CarritoControl">
+    <img src="capturas/08-temas-accesibilidad.jpeg" width="250" alt="Temas y opciones de accesibilidad">
     &nbsp;&nbsp;
-    <img src="capturas/09-pais-moneda.jpeg" width="250" alt="Selección de país y moneda">
+    <img src="capturas/09-pais-moneda.jpeg" width="250" alt="Configuración de país y moneda">
 </p>
 
 ---
 
-# 🛠️ Tecnologías utilizadas
+# 🛠️ Tecnologías
+
+CarritoControl fue desarrollado utilizando tecnologías web modernas combinadas con herramientas para desarrollo móvil Android.
 
 <div align="center">
 
-![Angular](https://img.shields.io/badge/Angular-18.0.0-DD0031?style=flat-square&logo=angular&logoColor=white)
-![Ionic](https://img.shields.io/badge/Ionic_Angular-8.4.3-3880FF?style=flat-square&logo=ionic&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![Capacitor](https://img.shields.io/badge/Capacitor-7.4.4-119EFF?style=flat-square&logo=capacitor&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-18-DD0031?style=flat-square&logo=angular&logoColor=white)
+![Ionic](https://img.shields.io/badge/Ionic-8-3880FF?style=flat-square&logo=ionic&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Capacitor](https://img.shields.io/badge/Capacitor-7-119EFF?style=flat-square&logo=capacitor&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-Native-3DDC84?style=flat-square&logo=android&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?style=flat-square&logo=nodedotjs&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 
 </div>
 
 ### Frontend
 
 ```text
-Angular 18
-Ionic Angular 8
+Ionic
+Angular
 TypeScript
 HTML
 SCSS
 RxJS
 ```
 
-### Aplicación Android
+### Integración móvil
 
 ```text
-Capacitor 7
+Capacitor
 Android
 Java
 Gradle
 ```
 
-### Plugins de Capacitor utilizados
+### Integración y servicios
 
 ```text
-@capacitor/app
-@capacitor/browser
-@capacitor/haptics
-@capacitor/keyboard
-@capacitor/screen-orientation
-@capacitor/splash-screen
-@capacitor/status-bar
+Local Storage
+Capacitor Plugins
+Backend Node.js
+PayPal
 ```
 
 ---
 
-# 🤖 Integración Android mediante Capacitor
+# 📱 Ionic + Angular + Capacitor
 
-CarritoControl utiliza **Capacitor** para transformar la aplicación desarrollada con tecnologías web en una aplicación Android instalable.
+La interfaz y lógica principal fueron desarrolladas utilizando **Angular e Ionic**.
 
-La configuración principal utiliza:
+Posteriormente, **Capacitor** permite integrar la aplicación con funcionalidades propias de Android y generar una aplicación móvil instalable.
+
+La arquitectura general puede representarse de la siguiente manera:
 
 ```text
-App ID:   com.carritocontrol.app
-App Name: CarritoControl
-Web Dir:  www
+              CarritoControl
+                    │
+                    ▼
+              Ionic / Angular
+                    │
+             TypeScript + SCSS
+                    │
+                    ▼
+                Capacitor
+                    │
+                    ▼
+                 Android
+                    │
+                    ▼
+                   APK
 ```
 
-La aplicación también incorpora configuración nativa para controlar aspectos como:
+---
+
+# 🤖 Integración con Android
+
+CarritoControl utiliza Capacitor para comunicarse con la plataforma Android.
+
+El proyecto incluye integración con diferentes funcionalidades nativas, entre ellas:
 
 - Status Bar.
 - Splash Screen.
-- Orientación de pantalla.
 - Keyboard.
 - Haptics.
-- Integración entre Angular y Android.
-- Comportamiento edge-to-edge del sistema.
+- Orientación de pantalla.
+- Browser.
+- Integración WebView.
+- Configuración de pantalla completa.
+- Manejo del área segura del dispositivo.
+
+Parte del comportamiento Android fue personalizado mediante código nativo para adaptar correctamente la interfaz al sistema.
 
 ---
 
-# 🏗️ Arquitectura del proyecto
+# 🏗️ Arquitectura
 
-El código Angular se encuentra organizado separando responsabilidades.
+El proyecto utiliza una estructura que separa las principales responsabilidades de la aplicación.
 
 ```text
-src/
+src/app/
 │
-├── app/
-│   │
-│   ├── core/
-│   │   └── Servicios y lógica central
-│   │
-│   ├── features/
-│   │   └── Funcionalidades principales de la aplicación
-│   │
-│   ├── layout/
-│   │   └── Componentes relacionados con la estructura visual
-│   │
-│   ├── shared/
-│   │   └── Componentes y elementos reutilizables
-│   │
-│   ├── tabs/
-│   │   └── Navegación principal
-│   │
-│   ├── app-routing.module.ts
-│   ├── app.component.ts
-│   └── app.module.ts
+├── core/
 │
-├── assets/
+├── features/
 │
-├── environments/
+├── layout/
 │
-├── theme/
-│
-├── global.scss
-└── main.ts
+├── shared/
+└── tabs/
 ```
 
-Esta separación permite mantener la lógica central, las funcionalidades y los componentes reutilizables organizados de manera independiente.
+### `core/`
+
+Contiene servicios y lógica central utilizados por diferentes partes de la aplicación.
+
+### `features/`
+
+Agrupa las principales funcionalidades.
+
+Por ejemplo:
+
+```text
+Nueva Compra
+Historial
+Configuración
+```
+
+### `shared/`
+
+Contiene elementos reutilizables utilizados en distintos módulos.
+
+### `layout/`
+
+Agrupa elementos relacionados con la estructura visual general.
+
+### `tabs/`
+
+Gestiona la navegación principal de la aplicación.
 
 ---
 
-# 📂 Estructura general del repositorio
+# 💾 Persistencia local
+
+La información principal de CarritoControl se almacena localmente en el dispositivo.
+
+Esto permite conservar:
+
+- Compras.
+- Listas.
+- Productos.
+- Configuraciones.
+- Preferencias.
+
+La funcionalidad principal de la aplicación no depende de mantener una conexión permanente con un servidor externo.
+
+---
+
+# 🔐 Seguridad
+
+El proyecto evita incluir credenciales sensibles directamente dentro del frontend.
+
+En funcionalidades que requieren operaciones privadas, como determinadas integraciones de PayPal, se contempla una separación entre:
+
+```text
+Aplicación Android
+        │
+        ▼
+      Backend
+        │
+        ▼
+Servicio externo
+```
+
+De esta manera, las credenciales privadas pueden mantenerse fuera de la aplicación distribuida al usuario.
+
+---
+
+# 📲 APK para Android
+
+CarritoControl dispone actualmente de una versión compilada para Android.
+
+<div align="center">
+
+## CarritoControl v1.0.0
+
+[![Descargar APK](https://img.shields.io/badge/⬇️_DESCARGAR-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DemWolfXZ/carrito/raw/refs/heads/main/Carrito%20Control.apk)
+
+</div>
+
+> Android puede solicitar autorización para instalar aplicaciones provenientes de fuentes externas a Google Play.
+
+---
+
+# 🎯 Objetivo técnico
+
+Además de resolver una necesidad cotidiana, CarritoControl fue desarrollado como proyecto personal para aplicar conocimientos de desarrollo de software en una aplicación móvil completa.
+
+Durante su desarrollo se trabajó con conceptos como:
+
+- Arquitectura por funcionalidades.
+- Componentes Angular.
+- Servicios.
+- TypeScript.
+- Interfaces.
+- Gestión de estado.
+- Persistencia local.
+- Formularios.
+- Validaciones.
+- Manejo de eventos.
+- Cálculos dinámicos.
+- Diseño responsive.
+- Navegación móvil.
+- Temas dinámicos.
+- Accesibilidad.
+- Integración web/nativa.
+- Plugins de Capacitor.
+- Configuración Android.
+- Java.
+- Generación de APK.
+- Integración con servicios externos.
+
+---
+
+# 🧠 Flujo de la aplicación
+
+```text
+┌───────────────────────────────┐
+│       NUEVA COMPRA            │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ Fecha                         │
+│ Supermercado                  │
+│ Presupuesto                   │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│       AGREGAR PRODUCTOS       │
+│                               │
+│ Nombre                        │
+│ Cantidad                      │
+│ Precio                        │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│    CONTROL DE PRESUPUESTO     │
+│                               │
+│ Gasto acumulado               │
+│ Saldo disponible              │
+│ Porcentaje utilizado          │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│       GUARDAR TEMPORAL        │
+│               o               │
+│       FINALIZAR COMPRA        │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│           HISTORIAL           │
+│                               │
+│ Productos                     │
+│ Ítems                         │
+│ Total pagado                  │
+│ Estadísticas                  │
+└───────────────────────────────┘
+```
+
+---
+
+# 🗂️ Estructura general
 
 ```text
 carrito/
 │
 ├── android/
-│   └── Proyecto Android generado mediante Capacitor
-│
-├── assets/
 │
 ├── capturas/
 │   ├── 01-splash.jpeg
@@ -426,11 +694,16 @@ carrito/
 │
 ├── src/
 │   ├── app/
+│   │   ├── core/
+│   │   ├── features/
+│   │   ├── layout/
+│   │   ├── shared/
+│   │   └── tabs/
+│   │
 │   ├── assets/
 │   ├── environments/
 │   └── theme/
 │
-├── .gitignore
 ├── angular.json
 ├── capacitor.config.ts
 ├── ionic.config.json
@@ -440,338 +713,74 @@ carrito/
 ├── backend-server.js
 ├── backend-package.json
 │
-├── BACKEND_PAYPAL_NODEJS.md
-├── BACKEND_SETUP_TESTING.md
-├── DONACIONES_GUIA.md
-├── PAYPAL_SEGURIDAD.md
-├── PAYPAL_SETUP.md
-│
-├── PROTECCION_TEMAS_ACCESIBILIDAD.md
-├── TEMAS_DOCUMENTACION.md
-├── VALIDACION_TEMAS_ACCESIBILIDAD.md
-│
 ├── Carrito Control.apk
 └── README.md
 ```
 
 ---
 
-# 💾 Persistencia de datos
+# 🚧 Estado del proyecto
 
-La aplicación está diseñada para mantener la información de las compras directamente en el dispositivo.
+**CarritoControl se encuentra actualmente en desarrollo y mejora continua.**
 
-Esto permite trabajar con las listas de compras sin depender permanentemente de una conexión con un servidor externo.
+La aplicación ya dispone de un flujo funcional de compras y puede instalarse mediante APK en Android.
 
----
-
-# 🚀 Ejecutar el proyecto localmente
-
-## Requisitos
-
-Antes de comenzar necesitas tener instalado:
-
-```text
-Node.js
-npm
-Ionic CLI
-Angular CLI
-```
-
-Para desarrollo Android también necesitarás:
-
-```text
-Android Studio
-Android SDK
-Java / JDK compatible
-```
+Las futuras versiones pueden incorporar nuevas herramientas relacionadas con análisis, organización y control de gastos.
 
 ---
 
-## 1. Clonar el repositorio
+# 🔮 Mejoras futuras
 
-```bash
-git clone https://github.com/DemWolfXZ/carrito.git
-```
+Algunas ideas contempladas para futuras versiones:
 
----
-
-## 2. Entrar al proyecto
-
-```bash
-cd carrito
-```
-
----
-
-## 3. Instalar dependencias
-
-```bash
-npm install
-```
-
----
-
-## 4. Ejecutar en navegador
-
-```bash
-ionic serve
-```
-
-La aplicación se abrirá en el navegador utilizando el servidor de desarrollo de Ionic.
-
----
-
-# 📦 Compilar la aplicación
-
-## Compilar Angular / Ionic
-
-```bash
-ionic build
-```
-
----
-
-## Sincronizar con Android
-
-```bash
-npx cap sync android
-```
-
----
-
-## Abrir Android Studio
-
-```bash
-npx cap open android
-```
-
-Desde Android Studio se puede ejecutar la aplicación en:
-
-```text
-Emulador Android
-o
-Dispositivo Android conectado mediante USB
-```
-
----
-
-# 📱 Generar APK
-
-Primero genera la aplicación web:
-
-```bash
-ionic build
-```
-
-Luego sincroniza Capacitor:
-
-```bash
-npx cap sync android
-```
-
-Abre Android Studio:
-
-```bash
-npx cap open android
-```
-
-Desde Android Studio:
-
-```text
-Build
-→ Generate App Bundles or APKs
-→ Generate APKs
-```
-
-Para una versión destinada a distribución se recomienda generar un APK firmado.
-
----
-
-# 📲 Descargar APK
-
-La versión Android compilada está disponible directamente desde este repositorio.
-
-<div align="center">
-
-### CarritoControl v1.0.0
-
-[![Descargar APK](https://img.shields.io/badge/⬇️_DESCARGAR-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DemWolfXZ/carrito/raw/refs/heads/main/Carrito%20Control.apk)
-
-</div>
-
-> **Nota:** Android puede solicitar autorización para instalar aplicaciones provenientes de fuentes externas a Google Play.
-
----
-
-# 🧪 Versión actual
-
-```text
-Aplicación: CarritoControl
-Versión: 1.0.0
-Plataforma: Android
-
-Angular: 18.0.0
-Ionic Angular: 8.4.3
-Capacitor: 7.4.4
-TypeScript: ~5.4.0
-```
-
----
-
-# 🎯 Objetivo del proyecto
-
-CarritoControl busca combinar dos necesidades que normalmente se resuelven por separado:
-
-```text
-LISTA DE COMPRAS
-       +
-CONTROL DE PRESUPUESTO
-       +
-HISTORIAL
-       +
-ESTADÍSTICAS
-       =
-CARRITOCONTROL
-```
-
-La idea no es solamente recordar qué comprar, sino conocer cuánto se está gastando mientras se realiza la compra.
-
----
-
-# 🧠 Flujo principal
-
-```text
-┌──────────────────────────────┐
-│       CREAR UNA COMPRA       │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│ Lugar + Fecha + Presupuesto  │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│      AGREGAR PRODUCTOS       │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│ Cantidad + Precio Unitario   │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│    CONTROL DE PRESUPUESTO    │
-│                              │
-│ Gasto acumulado              │
-│ Saldo disponible             │
-│ % utilizado                  │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│ Guardar temporalmente        │
-│             o                │
-│ Finalizar compra             │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│          HISTORIAL           │
-│                              │
-│ Productos                    │
-│ Ítems                        │
-│ Total pagado                 │
-│ Estadísticas                 │
-└──────────────────────────────┘
-```
-
----
-
-# 🔐 Seguridad
-
-Las credenciales privadas y secretos de servicios externos no deben almacenarse directamente dentro de la aplicación Angular.
-
-Para funcionalidades sensibles como pagos o donaciones mediante PayPal, el repositorio incluye documentación orientada a separar estas operaciones mediante un backend.
-
-Los archivos `.env` que contengan credenciales reales deben permanecer fuera del repositorio mediante `.gitignore`.
-
----
-
-# 🗺️ Mejoras futuras
-
-Algunas mejoras posibles para futuras versiones:
-
-- [ ] Publicación en Google Play.
-- [ ] Generación de releases automatizados.
-- [ ] Copias de seguridad opcionales.
-- [ ] Sincronización entre dispositivos.
-- [ ] Exportación de compras.
-- [ ] Comparación de gastos entre compras.
-- [ ] Gráficos de evolución del gasto.
-- [ ] Categorías de productos.
-- [ ] Búsqueda avanzada en el historial.
+- [ ] Publicación oficial en Google Play.
 - [ ] Nuevas estadísticas.
-- [ ] Mejoras continuas de accesibilidad.
-- [ ] Mayor cobertura de pruebas automatizadas.
+- [ ] Gráficos de gastos.
+- [ ] Categorías de productos.
+- [ ] Comparación entre compras.
+- [ ] Búsqueda avanzada en historial.
+- [ ] Exportación de compras.
+- [ ] Copias de seguridad.
+- [ ] Sincronización opcional entre dispositivos.
+- [ ] Más opciones de accesibilidad.
+- [ ] Nuevos temas visuales.
+- [ ] Optimización continua de la experiencia de usuario.
 
 ---
 
-# 👨‍💻 Sobre el desarrollo
+# 👨‍💻 Sobre el proyecto
 
-CarritoControl es un proyecto personal desarrollado con el objetivo de aplicar conocimientos de desarrollo de software en una aplicación móvil funcional.
+**CarritoControl** es un proyecto personal desarrollado con el objetivo de transformar una necesidad cotidiana en una aplicación móvil funcional.
 
-El proyecto abarca diferentes áreas:
+El proyecto abarca distintas áreas del desarrollo:
 
 ```text
-Frontend con Angular
-        ↓
-Componentes Ionic
-        ↓
-Lógica en TypeScript
-        ↓
+Diseño de interfaz
+       ↓
+Angular + Ionic
+       ↓
+Lógica con TypeScript
+       ↓
 Persistencia local
-        ↓
-Integración con Capacitor
-        ↓
-Configuración nativa Android
-        ↓
-Compilación APK
+       ↓
+Accesibilidad y temas
+       ↓
+Capacitor
+       ↓
+Integración Android
+       ↓
+APK funcional
 ```
 
-Durante el desarrollo se trabajó con:
-
-- Arquitectura modular.
-- Componentes reutilizables.
-- Servicios Angular.
-- Gestión de estado local.
-- Formularios.
-- Cálculos dinámicos.
-- Manejo de eventos.
-- Navegación móvil.
-- Persistencia.
-- Temas personalizados.
-- Accesibilidad.
-- Integración web/nativa.
-- Configuración Android.
-- Generación y prueba de APK.
+El desarrollo continúa evolucionando con nuevas ideas, mejoras y funcionalidades.
 
 ---
 
-# 📌 Repositorio
+# 🔗 Repositorio
 
-🔗 **GitHub**
+**GitHub**
 
 https://github.com/DemWolfXZ/carrito
-
----
-
-# 📄 Estado del proyecto
-
-🚧 **Proyecto en desarrollo y mejora continua.**
-
-La versión disponible puede seguir recibiendo nuevas características, mejoras visuales, correcciones y optimizaciones.
 
 ---
 
@@ -785,10 +794,10 @@ La versión disponible puede seguir recibiendo nuevas características, mejoras 
 
 <br>
 
-[![Descargar APK](https://img.shields.io/badge/Descargar-CarritoControl_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DemWolfXZ/carrito/raw/refs/heads/main/Carrito%20Control.apk)
+[![Descargar CarritoControl](https://img.shields.io/badge/Descargar-CarritoControl_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DemWolfXZ/carrito/raw/refs/heads/main/Carrito%20Control.apk)
 
 <br>
 
-Desarrollado como proyecto personal.
+**Proyecto personal de desarrollo móvil**
 
 </div>
