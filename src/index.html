@@ -11,7 +11,14 @@
   <!-- Esto previene que el navegador auto-oscurezca la app -->
   <!-- incluso si el usuario tiene Dark Mode en el sistema operativo -->
   <meta name="color-scheme" content="light" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <!--
+    viewport-fit=cover: HABILITA las variables env(safe-area-inset-*)
+    Sin esto, el notch/status bar/home indicator NO se pueden detectar
+    desde CSS y siempre valen 0px (por eso el fix del ion-app::before
+    no se notaba: el navegador nunca reportaba el alto real del notch)
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="format-detection" content="telephone=no" />
   <meta name="msapplication-tap-highlight" content="no" />
 

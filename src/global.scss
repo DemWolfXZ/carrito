@@ -123,12 +123,16 @@ html {
 
 html {
   background-color: var(--app-background) !important;
+  height: 100vh;
+  height: 100dvh;
 }
 
 body {
   background-color: var(--app-background) !important;
   color: var(--app-text-primary) !important;
   transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+  min-height: 100dvh;
   padding-top: max(env(safe-area-inset-top), 0px);
   padding-left: max(env(safe-area-inset-left), 0px);
   padding-right: max(env(safe-area-inset-right), 0px);
@@ -153,11 +157,58 @@ p, span, label {
 ion-app {
   background: var(--app-background) !important;
   color: var(--app-text-primary) !important;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/**
+ * ============================================================
+ * BARRA DE ESTADO DEL SISTEMA (NOTCH) - SIEMPRE VISIBLE Y SEPARADA
+ * ============================================================
+ * Con el modo edge-to-edge activado en Android (MainActivity.java),
+ * el WebView dibuja su contenido POR DETRÁS de la barra de estado,
+ * por eso los gradientes de las pantallas (ej: hero-section) se veían
+ * "mezclados" con el reloj/batería/notch.
+ *
+ * Esta capa fija corrige eso: pinta un fondo SÓLIDO y propio, del
+ * mismo color que usan los toolbars de cada tema (--app-toolbar-background,
+ * ya definido para los 6 temas claros/oscuros en paletas.scss), únicamente
+ * en la franja donde vive el notch. Así el notch queda siempre visible,
+ * pero claramente separado del contenido/gradiente de la app.
+ *
+ * IMPORTANTE: para que env(safe-area-inset-top) devuelva un valor real
+ * (y no 0px), el <meta name="viewport"> en src/index.html DEBE incluir
+ * viewport-fit=cover. Si no lo tiene, esta barra tendrá height: 0 y no
+ * se notará ningún cambio.
+ */
+ion-app::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Alto exacto de la zona del notch/status bar del dispositivo */
+  height: env(safe-area-inset-top, 0px);
+  /* Mismo color que el toolbar del tema activo: separación visual clara */
+  background: var(--app-toolbar-background);
+  /* Por encima de absolutamente todo (hero gradients, modales, tabs) */
+  z-index: 99999;
+  /* No debe interceptar toques: es solo una capa visual */
+  pointer-events: none;
+  /* Transición suave al cambiar de tema (igual que el resto de la app) */
+  transition: background-color 0.3s ease;
+}
+
+ion-router-outlet {
+  height: 100%;
 }
 
 ion-content {
   --background: var(--app-background) !important;
   --padding-bottom: var(--app-overlay-bg) !important;
+  --overflow: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 ion-toolbar {

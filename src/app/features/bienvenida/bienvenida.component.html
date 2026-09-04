@@ -7,7 +7,7 @@
   @version 2.0 - Grid selector implementado
 -->
 
-<ion-content [fullscreen]="true" class="bienvenida-content">
+<ion-content [fullscreen]="false" [scrollY]="true" class="bienvenida-content">
 
   <!-- SPLASH SCREEN ANIMADO -->
   <div
@@ -50,7 +50,7 @@
     </div>
 
     <!-- Área de contenido principal con scroll -->
-    <div class="content-scroll-area">
+    <div class="content-scroll-area" [class.step3-content]="pasoActual === 3">
 
       <!-- PASO 2: Explicación de la App -->
       <div *ngIf="pasoActual === 2" class="step-container fade-in">
@@ -149,7 +149,7 @@
       </div>
 
       <!-- PASO 3: Selección de País con GRID RESPONSIVO -->
-      <div *ngIf="pasoActual === 3" class="step-container fade-in">
+      <div *ngIf="pasoActual === 3" class="step-container step3-step fade-in">
 
         <!-- Contenedor principal del paso 3 con layout flex optimizado -->
         <div class="step3-layout">

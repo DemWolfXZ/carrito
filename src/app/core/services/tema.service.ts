@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AlmacenamientoService } from './almacenamiento.service';
 import { TemaVisual } from '../models/usuario.model';
+// Capacitor: para detectar si estamos en app nativa (Android/iOS) o en navegador
+import { Capacitor } from '@capacitor/core';
+// Plugin oficial para controlar el color de los íconos del notch/status bar
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 @Injectable({ providedIn: 'root' })
 export class TemaService {
@@ -12,6 +16,29 @@ export class TemaService {
   private readonly TEMA_DALTONICO = 'daltonism-safe';
 
   private readonly TEMAS_DISPONIBLES = ['claro', 'oscuro', 'azul', 'azul-elegante', 'azul-oscuro', 'morado', 'morado-oscuro', 'rosado', 'rosado-oscuro', 'verde', 'verde-oscuro', 'high-contrast', 'daltonism-safe'];
+
+  /**
+   * ============================================================
+   * TEMAS CON FONDO DE TOOLBAR OSCURO (necesitan íconos CLAROS)
+   * ============================================================
+   * Lista construida a partir de los valores reales de
+   * --app-toolbar-background / --ion-toolbar-background definidos
+   * en paletas.scss y variables.scss. Cualquier tema que NO esté
+   * en esta lista se asume con fondo claro (íconos oscuros).
+   *
+   * IMPORTANTE: si agregas un tema nuevo, revisa el color de su
+   * toolbar y actualiza esta lista si el fondo es oscuro.
+   */
+  private readonly TEMAS_ICONOS_CLAROS = [
+    'oscuro',          // #1a1a1a
+    'azul-elegante',   // #1f2633
+    'azul-oscuro',     // #162738
+    'morado-oscuro',   // #271d38
+    'rosado-oscuro',   // #36202e
+    'verde-oscuro',    // #162c27
+    'high-contrast',   // #000000
+    'daltonism-safe'   // #0072B2
+  ];
 
   private temaActualSubject = new BehaviorSubject<string>(this.TEMA_CLARO);
   private modoTemaSubject = new BehaviorSubject<string>(this.TEMA_AUTOMATICO);
@@ -131,11 +158,82 @@ export class TemaService {
       this.temaEfectivoSubject.next(tema);
       console.log('🎨 TemaService: Tema aplicado:', tema);
 
+      // Sincroniza el color de los íconos nativos del notch (reloj/batería/señal)
+      // con el fondo del toolbar del tema recién aplicado. Es "fire and forget":
+      // no se espera (await) porque aplicarTema() es síncrono y esto es solo
+      // un ajuste visual del SO, no debe bloquear el cambio de tema en pantalla.
+      this.actualizarIconosStatusBar(tema);
+
       window.dispatchEvent(new CustomEvent('tema-cambio', {
         detail: { tema, modo: this.modoTemaSubject.value }
       }));
     } catch (error) {
       console.error('❌ TemaService: Error al aplicar tema:', error);
+    }
+  }
+
+  /**
+   * ============================================================
+   * SINCRONIZAR ÍCONOS DEL NOTCH CON EL TEMA ACTIVO
+   * ============================================================
+   * El fondo de la franja del notch lo pinta global.scss
+   * (ion-app::before, con --app-toolbar-background). El COLOR de
+   * los íconos nativos (hora, batería, señal) lo controla el
+   * sistema operativo, no el CSS. Esta función decide si Android/iOS
+   * debe mostrar íconos claros u oscuros, según el tema recién
+   * aplicado, usando el plugin @capacitor/status-bar.
+   *
+   * @param tema Identificador del tema recién aplicado (ej: 'oscuro')
+   */
+  private async actualizarIconosStatusBar(tema: string): Promise<void> {
+    // Si no estamos en una app nativa (ej: navegador con "ionic serve"),
+    // el plugin no tiene nada que hacer: salimos sin error.
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+
+    // Si el tema está en la lista de fondos oscuros, pedimos íconos
+    // CLAROS (Style.Dark = "texto claro, para fondos oscuros").
+    // Si no, pedimos íconos OSCUROS (Style.Light = "texto oscuro,
+    // para fondos claros"). Los nombres del enum son así de
+    // Capacitor: describen el color del ÍCONO, no el del fondo.
+    const necesitaIconosClaros = this.TEMAS_ICONOS_CLAROS.includes(tema);
+    const estiloDeseado = necesitaIconosClaros ? Style.Dark : Style.Light;
+
+    // Primer intento: aplicamos el estilo de inmediato
+    await this.aplicarEstiloStatusBar(estiloDeseado, tema);
+
+    /*
+     * WORKAROUND para un bug de timing conocido en Android/Capacitor:
+     * justo al abrir la app en frío, la ventana todavía se está
+     * "asentando" (transición del splash screen, insets del sistema
+     * terminando de aplicarse). En ese instante, el sistema a veces
+     * IGNORA la primera llamada a setStyle(), aunque se haya hecho
+     * correctamente. Por eso reforzamos con una segunda llamada 300ms
+     * después, cuando la ventana ya está completamente estable.
+     * Repetirla es inofensivo: si el primer intento ya funcionó, esta
+     * segunda llamada no cambia nada visualmente en pantalla.
+     */
+    setTimeout(() => {
+      this.aplicarEstiloStatusBar(estiloDeseado, tema);
+    }, 300);
+  }
+
+  /**
+   * Ejecuta la llamada real al plugin StatusBar, con manejo de errores
+   * aislado para que un fallo aquí nunca rompa el resto de la app.
+   *
+   * @param estilo Style.Dark (íconos claros) o Style.Light (íconos oscuros)
+   * @param tema Identificador del tema, solo para el log
+   */
+  private async aplicarEstiloStatusBar(estilo: Style, tema: string): Promise<void> {
+    try {
+      await StatusBar.setStyle({ style: estilo });
+      console.log(`🎨 TemaService: Íconos del notch (${estilo}) aplicados para el tema "${tema}"`);
+    } catch (error) {
+      // No detenemos la app si esto falla (ej: plugin no disponible en
+      // esa plataforma específica); solo lo dejamos registrado.
+      console.error('❌ TemaService: Error al actualizar íconos del status bar:', error);
     }
   }
 

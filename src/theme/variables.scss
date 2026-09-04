@@ -277,6 +277,8 @@ body.high-contrast {
   --ion-toolbar-background: #000000;
   --ion-toolbar-border-color: #000000;
   --ion-toolbar-color: #ffff00;
+  // Variable usada por la franja del notch en global.scss (ion-app::before)
+  --app-toolbar-background: #000000 !important;
 
   // Tab bar
   --ion-tab-bar-background: #000000;
@@ -459,6 +461,8 @@ body.daltonism-safe {
   --ion-toolbar-background: #0072B2;
   --ion-toolbar-border-color: #E69F00;
   --ion-toolbar-color: #ffffff;
+  // Variable usada por la franja del notch en global.scss (ion-app::before)
+  --app-toolbar-background: #0072B2 !important;
 
   // Tab bar
   --ion-tab-bar-background: #FFFFFF;

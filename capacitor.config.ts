@@ -6,7 +6,13 @@ const config: CapacitorConfig = {
   webDir: 'www',
   plugins: {
     StatusBar: {
-      overlaysWebView: false,
+      // true: el WebView dibuja edge-to-edge, por detrás del status bar.
+      // Debe coincidir con MainActivity.java (setDecorFitsSystemWindows(false));
+      // dejarlo en false aquí contradecía lo que el código nativo ya hace.
+      overlaysWebView: true,
+      // Color inicial de los íconos (reloj/batería/señal) ANTES de que
+      // Angular cargue y TemaService.actualizarIconosStatusBar() lo
+      // ajuste al tema real guardado por el usuario.
       style: 'DARK'
     },
     SplashScreen: {

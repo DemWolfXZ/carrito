@@ -28,9 +28,6 @@
   --step3-padding-vertical: 16px;
 
   // Variables específicas para scroll táctil
-  --scroll-area-max-height: 300px; // Altura máxima del área de scroll
-  --scrollbar-width: 4px;
-  --scrollbar-thumb-color: var(--ion-color-step-400);
 }
 
 // Contenedor principal de la página
@@ -40,7 +37,7 @@
 
   // Asegurar altura completa
   height: 100vh;
-  overflow: hidden;
+  height: 100dvh;
 }
 
 // ============================
@@ -200,14 +197,15 @@
 .main-content {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - env(safe-area-inset-bottom));
+  height: 100%;
+  min-height: 0;
   width: 100%;
-  overflow: hidden; // No scrollear el contenedor principal
+  overflow: hidden;
   animation: contentFadeIn 0.8s ease-out;
 
   @media (max-height: 600px) {
-    height: auto;
-    min-height: calc(100vh - env(safe-area-inset-bottom));
+    height: 100%;
+    min-height: 0;
   }
 }
 
@@ -277,15 +275,18 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-  touch-action: auto;
-  min-height: 0; // Permitir que el contenido se reduzca si es necesario
+  touch-action: pan-y;
+  min-height: 0;
   padding-bottom: 20px; // Espacio adicional al final del contenido
   background: var(--app-background);
 
   @media (prefers-color-scheme: dark) {
     background: var(--ion-color-step-100);
   }
+}
+
+.content-scroll-area.step3-content {
+  overflow: hidden;
 }
 
 // Contenedor principal centrado
@@ -310,6 +311,13 @@
   }
 }
 
+.step3-step {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -329,11 +337,11 @@
 .step3-layout {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 1 1 auto;
   width: 100%;
   height: 100%;
   padding: 0;
-  overflow: hidden; // No scrollear el layout principal, solo el grid
+  overflow: hidden;
   position: relative;
   gap: 0;
 
@@ -383,21 +391,16 @@
 
 // Sección del selector grid - OCUPA ESPACIO DISPONIBLE CON SCROLL
 .country-selector-section {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-height: 0; // Importante para flex con scroll
+  min-height: 0;
   padding: 12px var(--bienvenida-padding);
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ion-color-step-300) var(--ion-color-step-100);
+  overflow: hidden;
   background-color: var(--app-background);
   z-index: 0;
   position: relative;
-  touch-action: auto; // Permitir scroll táctil
+  touch-action: pan-y; // Permitir desplazamiento vertical táctil
 
 }
 
@@ -660,62 +663,20 @@
 
 // Contenedor principal del selector con scroll táctil optimizado
 .countries-grid-container {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
-  overflow-x: hidden; // Solo scroll vertical
+  overflow-x: hidden;
   padding: 8px 0;
   position: relative;
   z-index: 99;
-  touch-action: auto; // Permitir scroll táctil
+  touch-action: pan-y; // Permitir desplazamiento vertical táctil
 
-  // CRÍTICO: Configuración de scroll táctil para móviles
-  -webkit-overflow-scrolling: touch; // Safari iOS - scroll suave
-  scroll-behavior: smooth; // Scroll suave en navegadores modernos
-  overscroll-behavior-y: contain; // Prevenir scroll bounce vertical
-  overscroll-behavior-x: none; // Sin scroll horizontal
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
-  // Momentum scrolling para mejor experiencia táctil
-  scrollbar-gutter: stable; // Espacio estable para scrollbar
-
-  // Estilos del scrollbar para dispositivos que lo soportan
   &::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--ion-color-step-100);
-    border-radius: calc(var(--scrollbar-width) / 2);
-    margin: 4px 0; // Márgenes arriba y abajo
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb-color);
-    border-radius: calc(var(--scrollbar-width) / 2);
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background: var(--ion-color-step-500);
-    }
-
-    &:active {
-      background: var(--ion-color-step-600);
-    }
-  }
-
-  // Indicador de scroll en modo oscuro
-  @media (prefers-color-scheme: dark) {
-    &::-webkit-scrollbar-track {
-      background: var(--ion-color-step-200);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--ion-color-step-600);
-
-      &:hover {
-        background: var(--ion-color-step-700);
-      }
-    }
+    display: none;
   }
 }
 
@@ -1491,6 +1452,18 @@
   }
 }
 
+// Reservar las zonas del sistema en teléfonos móviles
+@media (max-width: 767px) {
+  .main-content {
+    padding-top: max(env(safe-area-inset-top), 28px);
+    box-sizing: border-box;
+  }
+
+  .navigation-container {
+    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+  }
+}
+
 // ============================
 // RESPONSIVE DESIGN OPTIMIZADO PARA SCROLL TÁCTIL
 // ============================
@@ -1502,7 +1475,6 @@
     --grid-gap: 8px;
     --card-min-height: 100px;
     --step3-padding-vertical: 12px;
-    --scroll-area-max-height: 250px; // Altura reducida para móviles pequeños
   }
 
   .title-section-compact {
@@ -1520,16 +1492,6 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     padding: 2px; // Menos padding para móviles pequeños
-  }
-
-  .countries-grid-container {
-    // Altura máxima específica para móviles pequeños
-    max-height: var(--scroll-area-max-height);
-
-    // Scrollbar más delgado en móviles pequeños
-    &::-webkit-scrollbar {
-      width: 3px;
-    }
   }
 
   .country-card {
@@ -1624,16 +1586,11 @@
   :root {
     --grid-gap: 10px;
     --card-min-height: 110px;
-    --scroll-area-max-height: 280px;
   }
 
   .countries-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-  }
-
-  .countries-grid-container {
-    max-height: var(--scroll-area-max-height);
   }
 
   .country-card {
@@ -1685,16 +1642,11 @@
   :root {
     --grid-gap: 12px;
     --card-min-height: 120px;
-    --scroll-area-max-height: 320px;
   }
 
   .countries-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-  }
-
-  .countries-grid-container {
-    max-height: var(--scroll-area-max-height);
   }
 
   .country-card {
@@ -1727,21 +1679,11 @@
     --grid-gap: 14px;
     --card-min-height: 140px;
     --step3-padding-vertical: 20px;
-    --scroll-area-max-height: 400px;
   }
 
   .countries-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
-  }
-
-  .countries-grid-container {
-    max-height: var(--scroll-area-max-height);
-
-    // Scrollbar un poco más grande para tablets
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
   }
 
   .country-card {
@@ -1820,21 +1762,11 @@
     --grid-gap: 16px;
     --card-min-height: 160px;
     --step3-padding-vertical: 24px;
-    --scroll-area-max-height: 450px;
   }
 
   .countries-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-  }
-
-  .countries-grid-container {
-    max-height: var(--scroll-area-max-height);
-
-    // Scrollbar más visible para tablets grandes
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
   }
 
   .country-card {
@@ -1915,15 +1847,6 @@
     --step3-padding-vertical: 8px;
     --grid-gap: 8px;
     --card-min-height: 80px;
-    --scroll-area-max-height: 180px; // Muy reducido para paisaje
-  }
-
-  .step3-layout {
-    height: calc(100vh - 120px);
-  }
-
-  .content-scroll-area {
-    height: calc(100vh - 120px);
   }
 
   .title-section-compact {
@@ -1943,15 +1866,6 @@
   .countries-grid {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 8px;
-  }
-
-  .countries-grid-container {
-    max-height: var(--scroll-area-max-height);
-
-    // Scrollbar muy delgado en paisaje
-    &::-webkit-scrollbar {
-      width: 2px;
-    }
   }
 
   .country-card {
@@ -2075,35 +1989,6 @@
     scroll-margin-top: 8px;
   }
 
-  // Scrollbar oculto en dispositivos táctiles pero funcional
-  .countries-grid-container::-webkit-scrollbar {
-    width: 2px;
-    background: transparent;
-  }
-
-  .countries-grid-container::-webkit-scrollbar-thumb {
-    background: rgba(var(--ion-color-step-400-rgb), 0.3);
-    border-radius: 1px;
-  }
-}
-
-// Optimización para dispositivos con mouse
-@media (hover: hover) and (pointer: fine) {
-  .countries-grid-container {
-    // Scrollbar más visible en desktop
-    &::-webkit-scrollbar {
-      width: var(--scrollbar-width);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      opacity: 0.7;
-      transition: opacity 0.3s ease;
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
 }
 
 // ============================
@@ -2192,14 +2077,6 @@
     border-bottom-width: 3px;
   }
 
-  // Scrollbar más visible en alto contraste
-  .countries-grid-container::-webkit-scrollbar-thumb {
-    background: var(--ion-color-dark);
-
-    @media (prefers-color-scheme: dark) {
-      background: var(--ion-color-light);
-    }
-  }
 }
 
 // Modo oscuro específico para el grid selector con scroll
@@ -2218,20 +2095,6 @@
     }
   }
 
-  // Scrollbar en modo oscuro
-  .countries-grid-container {
-    &::-webkit-scrollbar-track {
-      background: var(--ion-color-step-200);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--ion-color-step-600);
-
-      &:hover {
-        background: var(--ion-color-step-700);
-      }
-    }
-  }
 }
 
 // ============================

@@ -7,6 +7,7 @@ export interface OpcionDonacion {
   label: string;
   emoji: string;
   url: string;
+  equivalenteUsd: string;
 }
 
 export interface ResultadoPago {
@@ -20,24 +21,11 @@ export interface ResultadoPago {
   providedIn: 'root'
 })
 export class DonacionesService {
-  private readonly tasasAproximadasPorClp: Record<string, number> = {
-    ARS: 1.05, BOB: 0.0073, CLP: 1, COP: 4.2, CRC: 0.52,
-    CUP: 0.026, DOP: 0.063, EUR: 0.00095, GTQ: 0.0081,
-    HNL: 0.026, MXN: 0.019, NIO: 0.039, PAB: 0.00105,
-    PEN: 0.0039, PYG: 7.6, USD: 0.00105, UYU: 0.041, VES: 0.039
-  };
-
-  private readonly simbolosMoneda: Record<string, string> = {
-    ARS: '$', BOB: 'Bs', CLP: '$', COP: '$', CRC: '₡', CUP: '$',
-    DOP: 'RD$', EUR: '€', GTQ: 'Q', HNL: 'L', MXN: '$', NIO: 'C$',
-    PAB: 'B/.', PEN: 'S/', PYG: '₲', USD: 'US$', UYU: '$U', VES: 'Bs.'
-  };
-
   private opcionesDonacion: OpcionDonacion[] = [
-    { monto: 500, label: '$500 CLP', emoji: '💙', url: 'https://mpago.la/22f79fF' },
-    { monto: 1000, label: '$1.000 CLP', emoji: '💙', url: 'https://mpago.la/1PLbJoW' },
-    { monto: 1500, label: '$1.500 CLP', emoji: '💙', url: 'https://mpago.la/1Pa5nhg' },
-    { monto: 2000, label: '$2.000 CLP', emoji: '💙', url: 'https://mpago.la/2p5AzTZ' },
+    { monto: 500, label: 'Donación $500', emoji: '💙', url: 'https://mpago.la/22f79fF', equivalenteUsd: 'aprox. US$0,50' },
+    { monto: 1000, label: 'Donación $1.000', emoji: '💙', url: 'https://mpago.la/1PLbJoW', equivalenteUsd: 'aprox. US$1' },
+    { monto: 1500, label: 'Donación $1.500', emoji: '💙', url: 'https://mpago.la/1Pa5nhg', equivalenteUsd: 'aprox. US$1,50' },
+    { monto: 2000, label: 'Donación $2.000', emoji: '💙', url: 'https://mpago.la/2p5AzTZ', equivalenteUsd: 'aprox. US$2' },
   ];
 
   private showDonacionesModal$ = new BehaviorSubject<boolean>(false);
@@ -49,14 +37,6 @@ export class DonacionesService {
 
   getOpcionesDonacion(): OpcionDonacion[] {
     return this.opcionesDonacion;
-  }
-
-  convertirDesdeClp(monto: number, moneda: string): number {
-    return monto * (this.tasasAproximadasPorClp[moneda] || this.tasasAproximadasPorClp['USD']);
-  }
-
-  obtenerInformacionMoneda(moneda: string): { simbolo: string } {
-    return { simbolo: this.simbolosMoneda[moneda] || moneda };
   }
 
   getShowDonacionesModal(): Observable<boolean> {
@@ -89,22 +69,11 @@ export class DonacionesService {
     this.montoSeleccionado$.next(null);
   }
 
-  async abrirEnlaceDonacion(opcion: OpcionDonacion): Promise<boolean> {
-    try {
-      const url = new URL(opcion.url);
-      if (url.protocol !== 'https:' || url.hostname !== 'mpago.la') {
-        throw new Error('Enlace de donación no permitido');
-      }
-
-      await Browser.open({ url: url.toString() });
-      return true;
-    } catch (error) {
-      console.error('❌ No se pudo abrir Mercado Pago:', error);
-      this.resultadoPago$.next({ exito: false, error: 'No se pudo abrir Mercado Pago' });
-      return false;
-    }
+  async abrirDonacion(opcion: OpcionDonacion): Promise<void> {
+    console.log('💙 Abriendo Mercado Pago para:', opcion.label);
+    this.montoSeleccionado$.next(opcion.monto);
+    await Browser.open({ url: opcion.url });
   }
-
 }
 
 

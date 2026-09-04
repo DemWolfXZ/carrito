@@ -2,7 +2,7 @@
   <ion-toolbar color="primary">
     <ion-title>Apoya el desarrollo</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrarModal()" [disabled]="procesando">
+      <ion-button (click)="cerrarModal()">
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -15,12 +15,13 @@
     <!-- Mensaje principal -->
     <div class="mensaje-donacion">
       <ion-icon name="heart" color="danger" class="icon-grande"></ion-icon>
-      <p class="texto-mensaje">Si quieres apoyar el desarrollo, puedes hacer una donación voluntaria.</p>
+      <p class="texto-mensaje">Apoya el desarrollo de Carrito Control con una donación voluntaria.</p>
     </div>
 
     <!-- Opciones de donación -->
     <div class="opciones-donacion">
       <h3>Elige tu donación</h3>
+      <p class="referencia-donacion">Valores orientativos en dólares. La cotización puede variar.</p>
 
       <div class="grid-opciones">
         <button
@@ -31,8 +32,10 @@
           ion-button
           expand="block">
           <div class="emoji">{{ opcion.emoji }}</div>
-          <div class="label">Carrito Control<br>{{ opcion.label }}</div>
-          <div class="conversion">{{ obtenerConversion(opcion) }}</div>
+          <div class="label">
+            <strong>{{ opcion.label }}</strong>
+            <small>{{ opcion.equivalenteUsd }}</small>
+          </div>
         </button>
       </div>
     </div>
@@ -41,15 +44,9 @@
     <div class="info-donacion">
       <ion-icon name="shield-checkmark" color="success"></ion-icon>
       <p>
-        <strong>100% seguro.</strong> Tus datos de pago son procesados de forma segura.
-        Esta app no guarda información de pago.
+        <strong>Transacción segura con Mercado Pago.</strong> El pago se realiza en la plataforma oficial y esta app no guarda información de pago.
       </p>
     </div>
-
-    <p class="aviso-conversion">
-      Conversión aproximada desde pesos chilenos. El valor final puede variar según el tipo de cambio local,
-      el banco y las condiciones de Mercado Pago.
-    </p>
 
     <!-- Botón cerrar -->
     <ion-button
@@ -61,5 +58,4 @@
       No, gracias
     </ion-button>
   </ng-container>
-
 </ion-content>

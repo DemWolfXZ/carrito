@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { DonacionesService, OpcionDonacion, ResultadoPago } from '../../../core/services/donaciones.service';
-import { UsuarioService } from '../../../core/services/usuario.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -10,33 +9,34 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./donaciones-modal.component.scss']
 })
 export class DonacionesModalComponent implements OnInit, OnDestroy {
-
   opcionesDonacion: OpcionDonacion[] = [];
   procesando: boolean = false;
   montoSeleccionado: number | null = null;
   resultadoPago: ResultadoPago | null = null;
-  monedaLocal = 'CLP';
-  simboloMonedaLocal = '$';
 
   private subscriptions: Subscription[] = [];
 
   constructor(
     private modalController: ModalController,
     private donacionesService: DonacionesService,
-    private usuarioService: UsuarioService,
     private toastController: ToastController
   ) {}
 
   ngOnInit(): void {
     console.log('✅ DonacionesModalComponent - ngOnInit');
     this.opcionesDonacion = this.donacionesService.getOpcionesDonacion();
-    void this.cargarMonedaLocal();
     console.log('💰 Opciones de donación cargadas:', this.opcionesDonacion);
 
     // Suscribirse a cambios de estado
     this.subscriptions.push(
       this.donacionesService.getLoadingPago().subscribe(loading => {
         this.procesando = loading;
+      })
+    );
+
+    this.subscriptions.push(
+      this.donacionesService.getMontoSeleccionado().subscribe(monto => {
+        this.montoSeleccionado = monto;
       })
     );
 
@@ -54,38 +54,11 @@ export class DonacionesModalComponent implements OnInit, OnDestroy {
     );
   }
 
-  private async cargarMonedaLocal(): Promise<void> {
-    const usuario = await this.usuarioService.obtenerUsuarioActual();
-    if (usuario) {
-      this.monedaLocal = usuario.moneda || 'CLP';
-      const informacion = this.donacionesService.obtenerInformacionMoneda(this.monedaLocal);
-      this.simboloMonedaLocal = informacion.simbolo;
-    }
-  }
-
-  obtenerConversion(opcion: OpcionDonacion): string {
-    const usd = opcion.monto / 950;
-    const local = this.donacionesService.convertirDesdeClp(opcion.monto, this.monedaLocal);
-    const valorLocal = new Intl.NumberFormat('es-CL', {
-      maximumFractionDigits: this.monedaLocal === 'CLP' ? 0 : 2
-    }).format(local);
-
-    if (this.monedaLocal === 'CLP') {
-      return `Aprox. US$${usd.toFixed(2)}`;
-    }
-    return `Aprox. US$${usd.toFixed(2)} · ${this.simboloMonedaLocal}${valorLocal}`;
-  }
-
   /**
    * Usuario selecciona un monto de donación
    */
   async seleccionarMonto(opcion: OpcionDonacion): Promise<void> {
-    this.procesando = true;
-    const abierto = await this.donacionesService.abrirEnlaceDonacion(opcion);
-    this.procesando = false;
-    if (abierto) {
-      await this.mostrarToast('Mercado Pago se abrió para completar la donación.', 'success');
-    }
+    await this.donacionesService.abrirDonacion(opcion);
   }
 
   /**
